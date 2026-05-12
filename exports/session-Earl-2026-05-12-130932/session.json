@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "contributor": "Earl",
+    "date": "2026-05-12",
+    "mode": "map"
+  },
+  "nodes": {
+    "91ab7f42": {
+      "url": "https://hub.docker.com",
+      "title": "ai",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": null,
+      "screenshotDataUrl": null
+    },
+    "313ad55f": {
+      "url": "https://hub.docker.com/u/ai",
+      "title": "Docker Hub Container Image Library | App Containerization",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "aa885e46"
+    },
+    "aa885e46": {
+      "url": "https://hub.docker.com/u",
+      "title": "U (hub.docker.com)",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": "91ab7f42"
+    },
+    "ad239ba8": {
+      "url": "https://www.docker.com",
+      "title": "Docker: Accelerated Container Application Development",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": null
+    }
+  },
+  "edges": [
+    {
+      "from": "91ab7f42",
+      "to": "313ad55f",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "aa885e46",
+      "to": "313ad55f",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "91ab7f42",
+      "to": "aa885e46",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "aa885e46",
+      "to": "91ab7f42",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "aa885e46",
+      "to": "ad239ba8",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "cross-domain"
+    }
+  ],
+  "workflows": []
+}

@@ -1,17 +1,18 @@
 {
   "manifest_version": 3,
   "name": "IA Mapper",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Build, annotate, and share a living Information Architecture map of the Docker web platform.",
   "permissions": [
     "activeTab",
     "storage",
     "webNavigation",
     "tabs",
-    "sidePanel"
+    "sidePanel",
+    "offscreen"
   ],
   "host_permissions": [
-    "*://*.docker.com/*"
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background.js"

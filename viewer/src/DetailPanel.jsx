@@ -32,6 +32,31 @@ export default function DetailPanel({ node, session, onClose }) {
         {data.url}
       </a>
 
+      {/* Screenshot */}
+      {data.screenshotDataUrl && (
+        <div className="detail-section">
+          <div className="detail-section-label">Screenshot</div>
+          <img
+            src={data.screenshotDataUrl}
+            alt={`Screenshot of ${data.title}`}
+            style={{
+              width: '100%',
+              borderRadius: 6,
+              border: '1px solid var(--border)',
+              cursor: 'pointer',
+            }}
+            onClick={() => {
+              // Open full screenshot in new tab
+              const w = window.open();
+              if (w) {
+                w.document.write(`<img src="${data.screenshotDataUrl}" style="max-width:100%">`);
+                w.document.title = data.title;
+              }
+            }}
+          />
+        </div>
+      )}
+
       {/* Type badges */}
       <div style={{ display: 'flex', gap: 6 }}>
         {data.isModal && (

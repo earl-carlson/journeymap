@@ -1,0 +1,223 @@
+{
+  "meta": {
+    "contributor": "Earl",
+    "date": "2026-05-12",
+    "mode": "map"
+  },
+  "nodes": {
+    "ad239ba8": {
+      "url": "https://www.docker.com",
+      "title": "Docker: Accelerated Container Application Development",
+      "screenshot": "screenshots/ad239ba8.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": null
+    },
+    "dc34ba86": {
+      "url": "https://www.docker.com/products/docker-sandboxes",
+      "title": "Docker Sandboxes | Sandboxes for Coding Agents | Docker",
+      "screenshot": "screenshots/dc34ba86.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "42a6354b"
+    },
+    "42a6354b": {
+      "url": "https://www.docker.com/products",
+      "title": "Products (www.docker.com)",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": "ad239ba8"
+    },
+    "51f9c63b": {
+      "url": "https://www.docker.com/get-started",
+      "title": "Get Started | Docker",
+      "screenshot": "screenshots/51f9c63b.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "ad239ba8"
+    },
+    "ea215c12": {
+      "url": "https://www.docker.com/products/cli",
+      "title": "Command Line Tools for Container Management | Docker CLI",
+      "screenshot": "screenshots/ea215c12.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "42a6354b"
+    },
+    "6c8f51aa": {
+      "url": "https://www.docker.com/products/extensions",
+      "title": "Extensions | Docker",
+      "screenshot": "screenshots/6c8f51aa.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "42a6354b"
+    },
+    "26aaee76": {
+      "url": "https://www.docker.com/newsletter-subscription",
+      "title": "Docker Newsletter | Docker",
+      "screenshot": "screenshots/26aaee76.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "ad239ba8"
+    },
+    "03f1acdc": {
+      "url": "https://www.docker.com/legal/trademark-guidelines",
+      "title": "Trademark Guidelines | Docker",
+      "screenshot": "screenshots/03f1acdc.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "37e1aafc"
+    },
+    "37e1aafc": {
+      "url": "https://www.docker.com/legal",
+      "title": "Legal (www.docker.com)",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": "ad239ba8"
+    },
+    "6365711c": {
+      "url": "https://www.docker.com/community",
+      "title": "Community | Docker",
+      "screenshot": "screenshots/6365711c.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "ad239ba8"
+    },
+    "d173546c": {
+      "url": "https://docs.docker.com",
+      "title": "Docker Docs",
+      "screenshot": null,
+      "notes": [],
+      "flags": [
+        "confusing"
+      ],
+      "stub": false,
+      "inferredParent": null
+    }
+  },
+  "edges": [
+    {
+      "from": "ad239ba8",
+      "to": "dc34ba86",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "42a6354b",
+      "to": "dc34ba86",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "ad239ba8",
+      "to": "42a6354b",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "dc34ba86",
+      "to": "51f9c63b",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "ad239ba8",
+      "to": "51f9c63b",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "51f9c63b",
+      "to": "ea215c12",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "42a6354b",
+      "to": "ea215c12",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "ea215c12",
+      "to": "6c8f51aa",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-sibling"
+    },
+    {
+      "from": "42a6354b",
+      "to": "6c8f51aa",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "6c8f51aa",
+      "to": "26aaee76",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "ad239ba8",
+      "to": "26aaee76",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "26aaee76",
+      "to": "03f1acdc",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "37e1aafc",
+      "to": "03f1acdc",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "ad239ba8",
+      "to": "37e1aafc",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "03f1acdc",
+      "to": "6365711c",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "ad239ba8",
+      "to": "6365711c",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "6365711c",
+      "to": "d173546c",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "cross-domain"
+    }
+  ],
+  "workflows": []
+}

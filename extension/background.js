@@ -303,7 +303,7 @@ function updateBadge() {
  * 2. Record the raw navigate edge from previous node
  * 3. Build the ancestor chain (stub nodes + child-of edges)
  */
-function recordNavigation(url, title) {
+function recordNavigation(url, title, tabId) {
   if (!session) return;
   if (!isDockerUrl(url)) return;
 
@@ -351,6 +351,17 @@ function recordNavigation(url, title) {
 
   persistSession();
   updateBadge();
+
+  // Schedule screenshot capture
+  if (tabId) {
+    scheduleScreenshot(id, tabId);
+  } else {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      if (tabs[0]) {
+        scheduleScreenshot(id, tabs[0].id);
+      }
+    });
+  }
 }
 
 /**
@@ -418,6 +429,13 @@ function recordModalOpen(pageUrl, contentHash, title) {
   activeModalNodeId = modalId;
   persistSession();
   updateBadge();
+
+  // Schedule screenshot for the modal
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs[0]) {
+      scheduleScreenshot(modalId, tabs[0].id);
+    }
+  });
 }
 
 /**
@@ -482,6 +500,93 @@ function recordModalDismiss(pageUrl, contentHash) {
 }
 
 // ---------------------------------------------------------------------------
+// Screenshot capture
+// ---------------------------------------------------------------------------
+
+// Track which nodes already have screenshots
+const capturedScreenshots = new Set();
+// Debounce: only one pending capture per tab
+const pendingCaptures = new Map(); // tabId → timeoutId
+
+/**
+ * Schedule a screenshot capture for a node.
+ *
+ * Strategy: debounce per tab. Each new navigation on the same tab cancels
+ * the previous pending capture and starts a new 1.5s timer. When the timer
+ * fires, we capture whatever is currently visible and tag it to the current
+ * node. This naturally handles fast SPA navigation — only the page the user
+ * actually pauses on gets captured.
+ */
+function scheduleScreenshot(nodeId, tabId) {
+  if (!session) return;
+  if (capturedScreenshots.has(nodeId)) return;
+
+  // Cancel any pending capture for this tab
+  if (pendingCaptures.has(tabId)) {
+    clearTimeout(pendingCaptures.get(tabId));
+  }
+
+  const timeoutId = setTimeout(async () => {
+    pendingCaptures.delete(tabId);
+
+    try {
+      // Get fresh tab state
+      const tab = await chrome.tabs.get(tabId).catch(() => null);
+      if (!tab) return;
+      if (!isDockerUrl(tab.url)) return;
+
+      // Figure out which node this tab is currently showing
+      const currentUrl = canonicalUrl(tab.url);
+      const currentId = urlHash(currentUrl);
+
+      // Skip if already captured
+      if (capturedScreenshots.has(currentId)) return;
+      if (!session || !session.nodes[currentId]) return;
+
+      console.log('[screenshot] Capturing:', currentId, 'tab:', tabId);
+
+      const dataUrl = await chrome.tabs.captureVisibleTab(tab.windowId, {
+        format: 'png',
+      });
+
+      if (!dataUrl) {
+        console.warn('[screenshot] captureVisibleTab returned empty');
+        return;
+      }
+
+      // Store against the node the tab is actually showing
+      const screenshotKey = `screenshot_${currentId}`;
+      await chrome.storage.local.set({ [screenshotKey]: dataUrl });
+
+      session.nodes[currentId].screenshot = `screenshots/${currentId}.png`;
+      session.nodes[currentId].screenshotDataUrl = dataUrl;
+      capturedScreenshots.add(currentId);
+      persistSession();
+      console.log('[screenshot] Stored:', currentId);
+    } catch (err) {
+      console.warn('[screenshot] Failed:', err.message || err);
+    }
+  }, 1500);
+
+  pendingCaptures.set(tabId, timeoutId);
+}
+
+/**
+ * Send a message to a tab's content script and await the response.
+ */
+function sendToTab(tabId, message) {
+  return new Promise((resolve) => {
+    chrome.tabs.sendMessage(tabId, message, (response) => {
+      if (chrome.runtime.lastError) {
+        resolve(null);
+      } else {
+        resolve(response);
+      }
+    });
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Navigation listeners
 // ---------------------------------------------------------------------------
 
@@ -494,7 +599,7 @@ chrome.webNavigation.onCompleted.addListener(
 
     chrome.tabs.get(details.tabId, (tab) => {
       if (chrome.runtime.lastError) return;
-      recordNavigation(details.url, tab.title);
+      recordNavigation(details.url, tab.title, details.tabId);
     });
   },
   { url: [{ hostSuffix: '.docker.com' }, { hostEquals: 'docker.com' }] }
@@ -509,7 +614,7 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(
 
     chrome.tabs.get(details.tabId, (tab) => {
       if (chrome.runtime.lastError) return;
-      recordNavigation(details.url, tab.title);
+      recordNavigation(details.url, tab.title, details.tabId);
     });
   },
   { url: [{ hostSuffix: '.docker.com' }, { hostEquals: 'docker.com' }] }
@@ -550,7 +655,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   switch (message.type) {
     case 'NAVIGATION': {
-      recordNavigation(message.url, message.title);
+      recordNavigation(message.url, message.title, sender.tab?.id);
       sendResponse({ ok: true });
       break;
     }
@@ -596,6 +701,59 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       recordModalDismiss(message.url, message.contentHash);
       sendResponse({ ok: true });
       break;
+    }
+
+    case 'RETRIGGER_SCREENSHOT': {
+      // Force re-capture of the current node's screenshot
+      const targetId = activeModalNodeId || currentNodeId;
+      if (targetId) {
+        capturedScreenshots.delete(targetId);
+        pendingCaptures.forEach((tid, tabKey) => clearTimeout(tid));
+        if (session.nodes[targetId]) {
+          session.nodes[targetId].screenshot = null;
+          session.nodes[targetId].screenshotDataUrl = null;
+        }
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+          if (tabs[0]) {
+            scheduleScreenshot(targetId, tabs[0].id);
+          }
+        });
+      }
+      sendResponse({ ok: true });
+      break;
+    }
+
+    case 'GET_SCREENSHOT': {
+      // Return screenshot data URL for a specific node
+      const key = `screenshot_${message.nodeId}`;
+      chrome.storage.local.get(key, (result) => {
+        sendResponse({ ok: true, dataUrl: result[key] || null });
+      });
+      return true; // async
+    }
+
+    case 'EXPORT_SESSION_WITH_SCREENSHOTS': {
+      // Return session data with all screenshot data URLs embedded
+      const exportData = structuredClone(session);
+      const screenshotKeys = Object.keys(exportData.nodes)
+        .filter(id => exportData.nodes[id].screenshot)
+        .map(id => `screenshot_${id}`);
+
+      if (screenshotKeys.length === 0) {
+        sendResponse({ ok: true, session: exportData });
+        return true;
+      }
+
+      chrome.storage.local.get(screenshotKeys, (result) => {
+        for (const [id, node] of Object.entries(exportData.nodes)) {
+          const key = `screenshot_${id}`;
+          if (result[key]) {
+            node.screenshotDataUrl = result[key];
+          }
+        }
+        sendResponse({ ok: true, session: exportData });
+      });
+      return true; // async
     }
 
     default:

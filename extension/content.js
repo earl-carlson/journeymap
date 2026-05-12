@@ -9,19 +9,30 @@
   let lastTitle = document.title;
 
   // -----------------------------------------------------------------------
+  // Safe message sender — guards against invalidated extension context
+  // (happens when the extension is reloaded while the page is still open)
+  // -----------------------------------------------------------------------
+
+  function safeSendMessage(message, callback) {
+    try {
+      if (!chrome.runtime?.id) return; // Extension context gone
+      chrome.runtime.sendMessage(message, (response) => {
+        if (chrome.runtime.lastError) { /* noop */ }
+        if (callback) callback(response);
+      });
+    } catch {
+      // Extension context invalidated — silently ignore
+    }
+  }
+
+  // -----------------------------------------------------------------------
   // Notify background of current page (on initial load)
   // -----------------------------------------------------------------------
 
   function notifyNavigation() {
     const url = location.href;
     const title = document.title || url;
-
-    chrome.runtime.sendMessage(
-      { type: 'NAVIGATION', url, title },
-      () => {
-        if (chrome.runtime.lastError) { /* noop */ }
-      }
-    );
+    safeSendMessage({ type: 'NAVIGATION', url, title });
   }
 
   // -----------------------------------------------------------------------
@@ -73,12 +84,7 @@
     const newTitle = document.title;
     if (newTitle && newTitle !== lastTitle) {
       lastTitle = newTitle;
-      chrome.runtime.sendMessage(
-        { type: 'NAVIGATION', url: location.href, title: newTitle },
-        () => {
-          if (chrome.runtime.lastError) { /* noop */ }
-        }
-      );
+      safeSendMessage({ type: 'NAVIGATION', url: location.href, title: newTitle });
     }
   });
 
@@ -331,41 +337,32 @@
 
   function notifyModalOpen(contentHash, title) {
     lastModalContentHash = contentHash;
-    chrome.runtime.sendMessage(
-      {
-        type: 'MODAL_OPEN',
-        url: location.href,
-        contentHash,
-        title
-      },
-      () => { if (chrome.runtime.lastError) { /* noop */ } }
-    );
+    safeSendMessage({
+      type: 'MODAL_OPEN',
+      url: location.href,
+      contentHash,
+      title
+    });
   }
 
   function notifyModalStep(contentHash, title, prevContentHash) {
     lastModalContentHash = contentHash;
-    chrome.runtime.sendMessage(
-      {
-        type: 'MODAL_STEP',
-        url: location.href,
-        contentHash,
-        title,
-        prevContentHash
-      },
-      () => { if (chrome.runtime.lastError) { /* noop */ } }
-    );
+    safeSendMessage({
+      type: 'MODAL_STEP',
+      url: location.href,
+      contentHash,
+      title,
+      prevContentHash
+    });
   }
 
   function notifyModalDismiss(contentHash, title) {
-    chrome.runtime.sendMessage(
-      {
-        type: 'MODAL_DISMISS',
-        url: location.href,
-        contentHash,
-        title
-      },
-      () => { if (chrome.runtime.lastError) { /* noop */ } }
-    );
+    safeSendMessage({
+      type: 'MODAL_DISMISS',
+      url: location.href,
+      contentHash,
+      title
+    });
     lastModalContentHash = null;
   }
 
@@ -459,6 +456,82 @@
   }
 
   startObserving();
+
+  // =======================================================================
+  // SCREENSHOT SUPPORT
+  // =======================================================================
+
+  // Handle screenshot-related messages from the background script
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    switch (message.type) {
+      case 'GET_PAGE_DIMENSIONS': {
+        // Return full page dimensions for scroll-and-stitch
+        const body = document.body;
+        const html = document.documentElement;
+        const pageWidth = Math.max(
+          body.scrollWidth || 0, body.offsetWidth || 0,
+          html.clientWidth || 0, html.scrollWidth || 0, html.offsetWidth || 0
+        );
+        const pageHeight = Math.max(
+          body.scrollHeight || 0, body.offsetHeight || 0,
+          html.clientHeight || 0, html.scrollHeight || 0, html.offsetHeight || 0
+        );
+        sendResponse({
+          pageWidth,
+          pageHeight,
+          viewportWidth: window.innerWidth,
+          viewportHeight: window.innerHeight,
+          devicePixelRatio: window.devicePixelRatio || 1,
+          currentScrollX: window.scrollX,
+          currentScrollY: window.scrollY,
+        });
+        return true;
+      }
+
+      case 'SCROLL_TO': {
+        window.scrollTo(message.x || 0, message.y || 0);
+        // Wait a frame for rendering to settle
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            sendResponse({ ok: true, scrollY: window.scrollY });
+          });
+        });
+        return true;
+      }
+
+      case 'RESTORE_SCROLL': {
+        window.scrollTo(message.x || 0, message.y || 0);
+        sendResponse({ ok: true });
+        return true;
+      }
+
+      case 'CAPTURE_MODAL_SCREENSHOT': {
+        // Capture just the modal element area
+        // Find the modal by matching content hash
+        const modals = document.querySelectorAll(MODAL_SELECTORS);
+        for (const el of modals) {
+          if (!isVisibleModal(el)) continue;
+          const hash = getModalContentHash(el);
+          if (hash === message.contentHash) {
+            const rect = el.getBoundingClientRect();
+            sendResponse({
+              ok: true,
+              rect: {
+                x: rect.x,
+                y: rect.y,
+                width: rect.width,
+                height: rect.height,
+              },
+              devicePixelRatio: window.devicePixelRatio || 1,
+            });
+            return true;
+          }
+        }
+        sendResponse({ ok: false, error: 'Modal not found' });
+        return true;
+      }
+    }
+  });
 
   // -----------------------------------------------------------------------
   // Initial navigation notification

@@ -7,17 +7,22 @@
   <link rel="stylesheet" href="sidepanel.css">
 </head>
 <body>
-  <!-- Setup: first-time contributor name entry -->
+  <!-- Setup: first-time name + directory -->
   <div id="view-setup" class="view hidden">
     <div class="header">
       <h1>IA Mapper</h1>
     </div>
-    <p class="description">Before you start, enter your name. This is saved permanently and used to attribute your captures.</p>
+    <p class="description">Set your name and choose where session files are saved. Both are remembered permanently.</p>
     <div class="field">
       <label for="contributor">Your name</label>
       <input type="text" id="contributor" placeholder="e.g. earl" autocomplete="off" spellcheck="false">
     </div>
-    <button id="btn-save-name" class="btn btn-primary">Save &amp; Continue</button>
+    <div class="field">
+      <label>Export directory</label>
+      <button id="btn-pick-dir" class="btn btn-secondary btn-small">Choose folder...</button>
+      <div id="setup-dir-name" class="dir-name"></div>
+    </div>
+    <button id="btn-save-setup" class="btn btn-primary">Save &amp; Continue</button>
   </div>
 
   <!-- Idle: name is set, no session active -->
@@ -31,7 +36,12 @@
       <span class="meta-item">
         <span class="meta-label">Contributor:</span>
         <span id="idle-contributor">—</span>
-        <button id="btn-change-name" class="btn-inline" title="Change name">edit</button>
+        <button id="btn-change-name" class="btn-inline" title="Change settings">edit</button>
+      </span>
+      <span class="meta-item">
+        <span class="meta-label">Export to:</span>
+        <span id="idle-dir" class="dir-display">—</span>
+        <button id="btn-change-dir" class="btn-inline" title="Change directory">change</button>
       </span>
     </div>
     <button id="btn-start" class="btn btn-primary">Start Session</button>
@@ -64,6 +74,10 @@
         <span class="meta-label">Mode:</span>
         <span id="meta-mode">Map</span>
       </span>
+      <span class="meta-item">
+        <span class="meta-label">Saving to:</span>
+        <span id="active-dir" class="dir-display">—</span>
+      </span>
     </div>
 
     <!-- Current page info -->
@@ -71,6 +85,10 @@
       <div class="section-label">Current Page</div>
       <div id="current-page-title" class="current-page-title">—</div>
       <div id="current-page-url" class="current-page-url">—</div>
+      <div id="screenshot-status" class="screenshot-status">
+        <span id="screenshot-indicator" class="screenshot-indicator"></span>
+        <button id="btn-retrigger" class="btn-inline" title="Re-capture screenshot">retake screenshot</button>
+      </div>
     </div>
 
     <div class="flags">
@@ -90,7 +108,7 @@
     </div>
 
     <div class="actions">
-      <button id="btn-export" class="btn btn-secondary">Export JSON</button>
+      <button id="btn-export" class="btn btn-secondary">Save Snapshot</button>
       <button id="btn-stop" class="btn btn-danger">End Session</button>
     </div>
   </div>
