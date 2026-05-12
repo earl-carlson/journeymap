@@ -176,6 +176,43 @@
   ].join(', ');
 
   /**
+   * Text patterns that indicate persistent feedback/NPS widgets,
+   * cookie banners, and other non-modal overlays we should ignore.
+   */
+  const IGNORED_CONTENT_PATTERNS = [
+    /was this page useful/i,
+    /was this helpful/i,
+    /rate this page/i,
+    /give feedback/i,
+    /cookie\s*(consent|preferences|settings|banner)/i,
+    /accept\s*(all\s*)?cookies/i,
+    /we use cookies/i,
+    /manage\s*preferences/i,
+  ];
+
+  /**
+   * Class/ID patterns for known persistent widgets to ignore.
+   */
+  const IGNORED_ELEMENT_PATTERNS = [
+    /feedback/i,
+    /nps/i,
+    /survey/i,
+    /cookie/i,
+    /consent/i,
+    /intercom/i,
+    /drift/i,
+    /hubspot/i,
+    /zendesk/i,
+    /crisp/i,
+    /hotjar/i,
+  ];
+
+  // Track elements that were in the DOM at page load — these are not
+  // user-triggered modals.
+  const initialElements = new WeakSet();
+  let initialScanDone = false;
+
+  /**
    * Filter out false positives — elements that match selectors but
    * aren't actually visible modals.
    */
@@ -191,6 +228,27 @@
     const style = getComputedStyle(el);
     if (style.display === 'none' || style.visibility === 'hidden') return false;
     if (parseFloat(style.opacity) < 0.1) return false;
+
+    // --- Reject known persistent widgets ---
+
+    // Check element class/id against ignored patterns
+    const classAndId = (el.className || '') + ' ' + (el.id || '');
+    if (IGNORED_ELEMENT_PATTERNS.some(p => p.test(classAndId))) return false;
+
+    // Check text content against ignored patterns
+    const text = (el.innerText || '').slice(0, 500);
+    if (IGNORED_CONTENT_PATTERNS.some(p => p.test(text))) return false;
+
+    // Skip elements that were present at page load (not user-triggered)
+    if (initialElements.has(el)) return false;
+
+    // --- Size heuristic: real modals are substantial ---
+    // NPS widgets, tooltips, and toasts are typically small.
+    // A real modal usually covers a significant portion of the viewport.
+    const viewportArea = window.innerWidth * window.innerHeight;
+    const elArea = rect.width * rect.height;
+    // Must cover at least 5% of viewport OR be at least 300x200
+    if (elArea < viewportArea * 0.05 && (rect.width < 300 || rect.height < 200)) return false;
 
     // Must be above the page (z-index or position:fixed/absolute)
     const position = style.position;
@@ -372,14 +430,22 @@
   // Start observing once the body is available
   function startObserving() {
     if (document.body) {
+      // Mark all currently-matching elements as "initial" so we don't
+      // treat persistent widgets (NPS, feedback, etc.) as modals.
+      if (!initialScanDone) {
+        const existing = document.querySelectorAll(MODAL_SELECTORS);
+        for (const el of existing) {
+          initialElements.add(el);
+        }
+        initialScanDone = true;
+      }
+
       bodyObserver.observe(document.body, {
         childList: true,
         subtree: true,
         attributes: true,
         attributeFilter: ['open', 'aria-modal', 'role', 'class', 'style', 'data-state']
       });
-      // Initial scan in case a modal is already open
-      setTimeout(scanForModals, 1000);
     } else {
       // Body not ready yet, wait
       const readyObserver = new MutationObserver(() => {
