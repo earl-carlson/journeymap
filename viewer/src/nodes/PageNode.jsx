@@ -9,17 +9,17 @@ const FLAG_COLORS = {
 };
 
 const DOMAIN_COLORS = {
-  'www.docker.com': '#6366f1',
-  'hub.docker.com': '#8b5cf6',
-  'app.docker.com': '#06b6d4',
-  'docs.docker.com': '#22c55e',
-  'admin.docker.com': '#f97316',
-  'scout.docker.com': '#ec4899',
-  'build.docker.com': '#eab308',
+  'www.docker.com': '#4B7BE5',
+  'hub.docker.com': '#6B8FD9',
+  'app.docker.com': '#2A9AAF',
+  'docs.docker.com': '#3BA55D',
+  'admin.docker.com': '#D4782A',
+  'scout.docker.com': '#C4508A',
+  'build.docker.com': '#C4A028',
 };
 
 function PageNode({ data, selected }) {
-  const domainColor = DOMAIN_COLORS[data.domain] || '#6366f1';
+  const domainColor = DOMAIN_COLORS[data.domain] || '#4B7BE5';
   const hasFlags = data.flags && data.flags.length > 0;
   const flagColor = hasFlags ? FLAG_COLORS[data.flags[0]] : null;
 
@@ -36,7 +36,7 @@ function PageNode({ data, selected }) {
     <div
       style={{
         background: selected ? '#2a2a4a' : '#1e1e36',
-        border: `2px solid ${selected ? '#6366f1' : flagColor || domainColor}`,
+        border: `2px solid ${selected ? '#4B7BE5' : flagColor || domainColor}`,
         borderRadius: 10,
         padding: '8px 12px',
         minWidth: 200,
@@ -44,7 +44,7 @@ function PageNode({ data, selected }) {
         cursor: 'pointer',
         transition: 'border-color 0.15s, box-shadow 0.15s, opacity 0.2s',
         boxShadow: selected
-          ? '0 0 0 2px rgba(99,102,241,0.3)'
+          ? '0 0 0 2px rgba(75,123,229,0.25)'
           : hasFlags
           ? `0 0 0 1px ${flagColor}33`
           : 'none',

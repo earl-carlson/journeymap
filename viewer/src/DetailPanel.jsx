@@ -1,7 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export default function DetailPanel({ node, session, onClose }) {
+const FLAG_OPTIONS = ['broken', 'confusing', 'missing', 'good'];
+
+export default function DetailPanel({ node, session, onClose, onAddNote, onToggleFlag }) {
   if (!node) return null;
+
+  const [noteText, setNoteText] = useState('');
 
   const data = node.data;
 
@@ -13,6 +17,13 @@ export default function DetailPanel({ node, session, onClose }) {
   const resolveTitle = (id) => {
     const n = session.nodes[id];
     return n ? n.title : id;
+  };
+
+  const handleSubmitNote = () => {
+    const text = noteText.trim();
+    if (!text || !onAddNote) return;
+    onAddNote(node.id, text);
+    setNoteText('');
   };
 
   return (
@@ -46,7 +57,6 @@ export default function DetailPanel({ node, session, onClose }) {
               cursor: 'pointer',
             }}
             onClick={() => {
-              // Open full screenshot in new tab
               const w = window.open();
               if (w) {
                 w.document.write(`<img src="${data.screenshotDataUrl}" style="max-width:100%">`);
@@ -58,106 +68,86 @@ export default function DetailPanel({ node, session, onClose }) {
       )}
 
       {/* Type badges */}
-      <div style={{ display: 'flex', gap: 6 }}>
+      <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
         {data.isModal && (
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              padding: '2px 8px',
-              borderRadius: 8,
-              background: 'rgba(6,182,212,0.15)',
-              color: '#06b6d4',
-            }}
-          >
-            Modal
-          </span>
+          <span className="detail-badge cyan">Modal</span>
         )}
         {data.isStub && (
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              padding: '2px 8px',
-              borderRadius: 8,
-              background: 'rgba(85,85,112,0.2)',
-              color: '#777799',
-            }}
-          >
-            Inferred
-          </span>
+          <span className="detail-badge dim">Inferred</span>
         )}
         {data.domain && (
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 600,
-              padding: '2px 8px',
-              borderRadius: 8,
-              background: 'rgba(99,102,241,0.1)',
-              color: '#8888aa',
-            }}
-          >
-            {data.domain}
-          </span>
+          <span className="detail-badge domain">{data.domain}</span>
+        )}
+        {data.platform && data.platform !== 'web' && (
+          <span className="detail-badge platform">{data.platform}</span>
         )}
       </div>
 
-      {/* Flags */}
-      {data.flags && data.flags.length > 0 && (
-        <div className="detail-section">
-          <div className="detail-section-label">Flags</div>
-          <div className="detail-flags">
-            {data.flags.map((flag) => (
-              <span key={flag} className={`detail-flag ${flag}`}>
-                {flag}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Platform */}
-      {data.platform && data.platform !== 'web' && (
-        <div style={{ marginTop: -8 }}>
-          <span
-            style={{
-              fontSize: 10,
-              fontWeight: 700,
-              textTransform: 'uppercase',
-              padding: '2px 8px',
-              borderRadius: 8,
-              background: 'rgba(234,179,8,0.12)',
-              color: '#eab308',
-            }}
-          >
-            {data.platform}
-          </span>
-        </div>
-      )}
-
-      {/* Notes */}
-      {data.notes && data.notes.length > 0 && (
-        <div className="detail-section">
-          <div className="detail-section-label">Notes</div>
-          {data.notes.map((note, i) => {
-            const text = typeof note === 'string' ? note : note?.text || '';
-            const contributor = typeof note === 'object' ? note?.contributor : null;
+      {/* Flags — clickable toggles */}
+      <div className="detail-section">
+        <div className="detail-section-label">Flags</div>
+        <div className="detail-flags">
+          {FLAG_OPTIONS.map((flag) => {
+            const active = data.flags && data.flags.includes(flag);
             return (
-              <div key={i} className="detail-note">
-                {text}
-                {contributor && (
-                  <div style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 4 }}>
-                    — {contributor}
-                  </div>
-                )}
-              </div>
+              <button
+                key={flag}
+                className={`detail-flag-btn ${flag} ${active ? 'active' : ''}`}
+                onClick={() => onToggleFlag && onToggleFlag(node.id, flag)}
+              >
+                {flag}
+              </button>
             );
           })}
         </div>
-      )}
+      </div>
+
+      {/* Notes */}
+      <div className="detail-section">
+        <div className="detail-section-label">
+          Notes{data.notes && data.notes.length > 0 ? ` (${data.notes.length})` : ''}
+        </div>
+        {data.notes && data.notes.length > 0 && (
+          <div className="detail-notes-list">
+            {data.notes.map((note, i) => {
+              const text = typeof note === 'string' ? note : note?.text || '';
+              const contributor = typeof note === 'object' ? note?.contributor : null;
+              return (
+                <div key={i} className="detail-note">
+                  {text}
+                  {contributor && (
+                    <div style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 4 }}>
+                      — {contributor}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+        {/* Add note input */}
+        <div className="detail-note-input">
+          <textarea
+            value={noteText}
+            onChange={(e) => setNoteText(e.target.value)}
+            placeholder="Add a note..."
+            rows={2}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSubmitNote();
+              }
+            }}
+          />
+          <button
+            className="detail-note-submit"
+            onClick={handleSubmitNote}
+            disabled={!noteText.trim()}
+          >
+            Add
+          </button>
+        </div>
+      </div>
 
       {/* Incoming edges */}
       {incomingEdges.length > 0 && (
@@ -171,18 +161,11 @@ export default function DetailPanel({ node, session, onClose }) {
                 <span className={`detail-edge-type ${edge.type}`}>
                   {edge.type}
                 </span>
-                <span
-                  style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                  title={resolveTitle(edge.from)}
-                >
+                <span className="detail-edge-title" title={resolveTitle(edge.from)}>
                   {resolveTitle(edge.from)}
                 </span>
                 {edge.count > 1 && (
-                  <span style={{ color: '#6366f1', fontWeight: 600 }}>
+                  <span style={{ color: 'var(--accent)', fontWeight: 600 }}>
                     {edge.count}x
                   </span>
                 )}
@@ -204,18 +187,11 @@ export default function DetailPanel({ node, session, onClose }) {
                 <span className={`detail-edge-type ${edge.type}`}>
                   {edge.type}
                 </span>
-                <span
-                  style={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                  title={resolveTitle(edge.to)}
-                >
+                <span className="detail-edge-title" title={resolveTitle(edge.to)}>
                   {resolveTitle(edge.to)}
                 </span>
                 {edge.count > 1 && (
-                  <span style={{ color: '#6366f1', fontWeight: 600 }}>
+                  <span style={{ color: 'var(--accent)', fontWeight: 600 }}>
                     {edge.count}x
                   </span>
                 )}

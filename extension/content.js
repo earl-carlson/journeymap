@@ -554,7 +554,7 @@
           margin-bottom: 10px;
         }
         .guess strong {
-          color: #a5b4fc;
+          color: #6B93EA;
           font-weight: 600;
         }
         .actions {
@@ -572,11 +572,11 @@
           transition: background .12s, color .12s;
         }
         .btn-confirm {
-          background: rgba(99,102,241,.15);
-          color: #818cf8;
-          border: 1px solid rgba(99,102,241,.25);
+          background: rgba(75,123,229,.15);
+          color: #6B93EA;
+          border: 1px solid rgba(75,123,229,.25);
         }
-        .btn-confirm:hover { background: rgba(99,102,241,.25); color: #a5b4fc; }
+        .btn-confirm:hover { background: rgba(75,123,229,.25); color: #8BAAF0; }
         .btn-correct {
           background: rgba(234,179,8,.1);
           color: #eab308;
@@ -590,7 +590,7 @@
         }
         .progress-bar {
           height: 100%;
-          background: #6366f1;
+          background: #4B7BE5;
           width: 100%;
           animation: countdown 10s linear forwards;
         }
@@ -625,7 +625,7 @@
           transition: border-color .12s, background .12s;
         }
         .picker-item:hover {
-          border-color: #6366f1;
+          border-color: #4B7BE5;
           background: #2a2a4a;
         }
         .picker-item-title {

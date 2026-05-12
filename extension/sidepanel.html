@@ -71,13 +71,59 @@
         <span id="meta-contributor">—</span>
       </span>
       <span class="meta-item">
-        <span class="meta-label">Mode:</span>
-        <span id="meta-mode">Map</span>
-      </span>
-      <span class="meta-item">
         <span class="meta-label">Saving to:</span>
         <span id="active-dir" class="dir-display">—</span>
       </span>
+    </div>
+
+    <!-- Mode toggle -->
+    <div class="mode-section">
+      <div class="mode-toggle">
+        <button id="btn-mode-map" class="mode-btn active" title="Map mode">Map</button>
+        <button id="btn-mode-workflow" class="mode-btn" title="Workflow mode">Workflow</button>
+      </div>
+      <div id="workflow-info" class="workflow-info hidden">
+        <span class="workflow-name-label">Recording:</span>
+        <span id="workflow-name-display" class="workflow-name-display">—</span>
+        <span id="workflow-persona-display" class="workflow-persona-badge hidden"></span>
+        <span id="workflow-step-count" class="workflow-step-count">0 steps</span>
+      </div>
+    </div>
+
+    <!-- Workflow name prompt (shown when switching to workflow mode) -->
+    <div id="workflow-prompt" class="workflow-prompt hidden">
+      <div class="section-label">New Workflow</div>
+      <div class="field" style="margin-bottom:8px">
+        <label for="workflow-name-input">Name</label>
+        <input type="text" id="workflow-name-input" placeholder="e.g. Create new project" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="field" style="margin-bottom:10px">
+        <label for="workflow-persona-select">Persona</label>
+        <select id="workflow-persona-select">
+          <option value="">— none —</option>
+          <option value="Admin">Admin</option>
+          <option value="Docker Employee">Docker Employee</option>
+          <option value="Purchaser">Purchaser</option>
+          <option value="Developer">Developer</option>
+          <option value="VP of Engineering">VP of Engineering</option>
+        </select>
+      </div>
+      <div class="workflow-prompt-actions">
+        <button id="btn-wf-start" class="btn btn-primary btn-small">Start Recording</button>
+        <button id="btn-wf-cancel" class="btn btn-secondary btn-small">Cancel</button>
+      </div>
+    </div>
+
+    <!-- Capture queue chip -->
+    <div id="capture-queue-chip" class="capture-queue-chip hidden">
+      <div class="queue-chip-header">
+        <span class="section-label">Next Target</span>
+        <button id="btn-queue-dismiss" class="btn-inline" title="Skip this target">skip</button>
+        <button id="btn-queue-clear" class="btn-inline" title="Clear queue">clear</button>
+      </div>
+      <div id="queue-target-title" class="queue-target-title">—</div>
+      <div id="queue-target-url" class="queue-target-url">—</div>
+      <div id="queue-progress" class="queue-progress">0 / 0</div>
     </div>
 
     <!-- Current page info -->
@@ -121,7 +167,23 @@
       <div id="recent-list" class="recent-list"></div>
     </div>
 
+    <!-- Workflow edit (shown after ending workflow recording) -->
+    <div id="workflow-edit" class="workflow-edit hidden">
+      <div class="section-label">Edit Workflow</div>
+      <div class="field">
+        <label for="wf-edit-name">Name</label>
+        <input type="text" id="wf-edit-name" autocomplete="off" spellcheck="false">
+      </div>
+      <div id="wf-edit-steps" class="wf-edit-steps"></div>
+      <div class="workflow-prompt-actions">
+        <button id="btn-wf-save" class="btn btn-primary btn-small">Save Workflow</button>
+        <button id="btn-wf-discard" class="btn btn-secondary btn-small">Discard</button>
+      </div>
+    </div>
+
     <div class="actions">
+      <button id="btn-load-queue" class="btn btn-secondary btn-small" title="Load capture queue from viewer">Load Capture Queue</button>
+      <input type="file" id="queue-file-input" accept=".json" style="display:none">
       <button id="btn-export" class="btn btn-secondary">Save Snapshot</button>
       <button id="btn-stop" class="btn btn-danger">End Session</button>
     </div>

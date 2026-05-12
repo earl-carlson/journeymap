@@ -6,8 +6,8 @@
   --bg-hover: #2a2a4a;
   --text: #e0e0f0;
   --text-muted: #8888aa;
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
+  --accent: #4B7BE5;
+  --accent-hover: #6B93EA;
   --danger: #ef4444;
   --danger-hover: #f87171;
   --green: #22c55e;
@@ -67,9 +67,9 @@ h1 {
 }
 
 .badge-active {
-  background: rgba(99, 102, 241, 0.15);
+  background: rgba(75, 123, 229, 0.15);
   color: var(--accent);
-  border: 1px solid rgba(99, 102, 241, 0.3);
+  border: 1px solid rgba(75, 123, 229, 0.3);
   animation: pulse 2s ease-in-out infinite;
 }
 
@@ -528,4 +528,258 @@ h1 {
   font-size: 12px;
   width: auto;
   display: inline-block;
+}
+
+/* Mode toggle */
+.mode-section {
+  margin-bottom: 14px;
+}
+
+.mode-toggle {
+  display: flex;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.mode-btn {
+  flex: 1;
+  padding: 6px 0;
+  font-size: 12px;
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.mode-btn:first-child {
+  border-right: 1px solid var(--border);
+}
+
+.mode-btn:hover {
+  color: var(--text);
+  background: var(--bg-hover);
+}
+
+.mode-btn.active {
+  color: var(--accent);
+  background: rgba(75, 123, 229, 0.12);
+}
+
+.mode-btn.active:last-child {
+  color: var(--green);
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.workflow-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 6px 10px;
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.15);
+  border-radius: 6px;
+  font-size: 11px;
+}
+
+.workflow-name-label {
+  color: var(--green);
+  font-weight: 600;
+}
+
+.workflow-name-display {
+  color: var(--text);
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-step-count {
+  color: var(--text-muted);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+/* Workflow name prompt */
+.workflow-prompt {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.workflow-prompt input,
+.workflow-prompt select {
+  width: 100%;
+  padding: 7px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 12px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.workflow-prompt input:focus,
+.workflow-prompt select:focus {
+  border-color: var(--accent);
+}
+
+.workflow-prompt select option {
+  background: var(--bg-surface);
+  color: var(--text);
+}
+
+.workflow-persona-badge {
+  font-size: 9px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 6px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #a78bfa;
+  white-space: nowrap;
+}
+
+.workflow-prompt-actions {
+  display: flex;
+  gap: 6px;
+}
+
+/* Capture queue chip */
+.capture-queue-chip {
+  background: rgba(234, 179, 8, 0.06);
+  border: 1px solid rgba(234, 179, 8, 0.15);
+  border-radius: var(--radius);
+  padding: 8px 10px;
+  margin-bottom: 14px;
+}
+
+.queue-chip-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.queue-chip-header .section-label {
+  flex: 1;
+  margin-bottom: 0;
+  color: var(--yellow);
+}
+
+.queue-target-title {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.queue-target-url {
+  font-size: 10px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 1px;
+}
+
+.queue-progress {
+  font-size: 10px;
+  color: var(--yellow);
+  margin-top: 4px;
+}
+
+/* Workflow edit */
+.workflow-edit {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 14px;
+}
+
+.wf-edit-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 250px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.wf-edit-step {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: grab;
+  transition: border-color 0.12s;
+}
+
+.wf-edit-step.dragging {
+  opacity: 0.4;
+}
+
+.wf-edit-step.drag-over {
+  border-color: var(--accent);
+  background: var(--bg-hover);
+}
+
+.wf-edit-step-num {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--accent);
+  min-width: 16px;
+  text-align: center;
+}
+
+.wf-edit-step-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.wf-edit-step-title {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wf-edit-step-url {
+  font-size: 9px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.wf-edit-step-remove {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0 4px;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.wf-edit-step-remove:hover {
+  color: var(--danger);
+  background: rgba(239, 68, 68, 0.1);
 }

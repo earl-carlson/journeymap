@@ -50,7 +50,7 @@ journeymap/
 | 5 | Merge logic | **Done** | Shared module in `viewer/src/merge.js` |
 | 6 | HTML viewer (static) | **Done** | React Flow + Dagre, hierarchy/navigation/all views, detail panel |
 | 7 | Workflows + gap detection | **Done** | See "Piece 7 status" below |
-| 8 | Workflow recording mode | Not started | |
+| 8 | Workflow recording mode | **Done** | See "Piece 8 status" below |
 
 ## Key architecture decisions
 
@@ -221,6 +221,53 @@ exports/
 - Node dimming is a data prop (`dimmed: true`) set during graph conversion, not CSS
 - Workflow edges use a `workflowEdgeKeys` Set for O(1) lookup during edge iteration
 - Define mode intercepts `onNodeClick` to add steps instead of selecting nodes
+
+## Piece 8 status (Workflow recording mode) — Done
+
+### What's built
+
+**Mode toggle (side panel):**
+- Map/Workflow toggle buttons in the active session view
+- Switching to Workflow mode prompts for a workflow name (required, not skippable)
+- Mode always visible — Map button is indigo, Workflow button is green when active
+- Workflow info bar shows recording name and step count
+- Switching back to Map saves the workflow and resumes general capture
+- Mode can be toggled at any point during a session
+
+**Workflow recording (background.js):**
+- `activeWorkflowName` and `activeWorkflowPath` track the recording in real time
+- Every navigation in workflow mode appends the node ID to the path
+- Current node added as first step when entering workflow mode
+- Stopping a session auto-finalizes any active workflow
+- `SET_MODE` message handler manages transitions between map and workflow
+- `GET_WORKFLOW_PATH` returns the current path for editing
+- `UPDATE_WORKFLOW_PATH` accepts reordered/trimmed path and renamed workflow
+
+**Post-session editing (side panel):**
+- Ending a session while in workflow mode shows the workflow editor instead of immediately stopping
+- Editor shows the workflow name (editable) and all steps as a numbered list
+- Steps are drag-and-drop reorderable
+- Steps can be removed individually
+- "Save Workflow" finalizes the edit, exports the session, and stops
+- "Discard" drops the workflow, exports the session without it, and stops
+
+**Capture queue (extension):**
+- "Load Capture Queue" button in the side panel actions area
+- Accepts the JSON format exported by the viewer (`{ captureQueue: [...] }`)
+- Active queue shows a persistent chip with the next target's title and URL
+- Navigating to the target URL auto-advances to the next target
+- "Skip" button advances without visiting
+- "Clear" button removes the queue entirely
+- Progress counter shows done/total
+- `LOAD_CAPTURE_QUEUE`, `DISMISS_QUEUE_TARGET`, `CLEAR_CAPTURE_QUEUE` message handlers
+
+### Architecture notes
+- Workflow state (`activeWorkflowName`, `activeWorkflowPath`) lives in background.js alongside session state
+- Capture queue state (`captureQueue`, `captureQueueIndex`) also in background.js
+- `recordNavigation()` appends to workflow path and checks capture queue on every navigation
+- `stopSession()` auto-saves any active workflow before clearing state
+- Workflow editing uses drag-and-drop HTML5 API in the side panel
+- Session JSON from workflow mode is fully mergeable — same schema as map mode
 
 ## Git setup
 - Remote: `git@github-work:earl-carlson/journeymap.git` (SSH via `github-work` host alias → `earl-carlson` account)

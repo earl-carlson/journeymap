@@ -10,6 +10,11 @@ let session = null;       // Active session object or null
 let currentNodeId = null; // URL-hash of the node the user is currently on
 let previousNodeId = null; // URL-hash of the node the user just left
 let visitHistory = [];    // Ordered list of visited node IDs (for back-button detection)
+let activeWorkflowName = null;  // Name of the workflow being recorded (null = map mode)
+let activeWorkflowPersona = null; // Persona for the workflow being recorded
+let activeWorkflowPath = [];    // Ordered node IDs for the workflow being recorded
+let captureQueue = [];          // Loaded capture queue from viewer
+let captureQueueIndex = 0;      // Current position in the capture queue
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -249,16 +254,34 @@ function startSession(contributor) {
   currentNodeId = null;
   previousNodeId = null;
   visitHistory = [];
+  activeWorkflowName = null;
+  activeWorkflowPersona = null;
+  activeWorkflowPath = [];
   persistSession();
   updateBadge();
 }
 
 function stopSession() {
+  // If a workflow was being recorded, finalize it before stopping
+  if (activeWorkflowName && activeWorkflowPath.length > 0 && session) {
+    const wf = {
+      name: activeWorkflowName,
+      path: [...activeWorkflowPath],
+      contributor: session.meta.contributor,
+    };
+    if (activeWorkflowPersona) wf.persona = activeWorkflowPersona;
+    session.workflows.push(wf);
+    persistSession();
+  }
+
   const data = session;
   session = null;
   currentNodeId = null;
   previousNodeId = null;
   visitHistory = [];
+  activeWorkflowName = null;
+  activeWorkflowPersona = null;
+  activeWorkflowPath = [];
   chrome.storage.local.remove('ia_session');
   updateBadge();
   return data;
@@ -290,7 +313,7 @@ function updateBadge() {
   if (session) {
     const count = Object.keys(session.nodes).length;
     chrome.action.setBadgeText({ text: count > 0 ? String(count) : 'ON' });
-    chrome.action.setBadgeBackgroundColor({ color: '#6366f1' });
+    chrome.action.setBadgeBackgroundColor({ color: '#4B7BE5' });
   } else {
     chrome.action.setBadgeText({ text: '' });
   }
@@ -407,6 +430,19 @@ function recordNavigation(url, title, tabId) {
   // Cap history to avoid unbounded growth
   if (visitHistory.length > 500) {
     visitHistory = visitHistory.slice(-250);
+  }
+
+  // Record workflow path if in workflow mode
+  if (activeWorkflowName) {
+    activeWorkflowPath.push(id);
+  }
+
+  // Check capture queue — mark completed if this URL matches the current target
+  if (captureQueue.length > 0 && captureQueueIndex < captureQueue.length) {
+    const target = captureQueue[captureQueueIndex];
+    if (target && canonical === canonicalUrl(target.url)) {
+      captureQueueIndex++;
+    }
   }
 
   persistSession();
@@ -826,12 +862,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // Handle messages that work without an active session
   if (message.type === 'GET_SESSION_STATUS') {
     if (session) {
+      const queueTarget = (captureQueue.length > 0 && captureQueueIndex < captureQueue.length)
+        ? captureQueue[captureQueueIndex]
+        : null;
       sendResponse({
         active: true,
         nodeCount: Object.keys(session.nodes).length,
         edgeCount: session.edges.length,
         contributor: session.meta.contributor,
-        mode: session.meta.mode
+        mode: activeWorkflowName ? 'workflow' : 'map',
+        workflowName: activeWorkflowName,
+        workflowPersona: activeWorkflowPersona,
+        workflowSteps: activeWorkflowPath.length,
+        queueTarget,
+        queueTotal: captureQueue.length,
+        queueDone: captureQueueIndex,
       });
     } else {
       sendResponse({ active: false, nodeCount: 0 });
@@ -1054,6 +1099,109 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       }
 
       sendResponse({ ok: true, nodes: recent });
+      break;
+    }
+
+    case 'SET_MODE': {
+      // Switch between map and workflow mode
+      if (message.mode === 'workflow') {
+        if (!message.workflowName) {
+          sendResponse({ ok: false, reason: 'workflow name required' });
+          break;
+        }
+        // If switching from a previous workflow, save it first
+        if (activeWorkflowName && activeWorkflowPath.length > 0) {
+          const prevWf = {
+            name: activeWorkflowName,
+            path: [...activeWorkflowPath],
+            contributor: session.meta.contributor,
+          };
+          if (activeWorkflowPersona) prevWf.persona = activeWorkflowPersona;
+          session.workflows.push(prevWf);
+        }
+        activeWorkflowName = message.workflowName;
+        activeWorkflowPersona = message.persona || null;
+        activeWorkflowPath = [];
+        session.meta.mode = 'workflow';
+        // Add current node as first step if we're on one
+        if (currentNodeId) {
+          activeWorkflowPath.push(currentNodeId);
+        }
+        persistSession();
+        console.log('[workflow] Started recording:', message.workflowName, activeWorkflowPersona ? `(${activeWorkflowPersona})` : '');
+      } else {
+        // Switching back to map mode — save the workflow if it has steps
+        if (activeWorkflowName && activeWorkflowPath.length > 0) {
+          const wf = {
+            name: activeWorkflowName,
+            path: [...activeWorkflowPath],
+            contributor: session.meta.contributor,
+          };
+          if (activeWorkflowPersona) wf.persona = activeWorkflowPersona;
+          session.workflows.push(wf);
+          persistSession();
+          console.log('[workflow] Saved:', activeWorkflowName, activeWorkflowPath.length, 'steps');
+        }
+        activeWorkflowName = null;
+        activeWorkflowPersona = null;
+        activeWorkflowPath = [];
+        session.meta.mode = 'map';
+        persistSession();
+      }
+      sendResponse({
+        ok: true,
+        mode: session.meta.mode,
+        workflowName: activeWorkflowName,
+        workflowPersona: activeWorkflowPersona,
+      });
+      break;
+    }
+
+    case 'GET_WORKFLOW_PATH': {
+      // Return the current workflow path for editing
+      sendResponse({
+        ok: true,
+        name: activeWorkflowName,
+        path: activeWorkflowPath.map((id) => ({
+          id,
+          title: session.nodes[id]?.title || id,
+          url: session.nodes[id]?.url || '',
+        })),
+      });
+      break;
+    }
+
+    case 'UPDATE_WORKFLOW_PATH': {
+      // Update the workflow path (reorder, remove steps, rename)
+      if (message.name) activeWorkflowName = message.name;
+      if (message.path) activeWorkflowPath = message.path;
+      persistSession();
+      sendResponse({ ok: true });
+      break;
+    }
+
+    case 'LOAD_CAPTURE_QUEUE': {
+      // Load a capture queue JSON from the viewer
+      captureQueue = message.queue || [];
+      captureQueueIndex = 0;
+      console.log('[queue] Loaded', captureQueue.length, 'targets');
+      sendResponse({ ok: true, total: captureQueue.length });
+      break;
+    }
+
+    case 'DISMISS_QUEUE_TARGET': {
+      // Skip the current capture queue target
+      if (captureQueueIndex < captureQueue.length) {
+        captureQueueIndex++;
+      }
+      sendResponse({ ok: true, queueDone: captureQueueIndex, queueTotal: captureQueue.length });
+      break;
+    }
+
+    case 'CLEAR_CAPTURE_QUEUE': {
+      captureQueue = [];
+      captureQueueIndex = 0;
+      sendResponse({ ok: true });
       break;
     }
 

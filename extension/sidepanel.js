@@ -34,9 +34,39 @@ const waveformCanvas = document.getElementById('waveform');
 const audioStatus = document.getElementById('audio-status');
 const transcriptionResult = document.getElementById('transcription-result');
 
+// Mode toggle + workflow elements
+const btnModeMap = document.getElementById('btn-mode-map');
+const btnModeWorkflow = document.getElementById('btn-mode-workflow');
+const workflowInfo = document.getElementById('workflow-info');
+const workflowNameDisplay = document.getElementById('workflow-name-display');
+const workflowStepCount = document.getElementById('workflow-step-count');
+const workflowPrompt = document.getElementById('workflow-prompt');
+const workflowNameInput = document.getElementById('workflow-name-input');
+const workflowPersonaSelect = document.getElementById('workflow-persona-select');
+const workflowPersonaDisplay = document.getElementById('workflow-persona-display');
+const btnWfStart = document.getElementById('btn-wf-start');
+const btnWfCancel = document.getElementById('btn-wf-cancel');
+const workflowEdit = document.getElementById('workflow-edit');
+const wfEditName = document.getElementById('wf-edit-name');
+const wfEditSteps = document.getElementById('wf-edit-steps');
+const btnWfSave = document.getElementById('btn-wf-save');
+const btnWfDiscard = document.getElementById('btn-wf-discard');
+
+// Capture queue elements
+const captureQueueChip = document.getElementById('capture-queue-chip');
+const queueTargetTitle = document.getElementById('queue-target-title');
+const queueTargetUrl = document.getElementById('queue-target-url');
+const queueProgress = document.getElementById('queue-progress');
+const btnQueueDismiss = document.getElementById('btn-queue-dismiss');
+const btnQueueClear = document.getElementById('btn-queue-clear');
+const btnLoadQueue = document.getElementById('btn-load-queue');
+const queueFileInput = document.getElementById('queue-file-input');
+
 let savedContributor = null;
 let dirHandle = null;    // FileSystemDirectoryHandle — persisted across sessions
 let dirName = null;      // Display name of the directory
+let currentMode = 'map'; // 'map' or 'workflow'
+let editingWorkflowPath = []; // For post-session workflow editing
 
 // ---------------------------------------------------------------------------
 // Init
@@ -99,7 +129,45 @@ function showActiveView(status) {
     statNodes.textContent = status.nodeCount || 0;
     statEdges.textContent = status.edgeCount || 0;
     metaContributor.textContent = status.contributor || savedContributor || '—';
-    metaMode.textContent = capitalize(status.mode || 'map');
+
+    // Update mode UI
+    currentMode = status.mode || 'map';
+    updateModeUI(status);
+  }
+}
+
+function updateModeUI(status) {
+  const isWorkflow = currentMode === 'workflow';
+  btnModeMap.classList.toggle('active', !isWorkflow);
+  btnModeWorkflow.classList.toggle('active', isWorkflow);
+
+  if (isWorkflow && status?.workflowName) {
+    workflowInfo.classList.remove('hidden');
+    workflowNameDisplay.textContent = status.workflowName;
+    workflowStepCount.textContent = (status.workflowSteps || 0) + ' steps';
+    if (status.workflowPersona) {
+      workflowPersonaDisplay.textContent = status.workflowPersona;
+      workflowPersonaDisplay.classList.remove('hidden');
+    } else {
+      workflowPersonaDisplay.classList.add('hidden');
+    }
+  } else {
+    workflowInfo.classList.add('hidden');
+  }
+
+  // Capture queue chip
+  if (status?.queueTarget) {
+    captureQueueChip.classList.remove('hidden');
+    queueTargetTitle.textContent = status.queueTarget.title || '—';
+    queueTargetUrl.textContent = status.queueTarget.url || '—';
+    queueProgress.textContent = `${status.queueDone || 0} / ${status.queueTotal || 0} done`;
+  } else if (status?.queueTotal > 0 && status?.queueDone >= status?.queueTotal) {
+    captureQueueChip.classList.remove('hidden');
+    queueTargetTitle.textContent = 'Queue complete!';
+    queueTargetUrl.textContent = '';
+    queueProgress.textContent = `${status.queueTotal} / ${status.queueTotal} done`;
+  } else {
+    captureQueueChip.classList.add('hidden');
   }
 }
 
@@ -358,6 +426,12 @@ btnStart.addEventListener('click', () => {
 // ---------------------------------------------------------------------------
 
 btnStop.addEventListener('click', () => {
+  // If in workflow mode, show the editor first before ending
+  if (currentMode === 'workflow') {
+    showWorkflowEditor();
+    return;
+  }
+
   chrome.runtime.sendMessage({ type: 'EXPORT_SESSION_WITH_SCREENSHOTS' }, async (response) => {
     if (chrome.runtime.lastError) return;
     if (response && response.ok && response.session) {
@@ -414,6 +488,204 @@ flagButtons.forEach((btn) => {
 });
 
 // ---------------------------------------------------------------------------
+// Mode toggle — Map / Workflow
+// ---------------------------------------------------------------------------
+
+btnModeMap.addEventListener('click', () => {
+  if (currentMode === 'map') return;
+  chrome.runtime.sendMessage({ type: 'SET_MODE', mode: 'map' }, (resp) => {
+    if (chrome.runtime.lastError || !resp?.ok) return;
+    currentMode = 'map';
+    workflowPrompt.classList.add('hidden');
+    updateModeUI(resp);
+  });
+});
+
+btnModeWorkflow.addEventListener('click', () => {
+  if (currentMode === 'workflow') return;
+  // Show the workflow name prompt
+  workflowPrompt.classList.remove('hidden');
+  workflowNameInput.value = '';
+  workflowNameInput.focus();
+});
+
+btnWfStart.addEventListener('click', () => {
+  const name = workflowNameInput.value.trim();
+  if (!name) {
+    workflowNameInput.style.borderColor = '#ef4444';
+    setTimeout(() => { workflowNameInput.style.borderColor = ''; }, 1500);
+    return;
+  }
+  const persona = workflowPersonaSelect.value || null;
+  chrome.runtime.sendMessage({ type: 'SET_MODE', mode: 'workflow', workflowName: name, persona }, (resp) => {
+    if (chrome.runtime.lastError || !resp?.ok) return;
+    currentMode = 'workflow';
+    workflowPrompt.classList.add('hidden');
+    updateModeUI({ ...resp, workflowName: name, workflowSteps: 1, workflowPersona: persona });
+  });
+});
+
+btnWfCancel.addEventListener('click', () => {
+  workflowPrompt.classList.add('hidden');
+});
+
+workflowNameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') btnWfStart.click();
+  if (e.key === 'Escape') btnWfCancel.click();
+});
+
+// ---------------------------------------------------------------------------
+// Workflow editing (post-session)
+// ---------------------------------------------------------------------------
+
+function showWorkflowEditor() {
+  chrome.runtime.sendMessage({ type: 'GET_WORKFLOW_PATH' }, (resp) => {
+    if (chrome.runtime.lastError || !resp?.ok) return;
+    if (!resp.path || resp.path.length === 0) return;
+
+    editingWorkflowPath = resp.path.map((s) => ({ ...s }));
+    wfEditName.value = resp.name || '';
+    renderWorkflowSteps();
+    workflowEdit.classList.remove('hidden');
+  });
+}
+
+function renderWorkflowSteps() {
+  wfEditSteps.innerHTML = '';
+  editingWorkflowPath.forEach((step, i) => {
+    const div = document.createElement('div');
+    div.className = 'wf-edit-step';
+    div.draggable = true;
+    div.dataset.index = i;
+    div.innerHTML = `
+      <span class="wf-edit-step-num">${i + 1}</span>
+      <div class="wf-edit-step-info">
+        <div class="wf-edit-step-title">${escapeHtml(step.title)}</div>
+        <div class="wf-edit-step-url">${escapeHtml(step.url)}</div>
+      </div>
+      <button class="wf-edit-step-remove" data-idx="${i}" title="Remove step">&times;</button>
+    `;
+
+    // Remove button
+    div.querySelector('.wf-edit-step-remove').addEventListener('click', (e) => {
+      const idx = parseInt(e.target.dataset.idx, 10);
+      editingWorkflowPath.splice(idx, 1);
+      renderWorkflowSteps();
+    });
+
+    // Drag-and-drop reordering
+    div.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', String(i));
+      div.classList.add('dragging');
+    });
+    div.addEventListener('dragend', () => {
+      div.classList.remove('dragging');
+    });
+    div.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      div.classList.add('drag-over');
+    });
+    div.addEventListener('dragleave', () => {
+      div.classList.remove('drag-over');
+    });
+    div.addEventListener('drop', (e) => {
+      e.preventDefault();
+      div.classList.remove('drag-over');
+      const fromIdx = parseInt(e.dataTransfer.getData('text/plain'), 10);
+      const toIdx = i;
+      if (fromIdx === toIdx) return;
+      const [moved] = editingWorkflowPath.splice(fromIdx, 1);
+      editingWorkflowPath.splice(toIdx, 0, moved);
+      renderWorkflowSteps();
+    });
+
+    wfEditSteps.appendChild(div);
+  });
+}
+
+btnWfSave.addEventListener('click', () => {
+  const name = wfEditName.value.trim();
+  if (!name || editingWorkflowPath.length < 2) return;
+  chrome.runtime.sendMessage({
+    type: 'UPDATE_WORKFLOW_PATH',
+    name,
+    path: editingWorkflowPath.map((s) => s.id),
+  }, () => {
+    // Switch to map mode to finalize the workflow, then export and stop
+    chrome.runtime.sendMessage({ type: 'SET_MODE', mode: 'map' }, () => {
+      chrome.runtime.sendMessage({ type: 'EXPORT_SESSION_WITH_SCREENSHOTS' }, async (response) => {
+        if (chrome.runtime.lastError) return;
+        if (response && response.ok && response.session) {
+          await saveToDirectory(response.session);
+          chrome.runtime.sendMessage({ type: 'STOP_SESSION' }, () => {
+            workflowEdit.classList.add('hidden');
+            editingWorkflowPath = [];
+            showIdleView();
+          });
+        }
+      });
+    });
+  });
+});
+
+btnWfDiscard.addEventListener('click', () => {
+  // Discard the workflow, then export and stop session
+  chrome.runtime.sendMessage({ type: 'UPDATE_WORKFLOW_PATH', name: null, path: [] }, () => {
+    chrome.runtime.sendMessage({ type: 'SET_MODE', mode: 'map' }, () => {
+      chrome.runtime.sendMessage({ type: 'EXPORT_SESSION_WITH_SCREENSHOTS' }, async (response) => {
+        if (chrome.runtime.lastError) return;
+        if (response && response.ok && response.session) {
+          await saveToDirectory(response.session);
+          chrome.runtime.sendMessage({ type: 'STOP_SESSION' }, () => {
+            workflowEdit.classList.add('hidden');
+            editingWorkflowPath = [];
+            showIdleView();
+          });
+        }
+      });
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Capture queue
+// ---------------------------------------------------------------------------
+
+btnLoadQueue.addEventListener('click', () => {
+  queueFileInput.click();
+});
+
+queueFileInput.addEventListener('change', async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  e.target.value = '';
+
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    const queue = data.captureQueue || data.queue || [];
+    if (queue.length === 0) return;
+
+    chrome.runtime.sendMessage({ type: 'LOAD_CAPTURE_QUEUE', queue }, (resp) => {
+      if (chrome.runtime.lastError) return;
+      // UI will update on next refresh cycle
+    });
+  } catch (err) {
+    console.error('Failed to load capture queue:', err);
+  }
+});
+
+btnQueueDismiss.addEventListener('click', () => {
+  chrome.runtime.sendMessage({ type: 'DISMISS_QUEUE_TARGET' });
+});
+
+btnQueueClear.addEventListener('click', () => {
+  chrome.runtime.sendMessage({ type: 'CLEAR_CAPTURE_QUEUE' }, () => {
+    captureQueueChip.classList.add('hidden');
+  });
+});
+
+// ---------------------------------------------------------------------------
 // Download fallback — used when directory isn't available
 // ---------------------------------------------------------------------------
 
@@ -454,6 +726,8 @@ function refreshStatus() {
 
     statNodes.textContent = response.nodeCount || 0;
     statEdges.textContent = response.edgeCount || 0;
+    currentMode = response.mode || 'map';
+    updateModeUI(response);
   });
 
   // Get current tab info + screenshot status
@@ -684,7 +958,7 @@ function drawWaveform() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     ctx.lineWidth = 1.5;
-    ctx.strokeStyle = '#6366f1';
+    ctx.strokeStyle = '#4B7BE5';
     ctx.beginPath();
 
     const sliceWidth = canvas.width / bufferLength;

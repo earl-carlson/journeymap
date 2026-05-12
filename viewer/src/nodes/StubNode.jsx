@@ -14,7 +14,7 @@ function StubNode({ data, selected }) {
     <div
       style={{
         background: '#16162a',
-        border: `1.5px dashed ${selected ? '#6366f1' : '#333355'}`,
+        border: `1.5px dashed ${selected ? '#4B7BE5' : '#333355'}`,
         borderRadius: 10,
         padding: '6px 12px',
         minWidth: 160,

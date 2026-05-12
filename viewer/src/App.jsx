@@ -142,11 +142,15 @@ function blobToDataUrl(blob) {
 // Write-back: save session.json to the directory
 // ---------------------------------------------------------------------------
 
+/**
+ * Write viewer-originated changes to a dedicated session-viewer/ directory.
+ * This keeps original capture sessions untouched — viewer contributions
+ * (workflows, notes, flags) live in their own mergeable session file.
+ */
 async function writeBackSession(dirHandle, session) {
   if (!dirHandle) return false;
 
   try {
-    // Verify write permission
     const perm = await dirHandle.queryPermission({ mode: 'readwrite' });
     if (perm !== 'granted') {
       const req = await dirHandle.requestPermission({ mode: 'readwrite' });
@@ -160,34 +164,13 @@ async function writeBackSession(dirHandle, session) {
       delete node.screenshotDataUrl;
     }
 
-    // Find or create a session directory to write to
-    // Write to the first session directory that has a session.json
-    for await (const entry of dirHandle.values()) {
-      if (entry.kind === 'directory') {
-        try {
-          await entry.getFileHandle('session.json');
-          // Found a session dir — write back here
-          const file = await entry.getFileHandle('session.json', { create: true });
-          const writable = await file.createWritable();
-          await writable.write(JSON.stringify(clean, null, 2));
-          await writable.close();
-          console.log('[viewer] Wrote session.json to', entry.name);
-          return true;
-        } catch {
-          // Not a session dir, continue
-        }
-      }
-    }
-
-    // No existing session dir found — create a new one
-    const now = new Date();
-    const folderName = `session-viewer-${now.toISOString().slice(0, 10)}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
-    const sessionDir = await dirHandle.getDirectoryHandle(folderName, { create: true });
-    const file = await sessionDir.getFileHandle('session.json', { create: true });
+    // Always write to session-viewer/ — a stable, dedicated directory
+    const viewerDir = await dirHandle.getDirectoryHandle('session-viewer', { create: true });
+    const file = await viewerDir.getFileHandle('session.json', { create: true });
     const writable = await file.createWritable();
     await writable.write(JSON.stringify(clean, null, 2));
     await writable.close();
-    console.log('[viewer] Created new session dir:', folderName);
+    console.log('[viewer] Wrote session.json to session-viewer/');
     return true;
   } catch (err) {
     console.error('[viewer] Write-back failed:', err);
@@ -511,14 +494,28 @@ export default function App() {
   }, []);
 
   const handleSaveDefine = useCallback(
-    (name, persona) => {
+    (name, persona, notes) => {
       if (!name || defineSteps.length < 2) return;
+
+      // Separate custom steps from graph node steps
+      const customSteps = {};
+      for (const step of defineSteps) {
+        if (step.custom) {
+          customSteps[step.id] = {
+            title: step.title,
+            notes: step.notes || null,
+            screenshotDataUrl: step.screenshotDataUrl || null,
+          };
+        }
+      }
 
       const workflow = {
         name,
         path: defineSteps.map((s) => s.id),
         contributor: 'viewer',
         ...(persona ? { persona } : {}),
+        ...(notes ? { notes } : {}),
+        ...(Object.keys(customSteps).length > 0 ? { customSteps } : {}),
       };
 
       mutateSession((s) => {
@@ -540,7 +537,13 @@ export default function App() {
   );
 
   const handleAddDefineStep = useCallback(
-    (nodeId) => {
+    (nodeIdOrStep) => {
+      // Accept either a node ID string or a custom step object
+      if (typeof nodeIdOrStep === 'object' && nodeIdOrStep.custom) {
+        setDefineSteps((prev) => [...prev, nodeIdOrStep]);
+        return;
+      }
+      const nodeId = nodeIdOrStep;
       const n = session?.nodes[nodeId];
       if (n) {
         setDefineSteps((prev) => [
@@ -642,77 +645,37 @@ export default function App() {
 
   if (!session) {
     return (
-      <div
-        className="empty-state"
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-      >
-        <h2>IA Mapper Viewer</h2>
+      <div className="empty-state">
+        <h2>IA Mapper</h2>
         {loading ? (
           <p>Loading sessions...</p>
+        ) : dirHandle ? (
+          <>
+            <button
+              className="empty-state-btn"
+              onClick={refreshDirectory}
+            >
+              Load from {dirName}
+            </button>
+            <button
+              className="toolbar-btn"
+              style={{ padding: '8px 16px', fontSize: 12, marginTop: 8 }}
+              onClick={pickDirectory}
+            >
+              Change folder
+            </button>
+          </>
         ) : (
           <>
             <p>
-              Choose your exports folder to auto-load all sessions, or drop
-              individual JSON files.
+              Open the <code>exports</code> folder from the repo to load all captured sessions.
             </p>
-
             <button
-              className="toolbar-btn"
-              style={{
-                padding: '12px 24px',
-                fontSize: 14,
-                background: '#6366f1',
-                color: 'white',
-                border: 'none',
-                borderRadius: 8,
-                cursor: 'pointer',
-              }}
+              className="empty-state-btn"
               onClick={pickDirectory}
             >
-              {dirName ? `Open ${dirName}` : 'Choose Exports Folder'}
+              Open Exports Folder
             </button>
-
-            {dirHandle && (
-              <button
-                className="toolbar-btn"
-                style={{
-                  padding: '8px 16px',
-                  fontSize: 12,
-                  marginTop: 4,
-                }}
-                onClick={refreshDirectory}
-              >
-                Reload from {dirName}
-              </button>
-            )}
-
-            <div
-              className="drop-zone"
-              onClick={() => fileInputRef.current?.click()}
-              onDragOver={(e) => {
-                e.preventDefault();
-                e.currentTarget.classList.add('dragover');
-              }}
-              onDragLeave={(e) => {
-                e.currentTarget.classList.remove('dragover');
-              }}
-              onDrop={(e) => {
-                e.currentTarget.classList.remove('dragover');
-                handleDrop(e);
-              }}
-            >
-              <p style={{ fontSize: 20, color: '#555570' }}>&#8693;</p>
-              <p>or drop JSON files here</p>
-            </div>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".json"
-              multiple
-              style={{ display: 'none' }}
-              onChange={handleFileInput}
-            />
           </>
         )}
       </div>
@@ -885,7 +848,7 @@ export default function App() {
               if (node.data?.dimmed) return '#222230';
               if (node.data?.isModal) return '#06b6d4';
               if (node.data?.isStub) return '#333355';
-              return '#6366f1';
+              return '#4B7BE5';
             }}
             maskColor="rgba(15, 15, 26, 0.8)"
           />
@@ -962,6 +925,32 @@ export default function App() {
           node={selectedNode}
           session={session}
           onClose={() => setSelectedNode(null)}
+          onAddNote={(nodeId, text) => {
+            mutateSession((s) => {
+              if (s.nodes[nodeId]) {
+                if (!s.nodes[nodeId].notes) s.nodes[nodeId].notes = [];
+                s.nodes[nodeId].notes.push({
+                  text,
+                  contributor: 'viewer',
+                  timestamp: new Date().toISOString(),
+                });
+              }
+            });
+          }}
+          onToggleFlag={(nodeId, flag) => {
+            mutateSession((s) => {
+              if (s.nodes[nodeId]) {
+                if (!s.nodes[nodeId].flags) s.nodes[nodeId].flags = [];
+                const flags = s.nodes[nodeId].flags;
+                const idx = flags.indexOf(flag);
+                if (idx >= 0) {
+                  flags.splice(idx, 1);
+                } else {
+                  flags.push(flag);
+                }
+              }
+            });
+          }}
         />
       )}
     </div>

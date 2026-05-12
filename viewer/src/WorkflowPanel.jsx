@@ -28,8 +28,13 @@ export default function WorkflowPanel({
 }) {
   const [newName, setNewName] = useState('');
   const [newPersona, setNewPersona] = useState('');
+  const [newNotes, setNewNotes] = useState('');
   const [search, setSearch] = useState('');
   const [personaFilter, setPersonaFilter] = useState(null);
+  const [showCustomForm, setShowCustomForm] = useState(false);
+  const [customTitle, setCustomTitle] = useState('');
+  const [customNotes, setCustomNotes] = useState('');
+  const [customScreenshot, setCustomScreenshot] = useState(null); // data URL
 
   // -----------------------------------------------------------------------
   // Personas — seed list + any custom ones from existing workflows
@@ -177,6 +182,17 @@ export default function WorkflowPanel({
           </datalist>
         </div>
 
+        <div className="wf-field">
+          <label>Workflow notes</label>
+          <textarea
+            value={newNotes}
+            onChange={(e) => setNewNotes(e.target.value)}
+            placeholder="Describe this workflow, context, assumptions..."
+            rows={2}
+            className="wf-textarea"
+          />
+        </div>
+
         <div className="wf-section-label">
           Steps ({(defineSteps || []).length})
           <span className="wf-hint">Click nodes on the graph to add steps</span>
@@ -213,14 +229,109 @@ export default function WorkflowPanel({
           </div>
         )}
 
+        {/* Add custom step form */}
+        {showCustomForm ? (
+          <div className="wf-custom-form">
+            <div className="wf-section-label">Custom Step</div>
+            <input
+              type="text"
+              value={customTitle}
+              onChange={(e) => setCustomTitle(e.target.value)}
+              placeholder="Step title (e.g. Check email for login link)"
+              className="wf-custom-input"
+              autoFocus
+            />
+            <textarea
+              value={customNotes}
+              onChange={(e) => setCustomNotes(e.target.value)}
+              placeholder="Notes about this step..."
+              rows={2}
+              className="wf-textarea"
+            />
+            <div className="wf-custom-screenshot-row">
+              <label className="wf-custom-screenshot-btn">
+                {customScreenshot ? 'Change screenshot' : '+ Screenshot'}
+                <input
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={(e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = () => setCustomScreenshot(reader.result);
+                    reader.readAsDataURL(file);
+                    e.target.value = '';
+                  }}
+                />
+              </label>
+              {customScreenshot && (
+                <img src={customScreenshot} alt="preview" className="wf-custom-screenshot-preview" />
+              )}
+            </div>
+            <div className="workflow-prompt-actions">
+              <button
+                className="wf-btn wf-btn-primary"
+                disabled={!customTitle.trim()}
+                onClick={() => {
+                  const id = `custom-${Date.now()}`;
+                  onRemoveDefineStep && void 0; // just to keep linter happy
+                  // Add custom step via the parent's step list
+                  // We pass it up through onCreateWorkflow with a special object
+                  const step = {
+                    id,
+                    title: customTitle.trim(),
+                    url: '',
+                    custom: true,
+                    notes: customNotes.trim() || null,
+                    screenshotDataUrl: customScreenshot,
+                  };
+                  // Directly add to defineSteps via the parent callback
+                  if (typeof onCreateWorkflow === 'function') {
+                    onCreateWorkflow(step);
+                  }
+                  setCustomTitle('');
+                  setCustomNotes('');
+                  setCustomScreenshot(null);
+                  setShowCustomForm(false);
+                }}
+              >
+                Add Step
+              </button>
+              <button
+                className="wf-btn wf-btn-secondary"
+                onClick={() => {
+                  setShowCustomForm(false);
+                  setCustomTitle('');
+                  setCustomNotes('');
+                  setCustomScreenshot(null);
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        ) : (
+          <button
+            className="wf-btn wf-btn-secondary wf-add-custom-btn"
+            onClick={() => setShowCustomForm(true)}
+          >
+            + Add Custom Step
+          </button>
+        )}
+
         {/* Step list */}
         <div className="wf-steps">
           {(defineSteps || []).map((step, i) => (
-            <div key={`${step.id}-${i}`} className="wf-step">
+            <div key={`${step.id}-${i}`} className={`wf-step ${step.custom ? 'custom' : ''}`}>
               <span className="wf-step-num">{i + 1}</span>
               <div className="wf-step-info">
-                <div className="wf-step-title">{step.title}</div>
-                <div className="wf-step-url">{step.url}</div>
+                <div className="wf-step-title">
+                  {step.custom && <span className="wf-custom-badge">custom</span>}
+                  {step.title}
+                </div>
+                {step.url && <div className="wf-step-url">{step.url}</div>}
+                {step.notes && <div className="wf-step-notes">{step.notes}</div>}
               </div>
               <button
                 className="wf-step-remove"
@@ -233,7 +344,7 @@ export default function WorkflowPanel({
           ))}
           {(defineSteps || []).length === 0 && (
             <div className="wf-empty">
-              Click nodes on the graph or search above to add steps.
+              Click nodes on the graph, search above, or add custom steps.
             </div>
           )}
         </div>
@@ -243,9 +354,14 @@ export default function WorkflowPanel({
             className="wf-btn wf-btn-primary"
             disabled={!newName.trim() || (defineSteps || []).length < 2}
             onClick={() => {
-              onSaveDefine(newName.trim(), newPersona.trim() || null);
+              onSaveDefine(
+                newName.trim(),
+                newPersona.trim() || null,
+                newNotes.trim() || null
+              );
               setNewName('');
               setNewPersona('');
+              setNewNotes('');
               setSearch('');
             }}
           >
@@ -282,16 +398,25 @@ export default function WorkflowPanel({
           )}
         </div>
 
+        {/* Workflow-level notes */}
+        {activeWorkflow.notes && (
+          <div className="wf-workflow-notes">
+            {activeWorkflow.notes}
+          </div>
+        )}
+
         <div className="wf-section-label">
           Path ({(activeWorkflow.path || []).length} steps)
         </div>
 
         <div className="wf-steps">
-          {(activeWorkflow.path || []).map((nodeId, i) => {
-            const node = session?.nodes[nodeId];
+          {(activeWorkflow.path || []).map((stepId, i) => {
+            const isCustom = stepId.startsWith('custom-');
+            const customData = isCustom ? (activeWorkflow.customSteps || {})[stepId] : null;
+            const node = isCustom ? null : session?.nodes[stepId];
             const isGapBefore = gaps.some((g) => g.index === i - 1);
             return (
-              <React.Fragment key={`${nodeId}-${i}`}>
+              <React.Fragment key={`${stepId}-${i}`}>
                 {isGapBefore && (
                   <div className="wf-gap">
                     <span className="wf-gap-icon">&#9888;</span>
@@ -314,6 +439,27 @@ export default function WorkflowPanel({
                     </button>
                   </div>
                 )}
+                {isCustom ? (
+                  <div className="wf-step custom">
+                    <span className="wf-step-num">{i + 1}</span>
+                    <div className="wf-step-info">
+                      <div className="wf-step-title">
+                        <span className="wf-custom-badge">custom</span>
+                        {customData?.title || stepId}
+                      </div>
+                      {customData?.notes && (
+                        <div className="wf-step-notes">{customData.notes}</div>
+                      )}
+                      {customData?.screenshotDataUrl && (
+                        <img
+                          src={customData.screenshotDataUrl}
+                          alt={customData.title}
+                          className="wf-step-screenshot"
+                        />
+                      )}
+                    </div>
+                  </div>
+                ) : (
                 <div
                   className={`wf-step ${node?.stub ? 'stub' : ''}`}
                 >
@@ -323,11 +469,12 @@ export default function WorkflowPanel({
                       {node?.stub && (
                         <span className="wf-stub-badge">stub</span>
                       )}
-                      {node?.title || nodeId}
+                      {node?.title || stepId}
                     </div>
                     <div className="wf-step-url">{node?.url || ''}</div>
                   </div>
                 </div>
+                )}
               </React.Fragment>
             );
           })}

@@ -8,9 +8,9 @@
   --text: #e0e0f0;
   --text-muted: #777799;
   --text-dim: #555570;
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
-  --accent-dim: rgba(99, 102, 241, 0.15);
+  --accent: #4B7BE5;
+  --accent-hover: #6B93EA;
+  --accent-dim: rgba(75, 123, 229, 0.15);
   --border: #2a2a44;
   --danger: #ef4444;
   --orange: #f97316;
@@ -199,11 +199,11 @@ html, body, #root {
   border-radius: 1px;
 }
 
-.legend-line.navigate { background: var(--accent); }
-.legend-line.child-of { background: var(--text-dim); }
-.legend-line.modal-open { background: var(--cyan); }
-.legend-line.modal-step { background: var(--cyan); background: repeating-linear-gradient(90deg, var(--cyan) 0 4px, transparent 4px 8px); }
-.legend-line.modal-dismiss { background: var(--pink); opacity: 0.6; }
+.legend-line.navigate { background: #354E80; }
+.legend-line.child-of { background: #3A3A52; }
+.legend-line.modal-open { background: #0E7A8F; }
+.legend-line.modal-step { background: #0E7A8F; background: repeating-linear-gradient(90deg, #0E7A8F 0 4px, transparent 4px 8px); }
+.legend-line.modal-dismiss { background: #8F3060; opacity: 0.6; }
 
 /* ---- Detail panel ---- */
 
@@ -301,6 +301,12 @@ html, body, #root {
 .detail-flag.missing { background: rgba(234,179,8,0.15); color: var(--yellow); }
 .detail-flag.good { background: rgba(34,197,94,0.15); color: var(--green); }
 
+.detail-notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .detail-note {
   font-size: 12px;
   line-height: 1.5;
@@ -309,6 +315,122 @@ html, body, #root {
   padding: 8px 10px;
   border-radius: 6px;
   border: 1px solid var(--border);
+}
+
+.detail-note-input {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.detail-note-input textarea {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 12px;
+  font-family: inherit;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  resize: none;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.detail-note-input textarea:focus {
+  border-color: var(--accent);
+}
+
+.detail-note-input textarea::placeholder {
+  color: var(--text-dim);
+}
+
+.detail-note-submit {
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  align-self: flex-end;
+  transition: background 0.12s;
+}
+
+.detail-note-submit:hover:not(:disabled) {
+  background: var(--accent-hover);
+}
+
+.detail-note-submit:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Detail flag toggle buttons */
+
+.detail-flag-btn {
+  padding: 3px 8px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.12s;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+}
+
+.detail-flag-btn.broken { color: var(--danger); }
+.detail-flag-btn.confusing { color: var(--orange); }
+.detail-flag-btn.missing { color: var(--yellow); }
+.detail-flag-btn.good { color: var(--green); }
+
+.detail-flag-btn:hover { background: var(--bg-hover); }
+
+.detail-flag-btn.broken.active { border-color: var(--danger); background: rgba(239,68,68,0.12); }
+.detail-flag-btn.confusing.active { border-color: var(--orange); background: rgba(249,115,22,0.12); }
+.detail-flag-btn.missing.active { border-color: var(--yellow); background: rgba(234,179,8,0.12); }
+.detail-flag-btn.good.active { border-color: var(--green); background: rgba(34,197,94,0.12); }
+
+/* Detail badges */
+
+.detail-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 8px;
+}
+
+.detail-badge.cyan { background: rgba(6,182,212,0.15); color: #06b6d4; }
+.detail-badge.dim { background: rgba(85,85,112,0.2); color: #777799; }
+.detail-badge.domain { background: rgba(75,123,229,0.1); color: #8888aa; font-weight: 600; }
+.detail-badge.platform { background: rgba(234,179,8,0.12); color: #eab308; }
+
+.detail-edge-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Empty state */
+
+.empty-state-btn {
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.empty-state-btn:hover {
+  background: var(--accent-hover);
 }
 
 .detail-edges {
@@ -751,6 +873,139 @@ html, body, #root {
   flex-shrink: 0;
 }
 
+.wf-custom-badge {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1px 4px;
+  border-radius: 4px;
+  background: rgba(75,123,229,0.12);
+  color: var(--accent);
+  flex-shrink: 0;
+  margin-right: 4px;
+}
+
+.wf-step.custom {
+  border-color: rgba(75,123,229,0.25);
+  border-style: solid;
+}
+
+.wf-step-notes {
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.wf-step-screenshot {
+  width: 100%;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-top: 4px;
+  border: 1px solid var(--border);
+}
+
+/* Workflow notes */
+
+.wf-workflow-notes {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  padding: 8px 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.wf-textarea {
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-family: inherit;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.wf-textarea:focus {
+  border-color: var(--accent);
+}
+
+.wf-textarea::placeholder {
+  color: var(--text-dim);
+}
+
+/* Custom step form */
+
+.wf-custom-form {
+  padding: 10px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wf-custom-input {
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.wf-custom-input:focus {
+  border-color: var(--accent);
+}
+
+.wf-custom-input::placeholder {
+  color: var(--text-dim);
+}
+
+.wf-custom-screenshot-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.wf-custom-screenshot-btn {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 4px 8px;
+  background: var(--accent-dim);
+  border-radius: 4px;
+  transition: background 0.12s;
+}
+
+.wf-custom-screenshot-btn:hover {
+  background: var(--bg-hover);
+}
+
+.wf-custom-screenshot-preview {
+  width: 48px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+}
+
+.wf-add-custom-btn {
+  font-size: 11px;
+  padding: 6px 0;
+}
+
 /* Gap indicators */
 
 .wf-gap {
@@ -912,7 +1167,7 @@ html, body, #root {
   font-weight: 600;
   color: var(--accent);
   background: var(--accent-dim);
-  border: 1px solid rgba(99,102,241,0.25);
+  border: 1px solid rgba(75,123,229,0.25);
   border-radius: 8px;
   pointer-events: none;
 }
@@ -956,5 +1211,5 @@ html, body, #root {
 /* Workflow path legend line */
 
 .legend-line.workflow-path {
-  background: var(--green);
+  background: #1A7A3A;
 }

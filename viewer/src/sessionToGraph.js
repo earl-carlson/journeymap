@@ -5,29 +5,29 @@
 // Edge style config by type
 const EDGE_STYLES = {
   navigate: {
-    stroke: '#6366f1',
+    stroke: '#354E80',
     strokeWidth: 2,
     animated: false,
   },
   'child-of': {
-    stroke: '#555570',
+    stroke: '#3A3A52',
     strokeWidth: 1.5,
     strokeDasharray: '6 3',
     animated: false,
   },
   'modal-open': {
-    stroke: '#06b6d4',
+    stroke: '#0E7A8F',
     strokeWidth: 2,
     animated: true,
   },
   'modal-step': {
-    stroke: '#06b6d4',
+    stroke: '#0E7A8F',
     strokeWidth: 1.5,
     strokeDasharray: '4 4',
     animated: false,
   },
   'modal-dismiss': {
-    stroke: '#ec4899',
+    stroke: '#8F3060',
     strokeWidth: 1,
     strokeDasharray: '3 3',
     animated: false,
@@ -152,7 +152,7 @@ export function sessionToGraph(session, options = {}) {
       type: 'smoothstep',
       animated: onWorkflowPath ? true : style.animated,
       style: {
-        stroke: onWorkflowPath ? '#22c55e' : style.stroke,
+        stroke: onWorkflowPath ? '#1A7A3A' : style.stroke,
         strokeWidth: onWorkflowPath ? 3 : style.strokeWidth,
         strokeDasharray: onWorkflowPath ? undefined : style.strokeDasharray,
         opacity: dimmedEdge ? 0.15 : style.opacity,
