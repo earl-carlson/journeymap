@@ -587,6 +587,93 @@ function sendToTab(tabId, message) {
 }
 
 // ---------------------------------------------------------------------------
+// Whisper offscreen document management
+// ---------------------------------------------------------------------------
+
+let whisperOffscreenReady = false;
+let whisperPort = null;
+let whisperResolve = null;
+let whisperReject = null;
+
+async function ensureWhisperOffscreen() {
+  if (whisperOffscreenReady && whisperPort) return;
+
+  // Close any existing offscreen doc
+  try {
+    await chrome.offscreen.closeDocument();
+  } catch { /* none open */ }
+
+  whisperOffscreenReady = false;
+  whisperPort = null;
+
+  await chrome.offscreen.createDocument({
+    url: 'whisper-offscreen.html',
+    reasons: ['WORKERS'],
+    justification: 'Run Whisper speech-to-text model via Transformers.js WebAssembly',
+  });
+
+  // Wait for the offscreen doc to connect via port
+  await new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => reject(new Error('Whisper offscreen connect timeout')), 10000);
+
+    function onConnect(port) {
+      if (port.name === 'whisper') {
+        clearTimeout(timeout);
+        chrome.runtime.onConnect.removeListener(onConnect);
+        whisperPort = port;
+        whisperPort.onMessage.addListener((msg) => {
+          if (msg.type === 'WHISPER_RESULT') {
+            if (whisperResolve) {
+              if (msg.ok) {
+                whisperResolve({ text: msg.text, chunks: msg.chunks || [] });
+              } else {
+                whisperReject(new Error(msg.error || 'Transcription failed'));
+              }
+              whisperResolve = null;
+              whisperReject = null;
+            }
+          } else if (msg.type === 'WHISPER_PROGRESS') {
+            // Could forward to side panel
+            console.log('[whisper] Progress:', msg.file, Math.round(msg.progress || 0) + '%');
+          }
+        });
+        whisperPort.onDisconnect.addListener(() => {
+          whisperPort = null;
+          whisperOffscreenReady = false;
+        });
+        resolve();
+      }
+    }
+
+    chrome.runtime.onConnect.addListener(onConnect);
+  });
+
+  whisperOffscreenReady = true;
+  console.log('[whisper] Offscreen document connected');
+}
+
+/**
+ * Send audio to the Whisper offscreen document for transcription.
+ */
+async function transcribeAudio(audioData, modelId) {
+  await ensureWhisperOffscreen();
+
+  return new Promise((resolve, reject) => {
+    whisperResolve = resolve;
+    whisperReject = reject;
+
+    whisperPort.postMessage({
+      type: 'WHISPER_TRANSCRIBE',
+      audioData: Array.from(audioData),
+      modelId: modelId || 'onnx-community/whisper-base',
+    });
+  });
+}
+
+// Track which node a recording was started on
+let recordingStartNodeId = null;
+
+// ---------------------------------------------------------------------------
 // Navigation listeners
 // ---------------------------------------------------------------------------
 
@@ -625,6 +712,13 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(
 // ---------------------------------------------------------------------------
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  // Ignore messages not meant for the background
+  if (message.type === 'WHISPER_TRANSCRIBE' || message.type === 'WHISPER_LOAD_MODEL'
+      || message.type === 'WHISPER_PROGRESS' || message.type === 'WHISPER_RESULT'
+      || message.type === 'MIC_PERMISSION_GRANTED') {
+    return false;
+  }
+
   // Handle messages that work without an active session
   if (message.type === 'GET_SESSION_STATUS') {
     if (session) {
@@ -754,6 +848,51 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sendResponse({ ok: true, session: exportData });
       });
       return true; // async
+    }
+
+    case 'AUDIO_RECORDING_STARTED': {
+      // Remember which node the recording started on
+      recordingStartNodeId = activeModalNodeId || currentNodeId;
+      console.log('[audio] Recording started on node:', recordingStartNodeId);
+      sendResponse({ ok: true, nodeId: recordingStartNodeId });
+      break;
+    }
+
+    case 'AUDIO_TRANSCRIBE': {
+      // Receive audio data from side panel, send to Whisper offscreen doc
+      const targetNodeId = message.nodeId || recordingStartNodeId || currentNodeId;
+      const audioData = new Float32Array(message.audioData);
+      const modelId = message.modelId || 'onnx-community/whisper-base';
+
+      console.log('[audio] Transcribing for node:', targetNodeId, 'samples:', audioData.length);
+
+      transcribeAudio(audioData, modelId)
+        .then((result) => {
+          // Attach transcription to the node
+          if (session && session.nodes[targetNodeId]) {
+            const note = {
+              text: result.text.trim(),
+              contributor: session.meta.contributor,
+              timestamp: new Date().toISOString(),
+              type: 'audio',
+            };
+            session.nodes[targetNodeId].notes.push(note);
+            persistSession();
+            console.log('[audio] Note attached to', targetNodeId, ':', result.text.trim());
+          }
+          sendResponse({
+            ok: true,
+            text: result.text.trim(),
+            nodeId: targetNodeId,
+          });
+        })
+        .catch((err) => {
+          console.error('[audio] Transcription failed:', err);
+          sendResponse({ ok: false, error: err.message });
+        });
+
+      recordingStartNodeId = null;
+      return true; // Async response
     }
 
     default:

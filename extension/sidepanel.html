@@ -91,6 +91,20 @@
       </div>
     </div>
 
+    <!-- Audio notes -->
+    <div class="audio-section">
+      <div class="section-label">Audio Note</div>
+      <div class="audio-controls">
+        <button id="btn-record" class="btn-record" title="Record audio note">
+          <span id="record-icon" class="record-icon"></span>
+          <span id="record-label">Record</span>
+        </button>
+        <canvas id="waveform" class="waveform" width="200" height="32"></canvas>
+      </div>
+      <div id="audio-status" class="audio-status hidden"></div>
+      <div id="transcription-result" class="transcription-result hidden"></div>
+    </div>
+
     <div class="flags">
       <div class="section-label">Flag current page</div>
       <div class="flag-buttons">

@@ -28,6 +28,11 @@ const recentList = document.getElementById('recent-list');
 const flagButtons = document.querySelectorAll('.btn-flag');
 const screenshotIndicator = document.getElementById('screenshot-indicator');
 const btnRetrigger = document.getElementById('btn-retrigger');
+const btnRecord = document.getElementById('btn-record');
+const recordLabel = document.getElementById('record-label');
+const waveformCanvas = document.getElementById('waveform');
+const audioStatus = document.getElementById('audio-status');
+const transcriptionResult = document.getElementById('transcription-result');
 
 let savedContributor = null;
 let dirHandle = null;    // FileSystemDirectoryHandle — persisted across sessions
@@ -515,6 +520,223 @@ function escapeHtml(str) {
 }
 
 setInterval(refreshStatus, 1500);
+
+// ---------------------------------------------------------------------------
+// Audio recording + transcription
+// ---------------------------------------------------------------------------
+
+let isRecording = false;
+let mediaRecorder = null;
+let audioChunks = [];
+let audioContext = null;
+let analyser = null;
+let animFrameId = null;
+let recordingNodeId = null;
+
+btnRecord.addEventListener('click', async () => {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    await startRecording();
+  }
+});
+
+async function startRecording() {
+  try {
+    // Check if getUserMedia is available in this context
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      // Side panel may not support getUserMedia — open permission page
+      openMicPermissionPage();
+      return;
+    }
+
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          sampleRate: 16000,
+          echoCancellation: true,
+          noiseSuppression: true,
+        },
+      });
+    } catch (micErr) {
+      if (micErr.name === 'NotAllowedError' || micErr.name === 'NotFoundError') {
+        // Permission denied or no mic — open permission page in a new tab
+        openMicPermissionPage();
+        return;
+      }
+      throw micErr;
+    }
+
+    // Tell background which node we're recording on
+    chrome.runtime.sendMessage({ type: 'AUDIO_RECORDING_STARTED' }, (resp) => {
+      if (resp && resp.nodeId) {
+        recordingNodeId = resp.nodeId;
+      }
+    });
+
+    // Set up audio context for waveform visualization
+    audioContext = new AudioContext({ sampleRate: 16000 });
+    const source = audioContext.createMediaStreamSource(stream);
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+
+    // Start MediaRecorder
+    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = async () => {
+      // Stop all tracks
+      stream.getTracks().forEach((t) => t.stop());
+      cancelAnimationFrame(animFrameId);
+
+      if (audioChunks.length === 0) {
+        showAudioStatus('No audio recorded');
+        return;
+      }
+
+      showAudioStatus('Transcribing...');
+
+      try {
+        // Convert recorded audio to Float32Array at 16kHz
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const arrayBuffer = await blob.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+        const float32Data = audioBuffer.getChannelData(0);
+
+        // Send to background for Whisper transcription
+        chrome.runtime.sendMessage(
+          {
+            type: 'AUDIO_TRANSCRIBE',
+            audioData: Array.from(float32Data),
+            nodeId: recordingNodeId,
+          },
+          (response) => {
+            if (chrome.runtime.lastError) {
+              showAudioStatus('Error: ' + chrome.runtime.lastError.message);
+              return;
+            }
+            if (response && response.ok) {
+              showTranscription(response.text, response.nodeId);
+              showAudioStatus('');
+            } else {
+              showAudioStatus('Transcription failed: ' + (response?.error || 'unknown'));
+            }
+          }
+        );
+      } catch (err) {
+        showAudioStatus('Error processing audio: ' + err.message);
+      }
+    };
+
+    mediaRecorder.start(250); // Collect data every 250ms
+    isRecording = true;
+    btnRecord.classList.add('recording');
+    recordLabel.textContent = 'Stop';
+    transcriptionResult.classList.add('hidden');
+    showAudioStatus('Recording...');
+
+    // Start waveform visualization
+    drawWaveform();
+  } catch (err) {
+    showAudioStatus('Error: ' + err.message);
+  }
+}
+
+function openMicPermissionPage() {
+  showAudioStatus('Opening microphone permission page...');
+  chrome.tabs.create({
+    url: chrome.runtime.getURL('mic-permission.html'),
+    active: true,
+  });
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+  }
+  isRecording = false;
+  btnRecord.classList.remove('recording');
+  recordLabel.textContent = 'Record';
+}
+
+function drawWaveform() {
+  if (!analyser || !isRecording) return;
+
+  const canvas = waveformCanvas;
+  const ctx = canvas.getContext('2d');
+  const bufferLength = analyser.frequencyBinCount;
+  const dataArray = new Uint8Array(bufferLength);
+
+  function draw() {
+    if (!isRecording) return;
+    animFrameId = requestAnimationFrame(draw);
+
+    analyser.getByteTimeDomainData(dataArray);
+
+    ctx.fillStyle = '#222240';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = '#6366f1';
+    ctx.beginPath();
+
+    const sliceWidth = canvas.width / bufferLength;
+    let x = 0;
+
+    for (let i = 0; i < bufferLength; i++) {
+      const v = dataArray[i] / 128.0;
+      const y = (v * canvas.height) / 2;
+
+      if (i === 0) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+
+      x += sliceWidth;
+    }
+
+    ctx.lineTo(canvas.width, canvas.height / 2);
+    ctx.stroke();
+  }
+
+  draw();
+}
+
+function showAudioStatus(text) {
+  if (text) {
+    audioStatus.textContent = text;
+    audioStatus.classList.remove('hidden');
+  } else {
+    audioStatus.classList.add('hidden');
+  }
+}
+
+function showTranscription(text, nodeId) {
+  if (!text || !text.trim()) {
+    transcriptionResult.innerHTML = '<em style="color: var(--text-muted)">No speech detected</em>';
+    transcriptionResult.classList.remove('hidden');
+    return;
+  }
+
+  transcriptionResult.innerHTML = `
+    <div style="margin-bottom: 4px">${escapeHtml(text)}</div>
+    <div style="font-size: 10px; color: var(--text-muted)">Attached to node ${nodeId || 'current'}</div>
+  `;
+  transcriptionResult.classList.remove('hidden');
+}
+
+// Listen for Whisper progress events (model download)
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.type === 'WHISPER_PROGRESS') {
+    const pct = Math.round(message.progress || 0);
+    showAudioStatus(`Loading model: ${pct}% (${message.file || ''})`);
+  }
+});
 
 // ---------------------------------------------------------------------------
 // Go

@@ -1,11 +1,12 @@
 {
   "manifest_version": 3,
   "name": "IA Mapper",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Build, annotate, and share a living Information Architecture map of the Docker web platform.",
   "permissions": [
     "activeTab",
     "storage",
+    "unlimitedStorage",
     "webNavigation",
     "tabs",
     "sidePanel",
@@ -24,6 +25,9 @@
       "run_at": "document_idle"
     }
   ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; connect-src 'self' https://cdn.jsdelivr.net https://huggingface.co https://*.huggingface.co blob:"
+  },
   "side_panel": {
     "default_path": "sidepanel.html"
   },
