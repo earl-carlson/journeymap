@@ -1,0 +1,75 @@
+{
+  "meta": {
+    "contributor": "Earl",
+    "date": "2026-05-12",
+    "mode": "map"
+  },
+  "nodes": {
+    "d4038df9": {
+      "url": "https://hub.docker.com/hardened-images/catalog",
+      "title": "Hardened Images catalog | Docker Hub",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "163830af"
+    },
+    "163830af": {
+      "url": "https://hub.docker.com/hardened-images",
+      "title": "Hardened Images (hub.docker.com)",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": "91ab7f42"
+    },
+    "91ab7f42": {
+      "url": "https://hub.docker.com",
+      "title": "hub.docker.com",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": null
+    },
+    "d4038df9:modal:d30ef885": {
+      "url": "https://hub.docker.com/hardened-images/catalog#modal:d30ef885",
+      "title": "Docker Hardened Images",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "d4038df9",
+      "isModal": true,
+      "modalContentHash": "d30ef885",
+      "parentPageId": "d4038df9"
+    }
+  },
+  "edges": [
+    {
+      "from": "163830af",
+      "to": "d4038df9",
+      "type": "child-of",
+      "count": 4
+    },
+    {
+      "from": "91ab7f42",
+      "to": "163830af",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "d4038df9",
+      "to": "d4038df9:modal:d30ef885",
+      "type": "modal-open",
+      "count": 1
+    },
+    {
+      "from": "d4038df9:modal:d30ef885",
+      "to": "d4038df9",
+      "type": "modal-dismiss",
+      "count": 1
+    }
+  ],
+  "workflows": []
+}

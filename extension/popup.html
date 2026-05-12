@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Mapper</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <!-- Idle state: no session active -->
+  <div id="view-idle" class="view">
+    <div class="header">
+      <h1>IA Mapper</h1>
+      <span class="badge badge-idle">Idle</span>
+    </div>
+    <p class="description">Capture the information architecture of Docker's web platform.</p>
+    <div class="field">
+      <label for="contributor">Your name</label>
+      <input type="text" id="contributor" placeholder="e.g. earl" autocomplete="off" spellcheck="false">
+    </div>
+    <button id="btn-start" class="btn btn-primary">Start Session</button>
+  </div>
+
+  <!-- Active state: session running -->
+  <div id="view-active" class="view hidden">
+    <div class="header">
+      <h1>IA Mapper</h1>
+      <span class="badge badge-active">Recording</span>
+    </div>
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-value" id="stat-nodes">0</span>
+        <span class="stat-label">Nodes</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="stat-edges">0</span>
+        <span class="stat-label">Edges</span>
+      </div>
+    </div>
+    <div class="meta">
+      <span class="meta-item">
+        <span class="meta-label">Contributor:</span>
+        <span id="meta-contributor">—</span>
+      </span>
+      <span class="meta-item">
+        <span class="meta-label">Mode:</span>
+        <span id="meta-mode">Map</span>
+      </span>
+    </div>
+
+    <div class="flags">
+      <span class="flag-label">Flag current page:</span>
+      <div class="flag-buttons">
+        <button class="btn-flag" data-flag="broken" title="Broken">broken</button>
+        <button class="btn-flag" data-flag="confusing" title="Confusing">confusing</button>
+        <button class="btn-flag" data-flag="missing" title="Missing">missing</button>
+        <button class="btn-flag" data-flag="good" title="Good">good</button>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="btn-export" class="btn btn-secondary">Export JSON</button>
+      <button id="btn-stop" class="btn btn-danger">End Session</button>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

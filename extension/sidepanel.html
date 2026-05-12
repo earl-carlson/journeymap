@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>IA Mapper</title>
+  <link rel="stylesheet" href="sidepanel.css">
+</head>
+<body>
+  <!-- Setup: first-time contributor name entry -->
+  <div id="view-setup" class="view hidden">
+    <div class="header">
+      <h1>IA Mapper</h1>
+    </div>
+    <p class="description">Before you start, enter your name. This is saved permanently and used to attribute your captures.</p>
+    <div class="field">
+      <label for="contributor">Your name</label>
+      <input type="text" id="contributor" placeholder="e.g. earl" autocomplete="off" spellcheck="false">
+    </div>
+    <button id="btn-save-name" class="btn btn-primary">Save &amp; Continue</button>
+  </div>
+
+  <!-- Idle: name is set, no session active -->
+  <div id="view-idle" class="view hidden">
+    <div class="header">
+      <h1>IA Mapper</h1>
+      <span class="badge badge-idle">Idle</span>
+    </div>
+    <p class="description">Navigate to any <code>*.docker.com</code> page and start a session to begin mapping.</p>
+    <div class="meta">
+      <span class="meta-item">
+        <span class="meta-label">Contributor:</span>
+        <span id="idle-contributor">—</span>
+        <button id="btn-change-name" class="btn-inline" title="Change name">edit</button>
+      </span>
+    </div>
+    <button id="btn-start" class="btn btn-primary">Start Session</button>
+  </div>
+
+  <!-- Active: session running -->
+  <div id="view-active" class="view hidden">
+    <div class="header">
+      <h1>IA Mapper</h1>
+      <span class="badge badge-active">Recording</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <span class="stat-value" id="stat-nodes">0</span>
+        <span class="stat-label">Nodes</span>
+      </div>
+      <div class="stat">
+        <span class="stat-value" id="stat-edges">0</span>
+        <span class="stat-label">Edges</span>
+      </div>
+    </div>
+
+    <div class="meta">
+      <span class="meta-item">
+        <span class="meta-label">Contributor:</span>
+        <span id="meta-contributor">—</span>
+      </span>
+      <span class="meta-item">
+        <span class="meta-label">Mode:</span>
+        <span id="meta-mode">Map</span>
+      </span>
+    </div>
+
+    <!-- Current page info -->
+    <div id="current-page" class="current-page hidden">
+      <div class="section-label">Current Page</div>
+      <div id="current-page-title" class="current-page-title">—</div>
+      <div id="current-page-url" class="current-page-url">—</div>
+    </div>
+
+    <div class="flags">
+      <div class="section-label">Flag current page</div>
+      <div class="flag-buttons">
+        <button class="btn-flag" data-flag="broken" title="Broken">broken</button>
+        <button class="btn-flag" data-flag="confusing" title="Confusing">confusing</button>
+        <button class="btn-flag" data-flag="missing" title="Missing">missing</button>
+        <button class="btn-flag" data-flag="good" title="Good">good</button>
+      </div>
+    </div>
+
+    <!-- Recent nodes -->
+    <div id="recent-nodes" class="recent-nodes">
+      <div class="section-label">Recent Pages</div>
+      <div id="recent-list" class="recent-list"></div>
+    </div>
+
+    <div class="actions">
+      <button id="btn-export" class="btn btn-secondary">Export JSON</button>
+      <button id="btn-stop" class="btn btn-danger">End Session</button>
+    </div>
+  </div>
+
+  <script src="sidepanel.js"></script>
+</body>
+</html>

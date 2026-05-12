@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Generate JourneyMap Icons</title>
+<style>
+  * { margin: 0; box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, sans-serif;
+    background: #0f0f14;
+    color: #e2e2e8;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    padding: 2rem;
+  }
+  h1 { font-size: 1.25rem; font-weight: 500; letter-spacing: -0.01em; }
+  .previews {
+    display: flex;
+    gap: 2.5rem;
+    align-items: end;
+  }
+  .preview {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .preview canvas {
+    border-radius: 6px;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .preview span {
+    font-size: 0.75rem;
+    color: #888;
+    font-variant-numeric: tabular-nums;
+  }
+  button {
+    padding: 0.6rem 1.5rem;
+    background: #6366f1;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  button:hover { background: #5457e5; }
+  button:active { background: #4f46e5; }
+  .done {
+    font-size: 0.8rem;
+    color: #6ee7b7;
+    min-height: 1.2em;
+  }
+</style>
+</head>
+<body>
+
+<h1>JourneyMap Icon Generator</h1>
+<div class="previews" id="previews"></div>
+<button id="download">Download All PNGs</button>
+<div class="done" id="status"></div>
+
+<script>
+const SIZES = [16, 48, 128];
+const BG = '#6366f1';
+
+// Node positions as fractions of canvas size (0-1).
+// Layout: a small constellation / graph of 5 nodes with connecting edges.
+const NODES = [
+  { x: 0.25, y: 0.28 },
+  { x: 0.72, y: 0.20 },
+  { x: 0.50, y: 0.50 },
+  { x: 0.22, y: 0.74 },
+  { x: 0.76, y: 0.72 },
+];
+
+const EDGES = [
+  [0, 1],
+  [0, 2],
+  [1, 2],
+  [2, 3],
+  [2, 4],
+  [3, 4],
+];
+
+function drawIcon(canvas, size) {
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+
+  // Background with slight rounded-rect clip (only visible at large sizes)
+  const r = size * 0.16;
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(size - r, 0);
+  ctx.quadraticCurveTo(size, 0, size, r);
+  ctx.lineTo(size, size - r);
+  ctx.quadraticCurveTo(size, size, size - r, size);
+  ctx.lineTo(r, size);
+  ctx.quadraticCurveTo(0, size, 0, size - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+  ctx.clip();
+
+  // Fill background
+  ctx.fillStyle = BG;
+  ctx.fillRect(0, 0, size, size);
+
+  // Subtle radial gradient overlay for depth
+  const grd = ctx.createRadialGradient(
+    size * 0.4, size * 0.35, 0,
+    size * 0.5, size * 0.5, size * 0.7
+  );
+  grd.addColorStop(0, 'rgba(255,255,255,0.10)');
+  grd.addColorStop(1, 'rgba(0,0,0,0.12)');
+  ctx.fillStyle = grd;
+  ctx.fillRect(0, 0, size, size);
+
+  // Padding so nodes don't touch the edge
+  const pad = size * 0.14;
+  const inner = size - pad * 2;
+
+  function nx(node) { return pad + node.x * inner; }
+  function ny(node) { return pad + node.y * inner; }
+
+  // Draw edges
+  const lineWidth = Math.max(1, size * 0.025);
+  ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+  ctx.lineWidth = lineWidth;
+  ctx.lineCap = 'round';
+
+  for (const [a, b] of EDGES) {
+    ctx.beginPath();
+    ctx.moveTo(nx(NODES[a]), ny(NODES[a]));
+    ctx.lineTo(nx(NODES[b]), ny(NODES[b]));
+    ctx.stroke();
+  }
+
+  // Draw nodes
+  const nodeRadius = Math.max(1.5, size * 0.06);
+  const centerRadius = Math.max(2, size * 0.08);
+
+  for (let i = 0; i < NODES.length; i++) {
+    const isCenter = i === 2; // middle node is the "hub"
+    const rad = isCenter ? centerRadius : nodeRadius;
+    const x = nx(NODES[i]);
+    const y = ny(NODES[i]);
+
+    // Glow behind node
+    if (size >= 48) {
+      const glowR = rad * 2.8;
+      const glow = ctx.createRadialGradient(x, y, 0, x, y, glowR);
+      glow.addColorStop(0, 'rgba(255,255,255,0.18)');
+      glow.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = glow;
+      ctx.beginPath();
+      ctx.arc(x, y, glowR, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // Node circle
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.arc(x, y, rad, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+// Render previews
+const container = document.getElementById('previews');
+const canvases = {};
+
+for (const size of SIZES) {
+  const wrap = document.createElement('div');
+  wrap.className = 'preview';
+
+  const canvas = document.createElement('canvas');
+  drawIcon(canvas, size);
+  canvases[size] = canvas;
+
+  const label = document.createElement('span');
+  label.textContent = `${size} x ${size}`;
+
+  wrap.appendChild(canvas);
+  wrap.appendChild(label);
+  container.appendChild(wrap);
+}
+
+// Download
+function downloadCanvas(canvas, filename) {
+  const link = document.createElement('a');
+  link.download = filename;
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+document.getElementById('download').addEventListener('click', () => {
+  for (const size of SIZES) {
+    downloadCanvas(canvases[size], `icon${size}.png`);
+  }
+  document.getElementById('status').textContent =
+    'Done -- move the downloaded files into extension/icons/';
+});
+</script>
+</body>
+</html>

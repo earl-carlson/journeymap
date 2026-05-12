@@ -1,0 +1,620 @@
+// IA Mapper — Background Service Worker
+// Tracks navigation across *.docker.com, builds the session graph.
+// Infers URL-path hierarchy alongside raw navigation edges.
+
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+
+let session = null;       // Active session object or null
+let currentNodeId = null; // URL-hash of the node the user is currently on
+let previousNodeId = null; // URL-hash of the node the user just left
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns true if the URL belongs to *.docker.com
+ */
+function isDockerUrl(url) {
+  try {
+    const hostname = new URL(url).hostname;
+    return hostname === 'docker.com' || hostname.endsWith('.docker.com');
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Deterministic hash of a URL (stripped of fragment).
+ * Uses a simple djb2-style hash → hex string.
+ * Stable across sessions so the same URL always produces the same key.
+ */
+function urlHash(url) {
+  const u = new URL(url);
+  u.hash = '';
+  let normalized = u.toString().replace(/\/+$/, '');
+
+  let hash = 5381;
+  for (let i = 0; i < normalized.length; i++) {
+    hash = ((hash << 5) + hash + normalized.charCodeAt(i)) >>> 0;
+  }
+  return hash.toString(16).padStart(8, '0');
+}
+
+/**
+ * Canonical URL string (no fragment, no trailing slash).
+ */
+function canonicalUrl(url) {
+  const u = new URL(url);
+  u.hash = '';
+  return u.toString().replace(/\/+$/, '');
+}
+
+// ---------------------------------------------------------------------------
+// URL hierarchy inference
+// ---------------------------------------------------------------------------
+
+/**
+ * Given a URL, return the inferred parent URL by removing the last path
+ * segment. Returns null if we're already at the domain root.
+ *
+ * Examples:
+ *   https://docs.docker.com/ai/sandboxes/security/isolation
+ *     → https://docs.docker.com/ai/sandboxes/security
+ *
+ *   https://docs.docker.com/ai/sandboxes
+ *     → https://docs.docker.com/ai
+ *
+ *   https://docs.docker.com/ai
+ *     → https://docs.docker.com          (domain root)
+ *
+ *   https://docs.docker.com
+ *     → null                              (already at root)
+ */
+function inferParentUrl(url) {
+  const u = new URL(url);
+  // Strip trailing slashes, split into segments
+  const path = u.pathname.replace(/\/+$/, '');
+  const segments = path.split('/').filter(Boolean);
+
+  if (segments.length === 0) {
+    // Already at domain root
+    return null;
+  }
+
+  // Remove last segment
+  segments.pop();
+  u.pathname = '/' + segments.join('/');
+  u.hash = '';
+  u.search = '';
+  return u.toString().replace(/\/+$/, '') || u.origin;
+}
+
+/**
+ * Derive a human-readable title from a URL path segment.
+ *   "security" → "Security"
+ *   "get-started" → "Get Started"
+ *   "ai" → "AI"
+ */
+function titleFromSegment(segment) {
+  // Common acronyms
+  const acronyms = new Set(['ai', 'api', 'cli', 'sdk', 'faq', 'mcp', 'ci', 'cd', 'ui', 'ux', 'sso', 'rbac']);
+  if (acronyms.has(segment.toLowerCase())) {
+    return segment.toUpperCase();
+  }
+  return segment
+    .split('-')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ');
+}
+
+/**
+ * Derive a stub title for a URL we haven't visited.
+ *   https://docs.docker.com/ai/sandboxes → "Sandboxes (docs.docker.com)"
+ *   https://docs.docker.com → "docs.docker.com"
+ */
+function stubTitleFromUrl(url) {
+  const u = new URL(url);
+  const path = u.pathname.replace(/\/+$/, '');
+  const segments = path.split('/').filter(Boolean);
+
+  if (segments.length === 0) {
+    return u.hostname;
+  }
+
+  const lastSegment = segments[segments.length - 1];
+  return titleFromSegment(lastSegment) + ' (' + u.hostname + ')';
+}
+
+/**
+ * Get or create a node for a URL. If the node doesn't exist, create it as
+ * a stub (inferred from URL, not yet visited).
+ * Returns the node ID (url-hash).
+ */
+function ensureNode(url, title, isStub = false) {
+  const canonical = canonicalUrl(url);
+  const id = urlHash(canonical);
+
+  if (!session.nodes[id]) {
+    session.nodes[id] = {
+      url: canonical,
+      title: title || stubTitleFromUrl(canonical),
+      screenshot: null,
+      notes: [],
+      flags: [],
+      stub: isStub,
+      inferredParent: null
+    };
+  }
+
+  return id;
+}
+
+/**
+ * Build the full ancestor chain for a URL. Creates stub nodes for any
+ * intermediate paths not yet visited. Adds `child-of` edges connecting
+ * each node to its parent.
+ *
+ * Stops at the domain root (e.g. https://docs.docker.com).
+ */
+function ensureAncestorChain(url) {
+  let current = canonicalUrl(url);
+  let currentId = urlHash(current);
+
+  while (true) {
+    const parentUrl = inferParentUrl(current);
+    if (!parentUrl) break;
+
+    const parentId = ensureNode(parentUrl, null, true);
+
+    // Set inferredParent on the child
+    if (session.nodes[currentId]) {
+      session.nodes[currentId].inferredParent = parentId;
+    }
+
+    // Add child-of edge (parent → child direction for tree rendering)
+    addEdge(parentId, currentId, 'child-of');
+
+    // If the parent already has its own ancestor chain built, stop
+    if (session.nodes[parentId] && session.nodes[parentId].inferredParent !== null) {
+      break;
+    }
+
+    current = parentUrl;
+    currentId = parentId;
+  }
+}
+
+/**
+ * Detect the relationship between two URLs:
+ *   - 'same-domain-sibling': same parent path (e.g. /security/isolation → /security/defaults)
+ *   - 'same-domain-parent-child': one is a direct parent of the other
+ *   - 'same-domain-other': same domain but different branches
+ *   - 'cross-domain': different subdomains (e.g. www → docs)
+ */
+function classifyNavigation(fromUrl, toUrl) {
+  const from = new URL(fromUrl);
+  const to = new URL(toUrl);
+
+  if (from.hostname !== to.hostname) {
+    return 'cross-domain';
+  }
+
+  const fromPath = from.pathname.replace(/\/+$/, '');
+  const toPath = to.pathname.replace(/\/+$/, '');
+  const fromSegments = fromPath.split('/').filter(Boolean);
+  const toSegments = toPath.split('/').filter(Boolean);
+
+  // Check if one is a direct parent of the other
+  const fromBase = '/' + fromSegments.join('/');
+  const toBase = '/' + toSegments.join('/');
+
+  if (toBase.startsWith(fromBase + '/') && toSegments.length === fromSegments.length + 1) {
+    return 'same-domain-parent-child';
+  }
+  if (fromBase.startsWith(toBase + '/') && fromSegments.length === toSegments.length + 1) {
+    return 'same-domain-parent-child';
+  }
+
+  // Check if they share the same parent path
+  const fromParent = fromSegments.slice(0, -1).join('/');
+  const toParent = toSegments.slice(0, -1).join('/');
+
+  if (fromParent === toParent && fromSegments.length === toSegments.length) {
+    return 'same-domain-sibling';
+  }
+
+  return 'same-domain-other';
+}
+
+// ---------------------------------------------------------------------------
+// Session management
+// ---------------------------------------------------------------------------
+
+function startSession(contributor) {
+  const now = new Date();
+  session = {
+    meta: {
+      contributor: contributor || 'anonymous',
+      date: now.toISOString().slice(0, 10),
+      mode: 'map'
+    },
+    nodes: {},
+    edges: [],
+    workflows: []
+  };
+  currentNodeId = null;
+  previousNodeId = null;
+  persistSession();
+  updateBadge();
+}
+
+function stopSession() {
+  const data = session;
+  session = null;
+  currentNodeId = null;
+  previousNodeId = null;
+  chrome.storage.local.remove('ia_session');
+  updateBadge();
+  return data;
+}
+
+function persistSession() {
+  if (session) {
+    chrome.storage.local.set({ ia_session: JSON.stringify(session) });
+  }
+}
+
+async function restoreSession() {
+  const result = await chrome.storage.local.get('ia_session');
+  if (result.ia_session) {
+    try {
+      session = JSON.parse(result.ia_session);
+      const nodeIds = Object.keys(session.nodes);
+      if (nodeIds.length > 0) {
+        currentNodeId = nodeIds[nodeIds.length - 1];
+      }
+      updateBadge();
+    } catch {
+      session = null;
+    }
+  }
+}
+
+function updateBadge() {
+  if (session) {
+    const count = Object.keys(session.nodes).length;
+    chrome.action.setBadgeText({ text: count > 0 ? String(count) : 'ON' });
+    chrome.action.setBadgeBackgroundColor({ color: '#6366f1' });
+  } else {
+    chrome.action.setBadgeText({ text: '' });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Graph construction
+// ---------------------------------------------------------------------------
+
+/**
+ * Process a navigation event.
+ * 1. Create/update the node
+ * 2. Record the raw navigate edge from previous node
+ * 3. Build the ancestor chain (stub nodes + child-of edges)
+ */
+function recordNavigation(url, title) {
+  if (!session) return;
+  if (!isDockerUrl(url)) return;
+
+  const canonical = canonicalUrl(url);
+  const id = ensureNode(canonical, title, false);
+
+  // If this node was previously a stub, promote it
+  if (session.nodes[id].stub) {
+    session.nodes[id].stub = false;
+  }
+
+  // Update title if we got a real one (better than stub-generated)
+  if (title && title !== canonical) {
+    session.nodes[id].title = title;
+  }
+
+  // Record raw navigation edge
+  if (currentNodeId && currentNodeId !== id) {
+    const fromNode = session.nodes[currentNodeId];
+    const navType = classifyNavigation(fromNode.url, canonical);
+
+    // Always record the raw navigate edge (preserves actual user flow)
+    addEdge(currentNodeId, id, 'navigate');
+
+    // Annotate the edge with the relationship type for the viewer
+    const lastEdge = session.edges[session.edges.length - 1];
+    if (lastEdge && lastEdge.from === currentNodeId && lastEdge.to === id) {
+      lastEdge.navClass = navType;
+    }
+  }
+
+  // Build ancestor chain (creates stubs + child-of edges)
+  ensureAncestorChain(canonical);
+
+  // Navigation implicitly dismisses any open modal
+  if (activeModalNodeId) {
+    const pageId = urlHash(canonicalUrl(url));
+    addEdge(activeModalNodeId, pageId, 'modal-dismiss');
+    activeModalNodeId = null;
+  }
+
+  // Update tracking
+  previousNodeId = currentNodeId;
+  currentNodeId = id;
+
+  persistSession();
+  updateBadge();
+}
+
+/**
+ * Add a directed edge. If the same from→to+type edge exists, increment count.
+ * Hierarchy edges (child-of) are idempotent — count stays at 1.
+ */
+function addEdge(fromId, toId, type = 'navigate') {
+  const existing = session.edges.find(
+    e => e.from === fromId && e.to === toId && e.type === type
+  );
+  if (existing) {
+    if (type !== 'child-of') {
+      existing.count += 1;
+    }
+  } else {
+    session.edges.push({ from: fromId, to: toId, type, count: 1 });
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Modal graph construction
+// ---------------------------------------------------------------------------
+
+// Track the currently active modal node so we can create step/dismiss edges
+let activeModalNodeId = null;
+
+/**
+ * Build a modal node ID: {page-url-hash}:modal:{content-hash}
+ */
+function modalNodeId(pageUrl, contentHash) {
+  return urlHash(pageUrl) + ':modal:' + contentHash;
+}
+
+/**
+ * Record a modal opening on the current page.
+ * Creates a modal node and a modal-open edge from the page node.
+ */
+function recordModalOpen(pageUrl, contentHash, title) {
+  if (!session) return;
+
+  const pageId = urlHash(canonicalUrl(pageUrl));
+  const modalId = modalNodeId(pageUrl, contentHash);
+
+  // Create modal node if it doesn't exist
+  if (!session.nodes[modalId]) {
+    session.nodes[modalId] = {
+      url: canonicalUrl(pageUrl) + '#modal:' + contentHash,
+      title: title || 'Modal',
+      screenshot: null,
+      notes: [],
+      flags: [],
+      stub: false,
+      inferredParent: pageId,
+      isModal: true,
+      modalContentHash: contentHash,
+      parentPageId: pageId
+    };
+  } else if (title) {
+    session.nodes[modalId].title = title;
+  }
+
+  // Edge from page → modal
+  addEdge(pageId, modalId, 'modal-open');
+
+  activeModalNodeId = modalId;
+  persistSession();
+  updateBadge();
+}
+
+/**
+ * Record a step within a modal (content changed but modal container persists).
+ * Creates a new modal node and a modal-step edge from the previous modal state.
+ */
+function recordModalStep(pageUrl, contentHash, title, prevContentHash) {
+  if (!session) return;
+
+  const prevModalId = prevContentHash
+    ? modalNodeId(pageUrl, prevContentHash)
+    : activeModalNodeId;
+  const newModalId = modalNodeId(pageUrl, contentHash);
+  const pageId = urlHash(canonicalUrl(pageUrl));
+
+  // Create new modal state node
+  if (!session.nodes[newModalId]) {
+    session.nodes[newModalId] = {
+      url: canonicalUrl(pageUrl) + '#modal:' + contentHash,
+      title: title || 'Modal Step',
+      screenshot: null,
+      notes: [],
+      flags: [],
+      stub: false,
+      inferredParent: pageId,
+      isModal: true,
+      modalContentHash: contentHash,
+      parentPageId: pageId
+    };
+  } else if (title) {
+    session.nodes[newModalId].title = title;
+  }
+
+  // Edge from previous modal state → new modal state
+  if (prevModalId && prevModalId !== newModalId) {
+    addEdge(prevModalId, newModalId, 'modal-step');
+  }
+
+  activeModalNodeId = newModalId;
+  persistSession();
+  updateBadge();
+}
+
+/**
+ * Record a modal being dismissed.
+ * Creates a modal-dismiss edge back to the parent page node.
+ */
+function recordModalDismiss(pageUrl, contentHash) {
+  if (!session) return;
+
+  const modalId = contentHash
+    ? modalNodeId(pageUrl, contentHash)
+    : activeModalNodeId;
+  const pageId = urlHash(canonicalUrl(pageUrl));
+
+  if (modalId && session.nodes[modalId]) {
+    addEdge(modalId, pageId, 'modal-dismiss');
+  }
+
+  activeModalNodeId = null;
+  persistSession();
+}
+
+// ---------------------------------------------------------------------------
+// Navigation listeners
+// ---------------------------------------------------------------------------
+
+// Fires on full page loads / traditional navigation
+chrome.webNavigation.onCompleted.addListener(
+  (details) => {
+    if (details.frameId !== 0) return;
+    if (!session) return;
+    if (!isDockerUrl(details.url)) return;
+
+    chrome.tabs.get(details.tabId, (tab) => {
+      if (chrome.runtime.lastError) return;
+      recordNavigation(details.url, tab.title);
+    });
+  },
+  { url: [{ hostSuffix: '.docker.com' }, { hostEquals: 'docker.com' }] }
+);
+
+// Fires on SPA history changes (pushState / replaceState)
+chrome.webNavigation.onHistoryStateUpdated.addListener(
+  (details) => {
+    if (details.frameId !== 0) return;
+    if (!session) return;
+    if (!isDockerUrl(details.url)) return;
+
+    chrome.tabs.get(details.tabId, (tab) => {
+      if (chrome.runtime.lastError) return;
+      recordNavigation(details.url, tab.title);
+    });
+  },
+  { url: [{ hostSuffix: '.docker.com' }, { hostEquals: 'docker.com' }] }
+);
+
+// ---------------------------------------------------------------------------
+// Message handler
+// ---------------------------------------------------------------------------
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  // Handle messages that work without an active session
+  if (message.type === 'GET_SESSION_STATUS') {
+    if (session) {
+      sendResponse({
+        active: true,
+        nodeCount: Object.keys(session.nodes).length,
+        edgeCount: session.edges.length,
+        contributor: session.meta.contributor,
+        mode: session.meta.mode
+      });
+    } else {
+      sendResponse({ active: false, nodeCount: 0 });
+    }
+    return true;
+  }
+
+  if (message.type === 'START_SESSION') {
+    startSession(message.contributor);
+    sendResponse({ ok: true });
+    return true;
+  }
+
+  // Everything below requires an active session
+  if (!session) {
+    sendResponse({ ok: false, reason: 'no active session' });
+    return true;
+  }
+
+  switch (message.type) {
+    case 'NAVIGATION': {
+      recordNavigation(message.url, message.title);
+      sendResponse({ ok: true });
+      break;
+    }
+
+    case 'STOP_SESSION': {
+      const data = stopSession();
+      sendResponse({ ok: true, session: data });
+      break;
+    }
+
+    case 'EXPORT_SESSION': {
+      sendResponse({ ok: true, session: session });
+      break;
+    }
+
+    case 'FLAG_NODE': {
+      // Flag the active modal node if one is open, otherwise the current page
+      const targetId = activeModalNodeId || currentNodeId;
+      if (targetId && session.nodes[targetId]) {
+        const flags = session.nodes[targetId].flags;
+        if (!flags.includes(message.flag)) {
+          flags.push(message.flag);
+          persistSession();
+        }
+      }
+      sendResponse({ ok: true });
+      break;
+    }
+
+    case 'MODAL_OPEN': {
+      recordModalOpen(message.url, message.contentHash, message.title);
+      sendResponse({ ok: true });
+      break;
+    }
+
+    case 'MODAL_STEP': {
+      recordModalStep(message.url, message.contentHash, message.title, message.prevContentHash);
+      sendResponse({ ok: true });
+      break;
+    }
+
+    case 'MODAL_DISMISS': {
+      recordModalDismiss(message.url, message.contentHash);
+      sendResponse({ ok: true });
+      break;
+    }
+
+    default:
+      sendResponse({ ok: false, reason: 'unknown message type' });
+  }
+
+  return true;
+});
+
+// ---------------------------------------------------------------------------
+// Side panel: open on extension icon click
+// ---------------------------------------------------------------------------
+
+chrome.action.onClicked.addListener((tab) => {
+  chrome.sidePanel.open({ tabId: tab.id });
+});
+
+// ---------------------------------------------------------------------------
+// Init
+// ---------------------------------------------------------------------------
+
+restoreSession();
