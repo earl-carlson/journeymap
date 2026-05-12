@@ -23,25 +23,62 @@ let captureQueueIndex = 0;      // Current position in the capture queue
 /**
  * Returns true if the URL belongs to *.docker.com
  */
+const TRACKED_DOMAINS = [
+  'docker.com',
+  'testcontainers.com',
+  'dockerstatus.com',
+];
+
 function isDockerUrl(url) {
   try {
     const hostname = new URL(url).hostname;
-    return hostname === 'docker.com' || hostname.endsWith('.docker.com');
+    return TRACKED_DOMAINS.some(
+      (d) => hostname === d || hostname.endsWith('.' + d)
+    );
   } catch {
     return false;
   }
 }
 
 /**
- * Deterministic hash of a URL (stripped of fragment).
+ * Tracking/analytics query parameters to strip from URLs.
+ * These cause the same page to appear as multiple nodes.
+ */
+const TRACKING_PARAMS = new Set([
+  '_gl', '_ga', '_gid', '_gac',           // Google Analytics
+  'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', // UTM
+  'gclid', 'gclsrc', 'dclid', 'fbclid',  // Ad click IDs
+  'msclkid', 'twclid', 'li_fat_id',       // More ad click IDs
+  'mc_cid', 'mc_eid',                      // Mailchimp
+  'ref', 'referrer',                        // Generic referrer
+  '_hsenc', '_hsmi', 'hsa_cam', 'hsa_grp', 'hsa_mt', 'hsa_src', 'hsa_ad', 'hsa_acc', 'hsa_net', 'hsa_ver', 'hsa_la', 'hsa_ol', 'hsa_kw', 'hsa_tgt', // HubSpot
+]);
+
+/**
+ * Strip tracking parameters from a URL, remove fragment and trailing slash.
+ */
+function cleanUrl(url) {
+  const u = new URL(url);
+  u.hash = '';
+  // Remove tracking params
+  for (const key of [...u.searchParams.keys()]) {
+    if (TRACKING_PARAMS.has(key)) {
+      u.searchParams.delete(key);
+    }
+  }
+  // If no params left, drop the ? entirely
+  let result = u.toString().replace(/\/+$/, '');
+  if (result.endsWith('?')) result = result.slice(0, -1);
+  return result;
+}
+
+/**
+ * Deterministic hash of a URL (cleaned of tracking params + fragment).
  * Uses a simple djb2-style hash → hex string.
  * Stable across sessions so the same URL always produces the same key.
  */
 function urlHash(url) {
-  const u = new URL(url);
-  u.hash = '';
-  let normalized = u.toString().replace(/\/+$/, '');
-
+  const normalized = cleanUrl(url);
   let hash = 5381;
   for (let i = 0; i < normalized.length; i++) {
     hash = ((hash << 5) + hash + normalized.charCodeAt(i)) >>> 0;
@@ -50,12 +87,10 @@ function urlHash(url) {
 }
 
 /**
- * Canonical URL string (no fragment, no trailing slash).
+ * Canonical URL string (no tracking params, no fragment, no trailing slash).
  */
 function canonicalUrl(url) {
-  const u = new URL(url);
-  u.hash = '';
-  return u.toString().replace(/\/+$/, '');
+  return cleanUrl(url);
 }
 
 // ---------------------------------------------------------------------------
@@ -632,15 +667,15 @@ function recordModalDismiss(pageUrl, contentHash) {
 const capturedScreenshots = new Set();
 // Debounce: only one pending capture per tab
 const pendingCaptures = new Map(); // tabId → timeoutId
+// Track tabs that need a screenshot when they become active
+const pendingActivation = new Map(); // tabId → nodeId
 
 /**
  * Schedule a screenshot capture for a node.
  *
- * Strategy: debounce per tab. Each new navigation on the same tab cancels
- * the previous pending capture and starts a new 1.5s timer. When the timer
- * fires, we capture whatever is currently visible and tag it to the current
- * node. This naturally handles fast SPA navigation — only the page the user
- * actually pauses on gets captured.
+ * Only captures if the tab is the active tab in its window. If the tab is
+ * in the background (e.g. cmd-click opened it), the capture is deferred
+ * until the user switches to that tab.
  */
 function scheduleScreenshot(nodeId, tabId) {
   if (!session) return;
@@ -655,16 +690,23 @@ function scheduleScreenshot(nodeId, tabId) {
     pendingCaptures.delete(tabId);
 
     try {
-      // Get fresh tab state
       const tab = await chrome.tabs.get(tabId).catch(() => null);
       if (!tab) return;
       if (!isDockerUrl(tab.url)) return;
 
-      // Figure out which node this tab is currently showing
+      // If this tab is not active, defer the capture until the user switches to it
+      if (!tab.active) {
+        const currentUrl = canonicalUrl(tab.url);
+        const currentId = urlHash(currentUrl);
+        if (!capturedScreenshots.has(currentId)) {
+          pendingActivation.set(tabId, currentId);
+        }
+        return;
+      }
+
       const currentUrl = canonicalUrl(tab.url);
       const currentId = urlHash(currentUrl);
 
-      // Skip if already captured
       if (capturedScreenshots.has(currentId)) return;
       if (!session || !session.nodes[currentId]) return;
 
@@ -679,22 +721,48 @@ function scheduleScreenshot(nodeId, tabId) {
         return;
       }
 
-      // Store against the node the tab is actually showing
       const screenshotKey = `screenshot_${currentId}`;
       await chrome.storage.local.set({ [screenshotKey]: dataUrl });
 
       session.nodes[currentId].screenshot = `screenshots/${currentId}.png`;
       session.nodes[currentId].screenshotDataUrl = dataUrl;
       capturedScreenshots.add(currentId);
+      pendingActivation.delete(tabId);
       persistSession();
       console.log('[screenshot] Stored:', currentId);
     } catch (err) {
       console.warn('[screenshot] Failed:', err.message || err);
     }
-  }, 1500);
+  }, 1000);
 
   pendingCaptures.set(tabId, timeoutId);
 }
+
+// When a tab becomes active, check if it needs a screenshot.
+// This handles tabs opened in the background (cmd-click) that were
+// deferred, plus any tab the user switches back to.
+chrome.tabs.onActivated.addListener((activeInfo) => {
+  if (!session) return;
+
+  // Check pendingActivation first (deferred from background tab)
+  const pendingNodeId = pendingActivation.get(activeInfo.tabId);
+  if (pendingNodeId && !capturedScreenshots.has(pendingNodeId)) {
+    pendingActivation.delete(activeInfo.tabId);
+    scheduleScreenshot(pendingNodeId, activeInfo.tabId);
+    return;
+  }
+
+  // Also check: is this tab showing a Docker page that has no screenshot?
+  chrome.tabs.get(activeInfo.tabId, (tab) => {
+    if (chrome.runtime.lastError || !tab) return;
+    if (!isDockerUrl(tab.url)) return;
+
+    const id = urlHash(canonicalUrl(tab.url));
+    if (session.nodes[id] && !session.nodes[id].screenshot && !capturedScreenshots.has(id)) {
+      scheduleScreenshot(id, activeInfo.tabId);
+    }
+  });
+});
 
 /**
  * Send a message to a tab's content script and await the response.
@@ -822,7 +890,11 @@ chrome.webNavigation.onCompleted.addListener(
       recordNavigation(details.url, tab.title, details.tabId);
     });
   },
-  { url: [{ hostSuffix: '.docker.com' }, { hostEquals: 'docker.com' }] }
+  { url: [
+    { hostSuffix: '.docker.com' }, { hostEquals: 'docker.com' },
+    { hostSuffix: '.testcontainers.com' }, { hostEquals: 'testcontainers.com' },
+    { hostSuffix: '.dockerstatus.com' }, { hostEquals: 'dockerstatus.com' },
+  ] }
 );
 
 // Fires on SPA history changes (pushState / replaceState)
@@ -837,7 +909,11 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(
       recordNavigation(details.url, tab.title, details.tabId);
     });
   },
-  { url: [{ hostSuffix: '.docker.com' }, { hostEquals: 'docker.com' }] }
+  { url: [
+    { hostSuffix: '.docker.com' }, { hostEquals: 'docker.com' },
+    { hostSuffix: '.testcontainers.com' }, { hostEquals: 'testcontainers.com' },
+    { hostSuffix: '.dockerstatus.com' }, { hostEquals: 'dockerstatus.com' },
+  ] }
 );
 
 // ---------------------------------------------------------------------------
@@ -910,7 +986,23 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
 
     case 'EXPORT_SESSION': {
-      sendResponse({ ok: true, session: session });
+      // Return session without screenshot data URLs to keep the message small.
+      // Screenshots are written separately from chrome.storage.local by the side panel.
+      // Build a lightweight copy without cloning the large base64 strings.
+      const lightNodes = {};
+      for (const [id, node] of Object.entries(session.nodes)) {
+        const { screenshotDataUrl, ...rest } = node;
+        lightNodes[id] = rest;
+      }
+      sendResponse({
+        ok: true,
+        session: {
+          meta: session.meta,
+          nodes: lightNodes,
+          edges: session.edges,
+          workflows: session.workflows,
+        },
+      });
       break;
     }
 

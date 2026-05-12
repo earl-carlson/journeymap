@@ -1,0 +1,20 @@
+{
+  "meta": {
+    "contributor": "Earl",
+    "date": "2026-05-12",
+    "mode": "map"
+  },
+  "nodes": {
+    "ad239ba8": {
+      "url": "https://www.docker.com",
+      "title": "Docker: Accelerated Container Application Development",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": null
+    }
+  },
+  "edges": [],
+  "workflows": []
+}

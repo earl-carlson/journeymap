@@ -20,7 +20,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.docker.com/*"],
+      "matches": [
+        "*://*.docker.com/*",
+        "*://*.testcontainers.com/*",
+        "*://testcontainers.com/*",
+        "*://*.dockerstatus.com/*",
+        "*://dockerstatus.com/*"
+      ],
       "js": ["content.js"],
       "run_at": "document_idle"
     }

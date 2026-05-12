@@ -1,0 +1,263 @@
+{
+  "meta": {
+    "contributor": "Earl",
+    "date": "2026-05-12",
+    "mode": "map"
+  },
+  "nodes": {
+    "ad239ba8": {
+      "url": "https://www.docker.com",
+      "title": "Docker: Accelerated Container Application Development",
+      "screenshot": "screenshots/ad239ba8.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": null
+    },
+    "6073c279": {
+      "url": "https://www.docker.com/products/docker-desktop",
+      "title": "Docker Desktop: The #1 Containerization Tool for Developers | Docker",
+      "screenshot": "screenshots/6073c279.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "42a6354b"
+    },
+    "42a6354b": {
+      "url": "https://www.docker.com/products",
+      "title": "Products | Docker",
+      "screenshot": "screenshots/42a6354b.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "ad239ba8"
+    },
+    "5871873e": {
+      "url": "https://www.docker.com/products/docker-hub",
+      "title": "The World’s Largest Container Registry | Docker",
+      "screenshot": "screenshots/5871873e.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "42a6354b"
+    },
+    "3badc44d": {
+      "url": "https://www.docker.com/products/docker-scout",
+      "title": "Software Supply Chain Management for Developers | Docker Scout",
+      "screenshot": "screenshots/3badc44d.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "42a6354b"
+    },
+    "9f1c6d9c": {
+      "url": "https://testcontainers.com/desktop",
+      "title": "Download the free Testcontainers Desktop app",
+      "screenshot": "screenshots/9f1c6d9c.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "f755e7b3"
+    },
+    "f755e7b3": {
+      "url": "https://testcontainers.com",
+      "title": "testcontainers.com",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": null
+    },
+    "3139fc0e": {
+      "url": "https://www.docker.com/products/build-cloud",
+      "title": "Build Docker Images Faster | Docker Build Cloud",
+      "screenshot": "screenshots/3139fc0e.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "42a6354b"
+    },
+    "77beb1f9": {
+      "url": "https://testcontainers.com/cloud",
+      "title": "Testcontainers Cloud",
+      "screenshot": "screenshots/77beb1f9.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "f755e7b3"
+    },
+    "91cdbe15": {
+      "url": "https://www.docker.com/products/mcp-catalog-and-toolkit",
+      "title": "Announcing: Docker MCP | Docker",
+      "screenshot": "screenshots/91cdbe15.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "42a6354b"
+    },
+    "8b87d8b8": {
+      "url": "https://www.docker.com/products/hardened-images",
+      "title": "Hardened Images | Docker",
+      "screenshot": "screenshots/8b87d8b8.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "42a6354b"
+    }
+  },
+  "edges": [
+    {
+      "from": "ad239ba8",
+      "to": "6073c279",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "42a6354b",
+      "to": "6073c279",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "ad239ba8",
+      "to": "42a6354b",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "6073c279",
+      "to": "5871873e",
+      "type": "navigate",
+      "count": 2,
+      "navClass": "same-domain-sibling"
+    },
+    {
+      "from": "42a6354b",
+      "to": "5871873e",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "5871873e",
+      "to": "6073c279",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-sibling"
+    },
+    {
+      "from": "5871873e",
+      "to": "42a6354b",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-parent-child"
+    },
+    {
+      "from": "42a6354b",
+      "to": "3badc44d",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-parent-child"
+    },
+    {
+      "from": "42a6354b",
+      "to": "3badc44d",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "3badc44d",
+      "to": "9f1c6d9c",
+      "type": "navigate",
+      "count": 2,
+      "navClass": "cross-domain"
+    },
+    {
+      "from": "f755e7b3",
+      "to": "9f1c6d9c",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "9f1c6d9c",
+      "to": "3badc44d",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "cross-domain"
+    },
+    {
+      "from": "9f1c6d9c",
+      "to": "3139fc0e",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "cross-domain"
+    },
+    {
+      "from": "42a6354b",
+      "to": "3139fc0e",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "3139fc0e",
+      "to": "77beb1f9",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "cross-domain"
+    },
+    {
+      "from": "f755e7b3",
+      "to": "77beb1f9",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "77beb1f9",
+      "to": "3139fc0e",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "cross-domain"
+    },
+    {
+      "from": "3139fc0e",
+      "to": "91cdbe15",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-sibling"
+    },
+    {
+      "from": "42a6354b",
+      "to": "91cdbe15",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "91cdbe15",
+      "to": "77beb1f9",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "cross-domain"
+    },
+    {
+      "from": "77beb1f9",
+      "to": "91cdbe15",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "cross-domain"
+    },
+    {
+      "from": "91cdbe15",
+      "to": "8b87d8b8",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-sibling"
+    },
+    {
+      "from": "42a6354b",
+      "to": "8b87d8b8",
+      "type": "child-of",
+      "count": 1
+    }
+  ],
+  "workflows": []
+}

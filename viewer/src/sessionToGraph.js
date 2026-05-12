@@ -6,32 +6,36 @@
 const EDGE_STYLES = {
   navigate: {
     stroke: '#354E80',
-    strokeWidth: 2,
+    strokeWidth: 1.5,
     animated: false,
+    opacity: 0.1,
   },
   'child-of': {
     stroke: '#3A3A52',
-    strokeWidth: 1.5,
+    strokeWidth: 1,
     strokeDasharray: '6 3',
     animated: false,
+    opacity: 0.1,
   },
   'modal-open': {
     stroke: '#0E7A8F',
-    strokeWidth: 2,
+    strokeWidth: 1.5,
     animated: true,
+    opacity: 0.15,
   },
   'modal-step': {
     stroke: '#0E7A8F',
-    strokeWidth: 1.5,
+    strokeWidth: 1,
     strokeDasharray: '4 4',
     animated: false,
+    opacity: 0.1,
   },
   'modal-dismiss': {
     stroke: '#8F3060',
     strokeWidth: 1,
     strokeDasharray: '3 3',
     animated: false,
-    opacity: 0.5,
+    opacity: 0.1,
   },
 };
 

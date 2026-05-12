@@ -62,6 +62,52 @@ const btnQueueClear = document.getElementById('btn-queue-clear');
 const btnLoadQueue = document.getElementById('btn-load-queue');
 const queueFileInput = document.getElementById('queue-file-input');
 
+function isTrackedUrl(url) {
+  try {
+    const hostname = new URL(url).hostname;
+    const domains = ['docker.com', 'testcontainers.com', 'dockerstatus.com'];
+    return domains.some((d) => hostname === d || hostname.endsWith('.' + d));
+  } catch {
+    return false;
+  }
+}
+
+const _TRACKING_PARAMS = new Set([
+  '_gl', '_ga', '_gid', '_gac',
+  'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+  'gclid', 'gclsrc', 'dclid', 'fbclid', 'msclkid', 'twclid',
+  'ref', 'referrer', '_hsenc', '_hsmi',
+]);
+
+function cleanTrackedUrl(url) {
+  try {
+    const u = new URL(url);
+    u.hash = '';
+    for (const key of [...u.searchParams.keys()]) {
+      if (_TRACKING_PARAMS.has(key)) u.searchParams.delete(key);
+    }
+    let result = u.toString().replace(/\/+$/, '');
+    if (result.endsWith('?')) result = result.slice(0, -1);
+    return result;
+  } catch {
+    return url;
+  }
+}
+
+/**
+ * Convert a data URL to a Blob without using fetch.
+ */
+function dataUrlToBlob(dataUrl) {
+  const [header, base64] = dataUrl.split(',');
+  const mime = header.match(/:(.*?);/)[1];
+  const binary = atob(base64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new Blob([bytes], { type: mime });
+}
+
 let savedContributor = null;
 let dirHandle = null;    // FileSystemDirectoryHandle — persisted across sessions
 let dirName = null;      // Display name of the directory
@@ -314,17 +360,18 @@ async function verifyDirPermission() {
 /**
  * Save session.json and screenshots to the export directory.
  * Creates a session subfolder: session-{contributor}-{date}-{time}/
+ *
+ * Screenshots are fetched directly from chrome.storage.local in batches
+ * to avoid passing large payloads through the message channel.
  */
 async function saveToDirectory(sessionData) {
   if (!dirHandle) {
-    // Fallback to download
     downloadSession(sessionData);
     return;
   }
 
   const hasPermission = await verifyDirPermission();
   if (!hasPermission) {
-    // Fallback to download
     downloadSession(sessionData);
     return;
   }
@@ -338,54 +385,77 @@ async function saveToDirectory(sessionData) {
   const folderName = `session-${contributor}-${date}-${time}`;
 
   try {
-    // Create session subfolder
     const sessionDir = await dirHandle.getDirectoryHandle(folderName, { create: true });
 
-    // Separate screenshot data URLs from the JSON
+    // Clean the session data for JSON (strip any embedded data URLs)
     const exportData = structuredClone(sessionData);
-    const screenshots = {};
+    const nodeIdsWithScreenshots = [];
 
     for (const [id, node] of Object.entries(exportData.nodes)) {
-      if (node.screenshotDataUrl) {
-        // Store for file writing, remove from JSON to keep it clean
-        screenshots[id] = node.screenshotDataUrl;
-        delete node.screenshotDataUrl;
-        // Ensure the relative path is set
-        node.screenshot = `screenshots/${id}.png`;
+      delete node.screenshotDataUrl;
+      if (node.screenshot) {
+        nodeIdsWithScreenshots.push(id);
       }
     }
 
-    // Write session.json
+    // Write session.json first (small, fast)
     const jsonFile = await sessionDir.getFileHandle('session.json', { create: true });
     const jsonWritable = await jsonFile.createWritable();
     await jsonWritable.write(JSON.stringify(exportData, null, 2));
     await jsonWritable.close();
+    console.log(`[export] Wrote session.json (${Object.keys(exportData.nodes).length} nodes)`);
 
-    // Write screenshots
-    if (Object.keys(screenshots).length > 0) {
+    // Write screenshots in batches directly from chrome.storage.local
+    if (nodeIdsWithScreenshots.length > 0) {
       const screenshotDir = await sessionDir.getDirectoryHandle('screenshots', { create: true });
+      const BATCH_SIZE = 10;
+      let written = 0;
+      let missing = 0;
 
-      for (const [id, dataUrl] of Object.entries(screenshots)) {
-        try {
-          // Convert data URL to blob
-          const response = await fetch(dataUrl);
-          const blob = await response.blob();
+      console.log(`[export] Writing ${nodeIdsWithScreenshots.length} screenshots...`);
 
-          const filename = `${id}.png`;
-          const file = await screenshotDir.getFileHandle(filename, { create: true });
-          const writable = await file.createWritable();
-          await writable.write(blob);
-          await writable.close();
-        } catch (err) {
-          console.warn('Failed to write screenshot for', id, err);
+      for (let i = 0; i < nodeIdsWithScreenshots.length; i += BATCH_SIZE) {
+        const batch = nodeIdsWithScreenshots.slice(i, i + BATCH_SIZE);
+        const keys = batch.map((id) => `screenshot_${id}`);
+
+        const result = await new Promise((resolve) => {
+          chrome.storage.local.get(keys, (r) => {
+            if (chrome.runtime.lastError) {
+              console.warn('[export] storage.get error:', chrome.runtime.lastError.message);
+              resolve({});
+            } else {
+              resolve(r || {});
+            }
+          });
+        });
+
+        for (const id of batch) {
+          const dataUrl = result[`screenshot_${id}`];
+          if (!dataUrl) {
+            missing++;
+            continue;
+          }
+
+          try {
+            // Convert data URL to blob without fetch
+            const blob = dataUrlToBlob(dataUrl);
+            const file = await screenshotDir.getFileHandle(`${id}.png`, { create: true });
+            const writable = await file.createWritable();
+            await writable.write(blob);
+            await writable.close();
+            written++;
+          } catch (err) {
+            console.warn('[export] Failed to write screenshot for', id, err);
+          }
         }
       }
+
+      console.log(`[export] Screenshots: ${written} written, ${missing} not in storage`);
     }
 
-    console.log(`Session saved to ${folderName}/`);
+    console.log(`[export] Session saved to ${folderName}/`);
   } catch (err) {
-    console.error('Failed to save to directory:', err);
-    // Fallback to download
+    console.error('[export] Failed to save to directory:', err);
     downloadSession(sessionData);
   }
 }
@@ -407,7 +477,7 @@ btnStart.addEventListener('click', () => {
         if (tabs[0] && tabs[0].url) {
           try {
             const hostname = new URL(tabs[0].url).hostname;
-            if (hostname === 'docker.com' || hostname.endsWith('.docker.com')) {
+            if (isTrackedUrl(tabs[0].url)) {
               chrome.runtime.sendMessage({
                 type: 'NAVIGATION',
                 url: tabs[0].url,
@@ -432,7 +502,7 @@ btnStop.addEventListener('click', () => {
     return;
   }
 
-  chrome.runtime.sendMessage({ type: 'EXPORT_SESSION_WITH_SCREENSHOTS' }, async (response) => {
+  chrome.runtime.sendMessage({ type: 'EXPORT_SESSION' }, async (response) => {
     if (chrome.runtime.lastError) return;
     if (response && response.ok && response.session) {
       await saveToDirectory(response.session);
@@ -448,7 +518,7 @@ btnStop.addEventListener('click', () => {
 // ---------------------------------------------------------------------------
 
 btnExport.addEventListener('click', () => {
-  chrome.runtime.sendMessage({ type: 'EXPORT_SESSION_WITH_SCREENSHOTS' }, async (response) => {
+  chrome.runtime.sendMessage({ type: 'EXPORT_SESSION' }, async (response) => {
     if (chrome.runtime.lastError) return;
     if (response && response.ok && response.session) {
       await saveToDirectory(response.session);
@@ -613,7 +683,7 @@ btnWfSave.addEventListener('click', () => {
   }, () => {
     // Switch to map mode to finalize the workflow, then export and stop
     chrome.runtime.sendMessage({ type: 'SET_MODE', mode: 'map' }, () => {
-      chrome.runtime.sendMessage({ type: 'EXPORT_SESSION_WITH_SCREENSHOTS' }, async (response) => {
+      chrome.runtime.sendMessage({ type: 'EXPORT_SESSION' }, async (response) => {
         if (chrome.runtime.lastError) return;
         if (response && response.ok && response.session) {
           await saveToDirectory(response.session);
@@ -632,7 +702,7 @@ btnWfDiscard.addEventListener('click', () => {
   // Discard the workflow, then export and stop session
   chrome.runtime.sendMessage({ type: 'UPDATE_WORKFLOW_PATH', name: null, path: [] }, () => {
     chrome.runtime.sendMessage({ type: 'SET_MODE', mode: 'map' }, () => {
-      chrome.runtime.sendMessage({ type: 'EXPORT_SESSION_WITH_SCREENSHOTS' }, async (response) => {
+      chrome.runtime.sendMessage({ type: 'EXPORT_SESSION' }, async (response) => {
         if (chrome.runtime.lastError) return;
         if (response && response.ok && response.session) {
           await saveToDirectory(response.session);
@@ -734,8 +804,7 @@ function refreshStatus() {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     if (!tabs[0] || !tabs[0].url) return;
     try {
-      const hostname = new URL(tabs[0].url).hostname;
-      if (hostname === 'docker.com' || hostname.endsWith('.docker.com')) {
+      if (isTrackedUrl(tabs[0].url)) {
         currentPageEl.classList.remove('hidden');
         currentPageTitle.textContent = tabs[0].title || '—';
         currentPageUrl.textContent = tabs[0].url;
@@ -743,14 +812,17 @@ function refreshStatus() {
         // Check screenshot status for current page
         chrome.runtime.sendMessage({ type: 'EXPORT_SESSION' }, (resp) => {
           if (chrome.runtime.lastError || !resp || !resp.session) return;
+          const currentClean = cleanTrackedUrl(tabs[0].url);
           for (const [id, node] of Object.entries(resp.session.nodes)) {
-            if (node.url === tabs[0].url.replace(/\/+$/, '').replace(/#.*$/, '')) {
+            if (node.url === currentClean || cleanTrackedUrl(node.url) === currentClean) {
               if (node.screenshot) {
                 screenshotIndicator.textContent = 'Screenshot captured';
                 screenshotIndicator.className = 'screenshot-indicator captured';
+                btnRetrigger.textContent = 'retake screenshot';
               } else {
                 screenshotIndicator.textContent = 'No screenshot yet';
                 screenshotIndicator.className = 'screenshot-indicator pending';
+                btnRetrigger.textContent = 'take screenshot';
               }
               return;
             }

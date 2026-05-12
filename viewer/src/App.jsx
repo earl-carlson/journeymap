@@ -13,6 +13,7 @@ import '@xyflow/react/dist/style.css';
 import PageNode from './nodes/PageNode';
 import StubNode from './nodes/StubNode';
 import ModalNode from './nodes/ModalNode';
+import DomainGroup from './nodes/DomainGroup';
 import DetailPanel from './DetailPanel';
 import WorkflowPanel from './WorkflowPanel';
 import { sessionToGraph, getSessionStats } from './sessionToGraph';
@@ -23,6 +24,7 @@ const nodeTypes = {
   pageNode: PageNode,
   stubNode: StubNode,
   modalNode: ModalNode,
+  domainGroup: DomainGroup,
 };
 
 // ---------------------------------------------------------------------------
@@ -231,8 +233,9 @@ export default function App() {
         platformFilter: platFilter,
       });
 
-      const positioned = layoutGraph(rfNodes, rfEdges, mode);
-      setNodes(positioned);
+      const { nodes: positioned, groups } = layoutGraph(rfNodes, rfEdges, mode);
+      // Place group nodes first (behind content nodes) then content nodes on top
+      setNodes([...groups, ...positioned]);
       setEdges(rfEdges);
       setStats(getSessionStats(sessionData));
       shouldFitView.current = true;

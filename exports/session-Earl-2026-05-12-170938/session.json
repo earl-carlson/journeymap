@@ -1,0 +1,65 @@
+{
+  "meta": {
+    "contributor": "Earl",
+    "date": "2026-05-12",
+    "mode": "map"
+  },
+  "nodes": {
+    "ad239ba8": {
+      "url": "https://www.docker.com",
+      "title": "Docker: Accelerated Container Application Development",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": null
+    },
+    "42a6354b": {
+      "url": "https://www.docker.com/products",
+      "title": "Products | Docker",
+      "screenshot": "screenshots/42a6354b.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "ad239ba8"
+    },
+    "dc34ba86": {
+      "url": "https://www.docker.com/products/docker-sandboxes",
+      "title": "Docker Sandboxes | Sandboxes for Coding Agents | Docker",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "42a6354b"
+    }
+  },
+  "edges": [
+    {
+      "from": "ad239ba8",
+      "to": "42a6354b",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "ad239ba8",
+      "to": "42a6354b",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "42a6354b",
+      "to": "dc34ba86",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-parent-child"
+    },
+    {
+      "from": "42a6354b",
+      "to": "dc34ba86",
+      "type": "child-of",
+      "count": 1
+    }
+  ],
+  "workflows": []
+}

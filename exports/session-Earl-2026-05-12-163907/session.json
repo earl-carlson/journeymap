@@ -1,0 +1,67 @@
+{
+  "meta": {
+    "contributor": "Earl",
+    "date": "2026-05-12",
+    "mode": "map"
+  },
+  "nodes": {
+    "ad239ba8": {
+      "url": "https://www.docker.com",
+      "title": "Docker: Accelerated Container Application Development",
+      "screenshot": "screenshots/ad239ba8.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": null
+    },
+    "a93997a1": {
+      "url": "https://hub.docker.com/hardened-images/catalog?_gl=1*w7r8d5*_gcl_au*MTc4MjU0NTc0Ny4xNzc2ODcwNjA1*_ga*MTgzNDI0Nzk2Mi4xNzExMTE3ODk2*_ga_XJWPQMJYHQ*czE3Nzg2MTUyNDEkbzU3MSRnMSR0MTc3ODYxODE5NCRqMzEkbDAkaDA.",
+      "title": "Hardened Images catalog | Docker Hub",
+      "screenshot": "screenshots/a93997a1.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "163830af"
+    },
+    "163830af": {
+      "url": "https://hub.docker.com/hardened-images",
+      "title": "Hardened Images (hub.docker.com)",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": "91ab7f42"
+    },
+    "91ab7f42": {
+      "url": "https://hub.docker.com",
+      "title": "hub.docker.com",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": null
+    }
+  },
+  "edges": [
+    {
+      "from": "ad239ba8",
+      "to": "a93997a1",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "cross-domain"
+    },
+    {
+      "from": "163830af",
+      "to": "a93997a1",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "91ab7f42",
+      "to": "163830af",
+      "type": "child-of",
+      "count": 1
+    }
+  ],
+  "workflows": []
+}

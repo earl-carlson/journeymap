@@ -19,15 +19,18 @@ function getNodeDimensions(node) {
  *   'navigation' — uses navigate edges, left-to-right flow
  *   'all' — uses all edges
  */
+/**
+ * Returns { nodes, groups } where groups are domain container nodes.
+ */
 export function layoutGraph(rfNodes, rfEdges, mode = 'hierarchy') {
-  if (rfNodes.length === 0) return rfNodes;
+  if (rfNodes.length === 0) return { nodes: rfNodes, groups: [] };
 
   if (mode === 'hierarchy') {
     return layoutHierarchy(rfNodes, rfEdges);
   }
 
   // Navigation and All modes: single Dagre LR graph
-  return layoutFlat(rfNodes, rfEdges, mode, 'LR');
+  return { nodes: layoutFlat(rfNodes, rfEdges, mode, 'LR'), groups: [] };
 }
 
 /**
@@ -120,13 +123,15 @@ function layoutHierarchy(rfNodes, rfEdges) {
     const clusterWidth = maxX - minX;
     const clusterHeight = maxY - minY;
 
-    // Normalize positions within cluster to start at 0,0
+    // Normalize positions within cluster to start at 0,0.
+    // Dagre returns center positions; convert to top-left for React Flow.
     for (const node of domainNodes) {
       const pos = clusterPositions.get(node.id);
       if (pos) {
+        const { width, height } = getNodeDimensions(node);
         clusterPositions.set(node.id, {
-          x: pos.x - minX,
-          y: pos.y - minY,
+          x: pos.x - minX - width / 2,
+          y: pos.y - minY - height / 2,
         });
       }
     }
@@ -134,36 +139,57 @@ function layoutHierarchy(rfNodes, rfEdges) {
     clusterSizes.push({ domain, width: clusterWidth, height: clusterHeight });
   }
 
-  // Arrange clusters left-to-right with gaps
+  // Arrange clusters left-to-right with gaps.
+  // Each group box includes padding around the content nodes + a label row.
   const CLUSTER_GAP = 80;
+  const GROUP_PADDING = 30;
+  const LABEL_HEIGHT = 14;
   let xOffset = 0;
 
   const clusterOffsets = new Map(); // domain → xOffset
   for (const { domain, width } of clusterSizes) {
     clusterOffsets.set(domain, xOffset);
-    xOffset += width + CLUSTER_GAP;
+    // Total group width = content + padding on both sides
+    xOffset += width + GROUP_PADDING * 2 + CLUSTER_GAP;
   }
 
-  // Apply final positions
+  // Apply final positions — nodes are offset within their group box
   const positioned = rfNodes.map((node) => {
     const domain = node.data?.domain || 'unknown';
     const localPos = clusterPositions.get(node.id);
     const domainOffset = clusterOffsets.get(domain) || 0;
 
     if (localPos) {
-      const { width, height } = getNodeDimensions(node);
       return {
         ...node,
         position: {
-          x: localPos.x + domainOffset,
-          y: localPos.y,
+          x: localPos.x + domainOffset + GROUP_PADDING,
+          y: localPos.y + GROUP_PADDING + LABEL_HEIGHT,
         },
       };
     }
     return node;
   });
 
-  return positioned;
+  // Build domain group nodes
+  const groups = clusterSizes.map(({ domain, width, height }) => {
+    const offset = clusterOffsets.get(domain) || 0;
+    return {
+      id: `group-${domain}`,
+      type: 'domainGroup',
+      position: { x: offset, y: 0 },
+      data: {
+        domain,
+        width: width + GROUP_PADDING * 2,
+        height: height + GROUP_PADDING * 2 + LABEL_HEIGHT,
+      },
+      selectable: false,
+      draggable: false,
+      style: { zIndex: -1 },
+    };
+  });
+
+  return { nodes: positioned, groups };
 }
 
 /**

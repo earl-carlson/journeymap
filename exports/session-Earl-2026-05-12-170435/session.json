@@ -1,0 +1,58 @@
+{
+  "meta": {
+    "contributor": "Earl",
+    "date": "2026-05-12",
+    "mode": "map"
+  },
+  "nodes": {
+    "ad239ba8": {
+      "url": "https://www.docker.com",
+      "title": "Docker: Accelerated Container Application Development",
+      "screenshot": "screenshots/ad239ba8.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": null
+    },
+    "dc34ba86": {
+      "url": "https://www.docker.com/products/docker-sandboxes",
+      "title": "Docker Sandboxes | Sandboxes for Coding Agents | Docker",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "42a6354b"
+    },
+    "42a6354b": {
+      "url": "https://www.docker.com/products",
+      "title": "Products (www.docker.com)",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": "ad239ba8"
+    }
+  },
+  "edges": [
+    {
+      "from": "ad239ba8",
+      "to": "dc34ba86",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "42a6354b",
+      "to": "dc34ba86",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "ad239ba8",
+      "to": "42a6354b",
+      "type": "child-of",
+      "count": 1
+    }
+  ],
+  "workflows": []
+}
