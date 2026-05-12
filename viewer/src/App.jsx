@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react';
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import {
   ReactFlow,
   Background,
@@ -14,6 +14,7 @@ import PageNode from './nodes/PageNode';
 import StubNode from './nodes/StubNode';
 import ModalNode from './nodes/ModalNode';
 import DetailPanel from './DetailPanel';
+import WorkflowPanel from './WorkflowPanel';
 import { sessionToGraph, getSessionStats } from './sessionToGraph';
 import { layoutGraph } from './layout';
 import { mergeSessions } from './merge';
@@ -80,13 +81,15 @@ async function scanDirectory(dirHandle) {
         const data = JSON.parse(text);
 
         if (data.nodes && data.edges !== undefined) {
+          // Remember the directory handle for write-back
+          data._dirHandle = entry;
+
           // Load screenshots from screenshots/ subfolder
           try {
             const screenshotDir = await entry.getDirectoryHandle('screenshots');
             for (const [nodeId, node] of Object.entries(data.nodes)) {
               if (node.screenshot) {
                 try {
-                  // Extract filename from path like "screenshots/abc123.png"
                   const filename = node.screenshot.split('/').pop();
                   const imgFile = await screenshotDir.getFileHandle(filename);
                   const imgBlob = await (await imgFile.getFile());
@@ -135,6 +138,63 @@ function blobToDataUrl(blob) {
   });
 }
 
+// ---------------------------------------------------------------------------
+// Write-back: save session.json to the directory
+// ---------------------------------------------------------------------------
+
+async function writeBackSession(dirHandle, session) {
+  if (!dirHandle) return false;
+
+  try {
+    // Verify write permission
+    const perm = await dirHandle.queryPermission({ mode: 'readwrite' });
+    if (perm !== 'granted') {
+      const req = await dirHandle.requestPermission({ mode: 'readwrite' });
+      if (req !== 'granted') return false;
+    }
+
+    // Prepare clean data (strip screenshotDataUrl and internal fields)
+    const clean = structuredClone(session);
+    delete clean._dirHandle;
+    for (const node of Object.values(clean.nodes)) {
+      delete node.screenshotDataUrl;
+    }
+
+    // Find or create a session directory to write to
+    // Write to the first session directory that has a session.json
+    for await (const entry of dirHandle.values()) {
+      if (entry.kind === 'directory') {
+        try {
+          await entry.getFileHandle('session.json');
+          // Found a session dir — write back here
+          const file = await entry.getFileHandle('session.json', { create: true });
+          const writable = await file.createWritable();
+          await writable.write(JSON.stringify(clean, null, 2));
+          await writable.close();
+          console.log('[viewer] Wrote session.json to', entry.name);
+          return true;
+        } catch {
+          // Not a session dir, continue
+        }
+      }
+    }
+
+    // No existing session dir found — create a new one
+    const now = new Date();
+    const folderName = `session-viewer-${now.toISOString().slice(0, 10)}-${String(now.getHours()).padStart(2, '0')}${String(now.getMinutes()).padStart(2, '0')}`;
+    const sessionDir = await dirHandle.getDirectoryHandle(folderName, { create: true });
+    const file = await sessionDir.getFileHandle('session.json', { create: true });
+    const writable = await file.createWritable();
+    await writable.write(JSON.stringify(clean, null, 2));
+    await writable.close();
+    console.log('[viewer] Created new session dir:', folderName);
+    return true;
+  } catch (err) {
+    console.error('[viewer] Write-back failed:', err);
+    return false;
+  }
+}
+
 // ===========================================================================
 // App
 // ===========================================================================
@@ -156,16 +216,36 @@ export default function App() {
   const reactFlowRef = useRef(null);
   const shouldFitView = useRef(false);
 
+  // Workflow state
+  const [showWorkflows, setShowWorkflows] = useState(false);
+  const [activeWorkflow, setActiveWorkflow] = useState(null);
+  const [definingWorkflow, setDefiningWorkflow] = useState(false);
+  const [defineSteps, setDefineSteps] = useState([]);
+
+  // Platform filter
+  const [platformFilter, setPlatformFilter] = useState(null);
+
+  // -----------------------------------------------------------------------
+  // Derived data
+  // -----------------------------------------------------------------------
+
+  const workflows = useMemo(
+    () => (session?.workflows || []),
+    [session]
+  );
+
   // -----------------------------------------------------------------------
   // Build graph from session data
   // -----------------------------------------------------------------------
 
   const buildGraph = useCallback(
-    (sessionData, mode, flags, stubs) => {
+    (sessionData, mode, flags, stubs, workflow, platFilter) => {
       const { nodes: rfNodes, edges: rfEdges } = sessionToGraph(sessionData, {
         viewMode: mode,
         flagFilter: flags,
         showStubs: stubs,
+        activeWorkflow: workflow,
+        platformFilter: platFilter,
       });
 
       const positioned = layoutGraph(rfNodes, rfEdges, mode);
@@ -177,12 +257,12 @@ export default function App() {
     [setNodes, setEdges]
   );
 
-  // Rebuild when view mode or filters change
+  // Rebuild when view mode, filters, or workflow change
   useEffect(() => {
     if (session) {
-      buildGraph(session, viewMode, flagFilter, showStubs);
+      buildGraph(session, viewMode, flagFilter, showStubs, activeWorkflow, platformFilter);
     }
-  }, [session, viewMode, flagFilter, showStubs, buildGraph]);
+  }, [session, viewMode, flagFilter, showStubs, activeWorkflow, platformFilter, buildGraph]);
 
   // Fit view only when data changes
   useEffect(() => {
@@ -195,7 +275,27 @@ export default function App() {
   }, [nodes]);
 
   // -----------------------------------------------------------------------
-  // Directory-based loading
+  // Session mutation helper (updates state + writes back to disk)
+  // -----------------------------------------------------------------------
+
+  const mutateSession = useCallback(
+    (mutator) => {
+      setSession((prev) => {
+        if (!prev) return prev;
+        const next = structuredClone(prev);
+        mutator(next);
+        // Write back asynchronously
+        if (dirHandle) {
+          writeBackSession(dirHandle, next).catch(() => {});
+        }
+        return next;
+      });
+    },
+    [dirHandle]
+  );
+
+  // -----------------------------------------------------------------------
+  // Directory-based loading (read-write)
   // -----------------------------------------------------------------------
 
   const loadFromDirectory = useCallback(
@@ -212,6 +312,7 @@ export default function App() {
         setSession(merged);
         setSessionCount(sessions.length);
         setSelectedNode(null);
+        setActiveWorkflow(null);
       } catch (err) {
         console.error('Failed to scan directory:', err);
       }
@@ -222,7 +323,7 @@ export default function App() {
 
   const pickDirectory = useCallback(async () => {
     try {
-      const handle = await window.showDirectoryPicker({ mode: 'read' });
+      const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
       setDirHandle(handle);
       setDirName(handle.name);
       await saveDirHandle(handle);
@@ -237,11 +338,10 @@ export default function App() {
   const refreshDirectory = useCallback(async () => {
     if (!dirHandle) return;
 
-    // Verify permission
     try {
-      const perm = await dirHandle.queryPermission({ mode: 'read' });
+      const perm = await dirHandle.queryPermission({ mode: 'readwrite' });
       if (perm !== 'granted') {
-        const req = await dirHandle.requestPermission({ mode: 'read' });
+        const req = await dirHandle.requestPermission({ mode: 'readwrite' });
         if (req !== 'granted') return;
       }
     } catch {
@@ -258,7 +358,6 @@ export default function App() {
       if (handle) {
         setDirHandle(handle);
         setDirName(handle.name);
-        // Don't auto-load — need user gesture to verify permission
       }
     })();
   }, []);
@@ -320,16 +419,32 @@ export default function App() {
   );
 
   // -----------------------------------------------------------------------
-  // Node selection
+  // Node selection + workflow define click
   // -----------------------------------------------------------------------
 
-  const onNodeClick = useCallback((event, node) => {
-    setSelectedNode(node);
-  }, []);
+  const onNodeClick = useCallback(
+    (event, node) => {
+      if (definingWorkflow) {
+        // Add this node to the workflow being defined
+        const n = session?.nodes[node.id];
+        if (n) {
+          setDefineSteps((prev) => [
+            ...prev,
+            { id: node.id, title: n.title, url: n.url },
+          ]);
+        }
+        return;
+      }
+      setSelectedNode(node);
+    },
+    [definingWorkflow, session]
+  );
 
   const onPaneClick = useCallback(() => {
-    setSelectedNode(null);
-  }, []);
+    if (!definingWorkflow) {
+      setSelectedNode(null);
+    }
+  }, [definingWorkflow]);
 
   // -----------------------------------------------------------------------
   // Filter toggles
@@ -339,6 +454,17 @@ export default function App() {
     setFlagFilter((prev) =>
       prev.includes(flag) ? prev.filter((f) => f !== flag) : [...prev, flag]
     );
+  }, []);
+
+  const togglePlatform = useCallback((platform) => {
+    setPlatformFilter((prev) => {
+      if (!prev) return [platform];
+      if (prev.includes(platform)) {
+        const next = prev.filter((p) => p !== platform);
+        return next.length === 0 ? null : next;
+      }
+      return [...prev, platform];
+    });
   }, []);
 
   const onInit = useCallback((instance) => {
@@ -352,7 +478,163 @@ export default function App() {
     setSelectedNode(null);
     setStats(null);
     setSessionCount(0);
+    setActiveWorkflow(null);
+    setShowWorkflows(false);
+    setDefiningWorkflow(false);
+    setDefineSteps([]);
+    setPlatformFilter(null);
   }, [setNodes, setEdges]);
+
+  // -----------------------------------------------------------------------
+  // Workflow actions
+  // -----------------------------------------------------------------------
+
+  const handleSelectWorkflow = useCallback((wf) => {
+    setActiveWorkflow(wf);
+    setSelectedNode(null);
+  }, []);
+
+  const handleDeselectWorkflow = useCallback(() => {
+    setActiveWorkflow(null);
+  }, []);
+
+  const handleStartDefine = useCallback(() => {
+    setDefiningWorkflow(true);
+    setDefineSteps([]);
+    setActiveWorkflow(null);
+    setSelectedNode(null);
+  }, []);
+
+  const handleCancelDefine = useCallback(() => {
+    setDefiningWorkflow(false);
+    setDefineSteps([]);
+  }, []);
+
+  const handleSaveDefine = useCallback(
+    (name, persona) => {
+      if (!name || defineSteps.length < 2) return;
+
+      const workflow = {
+        name,
+        path: defineSteps.map((s) => s.id),
+        contributor: 'viewer',
+        ...(persona ? { persona } : {}),
+      };
+
+      mutateSession((s) => {
+        if (!s.workflows) s.workflows = [];
+        // Replace if same name exists
+        const idx = s.workflows.findIndex((w) => w.name === name);
+        if (idx >= 0) {
+          s.workflows[idx] = workflow;
+        } else {
+          s.workflows.push(workflow);
+        }
+      });
+
+      setDefiningWorkflow(false);
+      setDefineSteps([]);
+      setActiveWorkflow(workflow);
+    },
+    [defineSteps, mutateSession]
+  );
+
+  const handleAddDefineStep = useCallback(
+    (nodeId) => {
+      const n = session?.nodes[nodeId];
+      if (n) {
+        setDefineSteps((prev) => [
+          ...prev,
+          { id: nodeId, title: n.title, url: n.url },
+        ]);
+      }
+    },
+    [session]
+  );
+
+  const handleRemoveDefineStep = useCallback((index) => {
+    setDefineSteps((prev) => prev.filter((_, i) => i !== index));
+  }, []);
+
+  const handleDeleteWorkflow = useCallback(
+    (name) => {
+      mutateSession((s) => {
+        s.workflows = (s.workflows || []).filter((w) => w.name !== name);
+      });
+      setActiveWorkflow(null);
+    },
+    [mutateSession]
+  );
+
+  const handleAddStub = useCallback(
+    (fromId, toId) => {
+      // Create a stub node between two workflow steps
+      const fromNode = session?.nodes[fromId];
+      const toNode = session?.nodes[toId];
+      if (!fromNode || !toNode) return;
+
+      // Infer a URL midpoint (use the toNode's parent path)
+      try {
+        const toUrl = new URL(toNode.url);
+        const segments = toUrl.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+        if (segments.length > 1) {
+          segments.pop();
+          toUrl.pathname = '/' + segments.join('/');
+          const stubUrl = toUrl.toString().replace(/\/+$/, '');
+
+          // Simple hash for the stub
+          let hash = 5381;
+          for (let i = 0; i < stubUrl.length; i++) {
+            hash = ((hash << 5) + hash + stubUrl.charCodeAt(i)) >>> 0;
+          }
+          const stubId = hash.toString(16).padStart(8, '0');
+
+          mutateSession((s) => {
+            if (!s.nodes[stubId]) {
+              const lastSeg = segments[segments.length - 1] || 'page';
+              s.nodes[stubId] = {
+                url: stubUrl,
+                title: lastSeg.charAt(0).toUpperCase() + lastSeg.slice(1).replace(/-/g, ' ') + ' (' + toUrl.hostname + ')',
+                screenshot: null,
+                notes: [],
+                flags: [],
+                stub: true,
+                inferredParent: null,
+                platform: fromNode.platform || 'web',
+              };
+            }
+            // Add child-of edge
+            s.edges.push({ from: stubId, to: toId, type: 'child-of', count: 1 });
+          });
+        }
+      } catch {
+        // URL parsing failed, skip
+      }
+    },
+    [session, mutateSession]
+  );
+
+  const handleExportCaptureQueue = useCallback(() => {
+    if (!activeWorkflow || !session) return;
+
+    const queue = (activeWorkflow.path || [])
+      .map((id) => {
+        const n = session.nodes[id];
+        if (!n || !n.stub) return null;
+        return { url: n.url, title: n.title, nodeId: id };
+      })
+      .filter(Boolean);
+
+    const blob = new Blob([JSON.stringify({ captureQueue: queue }, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `capture-queue-${activeWorkflow.name.replace(/\s+/g, '-').toLowerCase()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [activeWorkflow, session]);
 
   // -----------------------------------------------------------------------
   // Empty state
@@ -375,7 +657,6 @@ export default function App() {
               individual JSON files.
             </p>
 
-            {/* Directory picker — primary action */}
             <button
               className="toolbar-btn"
               style={{
@@ -392,7 +673,6 @@ export default function App() {
               {dirName ? `Open ${dirName}` : 'Choose Exports Folder'}
             </button>
 
-            {/* If we have a saved handle, offer to reconnect */}
             {dirHandle && (
               <button
                 className="toolbar-btn"
@@ -407,7 +687,6 @@ export default function App() {
               </button>
             )}
 
-            {/* Drop zone fallback */}
             <div
               className="drop-zone"
               onClick={() => fileInputRef.current?.click()}
@@ -446,6 +725,32 @@ export default function App() {
 
   return (
     <div className="app-container" onDrop={handleDrop} onDragOver={handleDragOver}>
+      {/* Workflow panel (left sidebar) */}
+      {showWorkflows && (
+        <WorkflowPanel
+          session={session}
+          workflows={workflows}
+          activeWorkflow={activeWorkflow}
+          onSelectWorkflow={handleSelectWorkflow}
+          onDeselectWorkflow={handleDeselectWorkflow}
+          onCreateWorkflow={handleAddDefineStep}
+          onDeleteWorkflow={handleDeleteWorkflow}
+          onAddStub={handleAddStub}
+          onExportCaptureQueue={handleExportCaptureQueue}
+          definingWorkflow={definingWorkflow}
+          onStartDefine={handleStartDefine}
+          onCancelDefine={handleCancelDefine}
+          onSaveDefine={handleSaveDefine}
+          defineSteps={defineSteps}
+          onRemoveDefineStep={handleRemoveDefineStep}
+          onClose={() => {
+            setShowWorkflows(false);
+            setDefiningWorkflow(false);
+            setDefineSteps([]);
+          }}
+        />
+      )}
+
       <div className="graph-container">
         {/* Toolbar */}
         <div className="toolbar">
@@ -470,6 +775,12 @@ export default function App() {
               All
             </button>
           </div>
+          <button
+            className={`toolbar-btn ${showWorkflows ? 'active' : ''}`}
+            onClick={() => setShowWorkflows(!showWorkflows)}
+          >
+            Workflows{workflows.length > 0 ? ` (${workflows.length})` : ''}
+          </button>
           <button
             className={`toolbar-btn ${showStubs ? 'active' : ''}`}
             onClick={() => setShowStubs(!showStubs)}
@@ -500,7 +811,7 @@ export default function App() {
           />
         </div>
 
-        {/* Flag filters */}
+        {/* Flag + platform filters */}
         <div className="filter-bar">
           {['broken', 'confusing', 'missing', 'good'].map((flag) => (
             <button
@@ -513,7 +824,38 @@ export default function App() {
               {flag}
             </button>
           ))}
+          {stats && stats.platforms && stats.platforms.length > 1 && (
+            <>
+              <span className="filter-separator" />
+              {stats.platforms.map((p) => (
+                <button
+                  key={p}
+                  className={`filter-btn platform ${
+                    !platformFilter || platformFilter.includes(p) ? 'active' : ''
+                  }`}
+                  onClick={() => togglePlatform(p)}
+                >
+                  {p}
+                </button>
+              ))}
+            </>
+          )}
         </div>
+
+        {/* Define mode banner */}
+        {definingWorkflow && (
+          <div className="define-banner">
+            Click nodes to add steps to your workflow
+          </div>
+        )}
+
+        {/* Active workflow banner */}
+        {activeWorkflow && !definingWorkflow && (
+          <div className="workflow-banner">
+            Viewing: <strong>{activeWorkflow.name}</strong>
+            <button onClick={handleDeselectWorkflow}>Clear</button>
+          </div>
+        )}
 
         {/* Graph */}
         <ReactFlow
@@ -540,6 +882,7 @@ export default function App() {
             position="bottom-right"
             style={{ marginBottom: 48 }}
             nodeColor={(node) => {
+              if (node.data?.dimmed) return '#222230';
               if (node.data?.isModal) return '#06b6d4';
               if (node.data?.isStub) return '#333355';
               return '#6366f1';
@@ -566,6 +909,12 @@ export default function App() {
             <div className="legend-line modal-dismiss" />
             <span>Dismiss</span>
           </div>
+          {activeWorkflow && (
+            <div className="legend-item">
+              <div className="legend-line workflow-path" />
+              <span>Workflow</span>
+            </div>
+          )}
         </div>
 
         {/* Stats */}
@@ -593,6 +942,11 @@ export default function App() {
             <div>
               <span>{stats.domains}</span> domains
             </div>
+            {stats.workflows > 0 && (
+              <div>
+                <span>{stats.workflows}</span> workflows
+              </div>
+            )}
             {dirName && (
               <div style={{ color: '#555570' }}>
                 {dirName}/
@@ -603,7 +957,7 @@ export default function App() {
       </div>
 
       {/* Detail panel */}
-      {selectedNode && session && (
+      {selectedNode && session && !definingWorkflow && (
         <DetailPanel
           node={selectedNode}
           session={session}

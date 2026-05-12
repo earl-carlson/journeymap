@@ -461,7 +461,327 @@
   // SCREENSHOT SUPPORT
   // =======================================================================
 
-  // Handle screenshot-related messages from the background script
+  // =======================================================================
+  // SANITY CHECK TOAST (Piece 4)
+  // =======================================================================
+
+  // The toast is rendered inside a shadow DOM to avoid style conflicts
+  // with Docker's pages. It appears at the bottom-right of the viewport.
+
+  let toastHost = null;
+  let toastShadow = null;
+  let toastDismissTimer = null;
+  let toastCurrentNodeId = null;
+
+  function ensureToastHost() {
+    if (toastHost && toastHost.isConnected) return;
+
+    toastHost = document.createElement('ia-mapper-toast');
+    toastHost.style.cssText = 'all:initial; position:fixed; z-index:2147483647; bottom:20px; right:20px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;';
+    toastShadow = toastHost.attachShadow({ mode: 'closed' });
+    document.body.appendChild(toastHost);
+  }
+
+  function showSanityToast(data) {
+    dismissToast(); // Clear any existing toast first
+    ensureToastHost(); // Then create fresh host
+
+    toastCurrentNodeId = data.nodeId;
+
+    const reasonLabel = {
+      'cross-domain': 'Cross-domain navigation',
+      'back-button-branch': 'Back-button branch',
+      'hierarchy-skip': 'Hierarchy skip',
+    }[data.reason] || 'Ambiguous navigation';
+
+    const parentDisplay = data.parentTitle
+      ? escapeForHtml(data.parentTitle)
+      : '<em style="opacity:.6">domain root</em>';
+
+    toastShadow.innerHTML = `
+      <style>
+        :host { all: initial; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        .toast {
+          width: 340px;
+          background: #1e1e38;
+          border: 1px solid #3a3a5c;
+          border-radius: 10px;
+          box-shadow: 0 8px 32px rgba(0,0,0,.45);
+          color: #e0e0f0;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+          font-size: 13px;
+          overflow: hidden;
+          animation: slideIn .25s ease-out;
+        }
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateY(12px) scale(.97); }
+          to   { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .toast.dismissing {
+          animation: slideOut .2s ease-in forwards;
+        }
+        @keyframes slideOut {
+          to { opacity: 0; transform: translateY(8px) scale(.97); }
+        }
+        .header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 10px 14px 8px;
+          border-bottom: 1px solid #2a2a4a;
+        }
+        .label {
+          font-size: 10px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: .05em;
+          color: #8888aa;
+        }
+        .reason {
+          font-size: 10px;
+          font-weight: 500;
+          color: #eab308;
+          background: rgba(234,179,8,.1);
+          padding: 2px 7px;
+          border-radius: 8px;
+        }
+        .body {
+          padding: 12px 14px;
+        }
+        .guess {
+          line-height: 1.5;
+          margin-bottom: 10px;
+        }
+        .guess strong {
+          color: #a5b4fc;
+          font-weight: 600;
+        }
+        .actions {
+          display: flex;
+          gap: 8px;
+        }
+        .btn {
+          flex: 1;
+          padding: 7px 0;
+          font-size: 12px;
+          font-weight: 600;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: background .12s, color .12s;
+        }
+        .btn-confirm {
+          background: rgba(99,102,241,.15);
+          color: #818cf8;
+          border: 1px solid rgba(99,102,241,.25);
+        }
+        .btn-confirm:hover { background: rgba(99,102,241,.25); color: #a5b4fc; }
+        .btn-correct {
+          background: rgba(234,179,8,.1);
+          color: #eab308;
+          border: 1px solid rgba(234,179,8,.2);
+        }
+        .btn-correct:hover { background: rgba(234,179,8,.18); color: #facc15; }
+        .progress {
+          height: 2px;
+          background: #2a2a4a;
+          overflow: hidden;
+        }
+        .progress-bar {
+          height: 100%;
+          background: #6366f1;
+          width: 100%;
+          animation: countdown 10s linear forwards;
+        }
+        @keyframes countdown {
+          from { width: 100%; }
+          to   { width: 0%; }
+        }
+        /* Parent picker */
+        .picker {
+          padding: 10px 14px 14px;
+          border-top: 1px solid #2a2a4a;
+        }
+        .picker-label {
+          font-size: 11px;
+          font-weight: 600;
+          color: #8888aa;
+          margin-bottom: 8px;
+        }
+        .picker-list {
+          max-height: 180px;
+          overflow-y: auto;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+        }
+        .picker-item {
+          padding: 7px 10px;
+          background: #222240;
+          border: 1px solid #333355;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: border-color .12s, background .12s;
+        }
+        .picker-item:hover {
+          border-color: #6366f1;
+          background: #2a2a4a;
+        }
+        .picker-item-title {
+          font-size: 12px;
+          font-weight: 500;
+          color: #e0e0f0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .picker-item-url {
+          font-size: 10px;
+          color: #6668aa;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          margin-top: 1px;
+        }
+        .picker-loading {
+          font-size: 11px;
+          color: #8888aa;
+          padding: 8px 0;
+        }
+      </style>
+      <div class="toast" id="toast">
+        <div class="header">
+          <span class="label">IA Mapper</span>
+          <span class="reason">${escapeForHtml(reasonLabel)}</span>
+        </div>
+        <div class="body">
+          <div class="guess">
+            Placed <strong>${escapeForHtml(data.nodeTitle)}</strong>
+            as child of <strong>${parentDisplay}</strong> — correct?
+          </div>
+          <div class="actions">
+            <button class="btn btn-confirm" id="btn-confirm">Correct</button>
+            <button class="btn btn-correct" id="btn-change">Change parent</button>
+          </div>
+        </div>
+        <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+      </div>
+    `;
+
+    // Wire up buttons
+    const btnConfirm = toastShadow.getElementById('btn-confirm');
+    const btnChange = toastShadow.getElementById('btn-change');
+
+    btnConfirm.addEventListener('click', () => {
+      dismissToast();
+    });
+
+    btnChange.addEventListener('click', () => {
+      showParentPicker(data.nodeId);
+    });
+
+    // Auto-dismiss after 10 seconds
+    toastDismissTimer = setTimeout(() => {
+      dismissToast();
+    }, 10000);
+  }
+
+  function showParentPicker(nodeId) {
+    // Cancel auto-dismiss while picker is open
+    if (toastDismissTimer) {
+      clearTimeout(toastDismissTimer);
+      toastDismissTimer = null;
+    }
+
+    // Stop the progress bar animation
+    const progressBar = toastShadow.getElementById('progress-bar');
+    if (progressBar) progressBar.style.animation = 'none';
+
+    // Replace the actions area with a loading state, then fetch recent nodes
+    const toastEl = toastShadow.getElementById('toast');
+    if (!toastEl) return;
+
+    // Remove existing picker if any
+    const existingPicker = toastShadow.querySelector('.picker');
+    if (existingPicker) existingPicker.remove();
+
+    // Hide the action buttons
+    const actionsEl = toastShadow.querySelector('.actions');
+    if (actionsEl) actionsEl.style.display = 'none';
+
+    // Add picker container
+    const picker = document.createElement('div');
+    picker.className = 'picker';
+    picker.innerHTML = '<div class="picker-label">Choose new parent</div><div class="picker-loading">Loading recent pages...</div>';
+    toastEl.querySelector('.body').appendChild(picker);
+
+    // Fetch recent nodes from background
+    safeSendMessage({ type: 'GET_RECENT_NODES', excludeId: nodeId }, (response) => {
+      if (!response || !response.ok || !response.nodes || response.nodes.length === 0) {
+        picker.innerHTML = '<div class="picker-label">Choose new parent</div><div class="picker-loading">No recent pages available</div>';
+        // Re-show dismiss after 5s
+        toastDismissTimer = setTimeout(() => dismissToast(), 5000);
+        return;
+      }
+
+      const list = document.createElement('div');
+      list.className = 'picker-list';
+
+      for (const node of response.nodes) {
+        const item = document.createElement('div');
+        item.className = 'picker-item';
+        item.innerHTML = `
+          <div class="picker-item-title">${escapeForHtml(node.title)}</div>
+          <div class="picker-item-url">${escapeForHtml(node.url)}</div>
+        `;
+        item.addEventListener('click', () => {
+          // Send correction to background
+          safeSendMessage({
+            type: 'CORRECT_PARENT',
+            nodeId: nodeId,
+            newParentId: node.id,
+          });
+          dismissToast();
+        });
+        list.appendChild(item);
+      }
+
+      picker.innerHTML = '<div class="picker-label">Choose new parent</div>';
+      picker.appendChild(list);
+    });
+  }
+
+  function dismissToast() {
+    if (toastDismissTimer) {
+      clearTimeout(toastDismissTimer);
+      toastDismissTimer = null;
+    }
+
+    const toastEl = toastShadow ? toastShadow.getElementById('toast') : null;
+    if (toastEl) {
+      toastEl.classList.add('dismissing');
+      setTimeout(() => {
+        if (toastHost && toastHost.isConnected) {
+          toastHost.remove();
+        }
+      }, 200);
+    } else if (toastHost && toastHost.isConnected) {
+      toastHost.remove();
+    }
+
+    toastCurrentNodeId = null;
+  }
+
+  function escapeForHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  // =======================================================================
+  // MESSAGE HANDLER (screenshots, toast, etc.)
+  // =======================================================================
+
   chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     switch (message.type) {
       case 'GET_PAGE_DIMENSIONS': {
@@ -529,6 +849,12 @@
         }
         sendResponse({ ok: false, error: 'Modal not found' });
         return true;
+      }
+
+      case 'SHOW_SANITY_TOAST': {
+        showSanityToast(message);
+        // No response needed — fire and forget
+        return false;
       }
     }
   });

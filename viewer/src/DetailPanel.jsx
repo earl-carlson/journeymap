@@ -119,15 +119,43 @@ export default function DetailPanel({ node, session, onClose }) {
         </div>
       )}
 
+      {/* Platform */}
+      {data.platform && data.platform !== 'web' && (
+        <div style={{ marginTop: -8 }}>
+          <span
+            style={{
+              fontSize: 10,
+              fontWeight: 700,
+              textTransform: 'uppercase',
+              padding: '2px 8px',
+              borderRadius: 8,
+              background: 'rgba(234,179,8,0.12)',
+              color: '#eab308',
+            }}
+          >
+            {data.platform}
+          </span>
+        </div>
+      )}
+
       {/* Notes */}
       {data.notes && data.notes.length > 0 && (
         <div className="detail-section">
           <div className="detail-section-label">Notes</div>
-          {data.notes.map((note, i) => (
-            <div key={i} className="detail-note">
-              {note}
-            </div>
-          ))}
+          {data.notes.map((note, i) => {
+            const text = typeof note === 'string' ? note : note?.text || '';
+            const contributor = typeof note === 'object' ? note?.contributor : null;
+            return (
+              <div key={i} className="detail-note">
+                {text}
+                {contributor && (
+                  <div style={{ fontSize: 10, color: 'var(--text-dim)', marginTop: 4 }}>
+                    — {contributor}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 

@@ -9,6 +9,7 @@
 let session = null;       // Active session object or null
 let currentNodeId = null; // URL-hash of the node the user is currently on
 let previousNodeId = null; // URL-hash of the node the user just left
+let visitHistory = [];    // Ordered list of visited node IDs (for back-button detection)
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -247,6 +248,7 @@ function startSession(contributor) {
   };
   currentNodeId = null;
   previousNodeId = null;
+  visitHistory = [];
   persistSession();
   updateBadge();
 }
@@ -256,6 +258,7 @@ function stopSession() {
   session = null;
   currentNodeId = null;
   previousNodeId = null;
+  visitHistory = [];
   chrome.storage.local.remove('ia_session');
   updateBadge();
   return data;
@@ -298,10 +301,34 @@ function updateBadge() {
 // ---------------------------------------------------------------------------
 
 /**
+ * Count how many hierarchy levels separate two URLs on the same domain.
+ * Returns 0 if they share the same parent, 1 if one level apart, etc.
+ * Returns -1 if they're on different domains.
+ */
+function hierarchyDistance(urlA, urlB) {
+  const a = new URL(urlA);
+  const b = new URL(urlB);
+  if (a.hostname !== b.hostname) return -1;
+
+  const segsA = a.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+  const segsB = b.pathname.replace(/\/+$/, '').split('/').filter(Boolean);
+
+  // Find common prefix length
+  let common = 0;
+  while (common < segsA.length && common < segsB.length && segsA[common] === segsB[common]) {
+    common++;
+  }
+
+  // Distance = steps up from A to common ancestor + steps down to B
+  return (segsA.length - common) + (segsB.length - common);
+}
+
+/**
  * Process a navigation event.
  * 1. Create/update the node
  * 2. Record the raw navigate edge from previous node
  * 3. Build the ancestor chain (stub nodes + child-of edges)
+ * 4. Detect ambiguous navigation and trigger sanity check toast
  */
 function recordNavigation(url, title, tabId) {
   if (!session) return;
@@ -320,7 +347,9 @@ function recordNavigation(url, title, tabId) {
     session.nodes[id].title = title;
   }
 
-  // Record raw navigation edge
+  // --- Sanity check: detect ambiguous navigation ---
+  let sanityReason = null;
+
   if (currentNodeId && currentNodeId !== id) {
     const fromNode = session.nodes[currentNodeId];
     const navType = classifyNavigation(fromNode.url, canonical);
@@ -332,6 +361,32 @@ function recordNavigation(url, title, tabId) {
     const lastEdge = session.edges[session.edges.length - 1];
     if (lastEdge && lastEdge.from === currentNodeId && lastEdge.to === id) {
       lastEdge.navClass = navType;
+    }
+
+    // Detect ambiguous navigation conditions:
+
+    // 1. Cross-domain navigation
+    if (navType === 'cross-domain') {
+      sanityReason = 'cross-domain';
+    }
+
+    // 2. Back-button branch: user returned to a previously visited node
+    //    and is now navigating somewhere new from it
+    if (!sanityReason && visitHistory.length >= 2) {
+      const prevIdx = visitHistory.lastIndexOf(currentNodeId);
+      if (prevIdx >= 0 && prevIdx < visitHistory.length - 1) {
+        // currentNodeId appeared earlier in history and we just came back to it
+        // (the last entry in visitHistory is where we were before currentNodeId)
+        sanityReason = 'back-button-branch';
+      }
+    }
+
+    // 3. Hierarchy skip: navigation jumps more than 1 level in the URL tree
+    if (!sanityReason && navType !== 'cross-domain') {
+      const dist = hierarchyDistance(fromNode.url, canonical);
+      if (dist > 2) {
+        sanityReason = 'hierarchy-skip';
+      }
     }
   }
 
@@ -348,19 +403,53 @@ function recordNavigation(url, title, tabId) {
   // Update tracking
   previousNodeId = currentNodeId;
   currentNodeId = id;
+  visitHistory.push(id);
+  // Cap history to avoid unbounded growth
+  if (visitHistory.length > 500) {
+    visitHistory = visitHistory.slice(-250);
+  }
 
   persistSession();
   updateBadge();
 
   // Schedule screenshot capture
-  if (tabId) {
-    scheduleScreenshot(id, tabId);
+  const resolvedTabId = tabId;
+  if (resolvedTabId) {
+    scheduleScreenshot(id, resolvedTabId);
   } else {
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
       if (tabs[0]) {
         scheduleScreenshot(id, tabs[0].id);
       }
     });
+  }
+
+  // --- Send sanity check toast to content script ---
+  if (sanityReason) {
+    const node = session.nodes[id];
+    const parentId = node.inferredParent;
+    const parentNode = parentId ? session.nodes[parentId] : null;
+
+    const toastData = {
+      type: 'SHOW_SANITY_TOAST',
+      nodeId: id,
+      nodeTitle: node.title,
+      parentId: parentId,
+      parentTitle: parentNode ? parentNode.title : null,
+      reason: sanityReason,
+    };
+
+    // Send to the tab's content script
+    const sendTabId = resolvedTabId || null;
+    if (sendTabId) {
+      chrome.tabs.sendMessage(sendTabId, toastData).catch(() => {});
+    } else {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]) {
+          chrome.tabs.sendMessage(tabs[0].id, toastData).catch(() => {});
+        }
+      });
+    }
   }
 }
 
@@ -606,21 +695,19 @@ async function ensureWhisperOffscreen() {
   whisperOffscreenReady = false;
   whisperPort = null;
 
-  await chrome.offscreen.createDocument({
-    url: 'whisper-offscreen.html',
-    reasons: ['WORKERS'],
-    justification: 'Run Whisper speech-to-text model via Transformers.js WebAssembly',
-  });
+  // Register the onConnect listener BEFORE creating the document to avoid
+  // a race condition where the offscreen doc connects before we're listening.
+  const portReady = new Promise((resolve, reject) => {
+    const timeout = setTimeout(() => {
+      chrome.runtime.onConnect.removeListener(onConnect);
+      reject(new Error('Whisper offscreen connect timeout (10s)'));
+    }, 10000);
 
-  // Wait for the offscreen doc to connect via port
-  await new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => reject(new Error('Whisper offscreen connect timeout')), 10000);
-
-    function onConnect(port) {
-      if (port.name === 'whisper') {
+    function onConnect(p) {
+      if (p.name === 'whisper') {
         clearTimeout(timeout);
         chrome.runtime.onConnect.removeListener(onConnect);
-        whisperPort = port;
+        whisperPort = p;
         whisperPort.onMessage.addListener((msg) => {
           if (msg.type === 'WHISPER_RESULT') {
             if (whisperResolve) {
@@ -633,13 +720,14 @@ async function ensureWhisperOffscreen() {
               whisperReject = null;
             }
           } else if (msg.type === 'WHISPER_PROGRESS') {
-            // Could forward to side panel
+            // Forward to side panel if needed
             console.log('[whisper] Progress:', msg.file, Math.round(msg.progress || 0) + '%');
           }
         });
         whisperPort.onDisconnect.addListener(() => {
           whisperPort = null;
           whisperOffscreenReady = false;
+          console.log('[whisper] Offscreen port disconnected');
         });
         resolve();
       }
@@ -647,6 +735,15 @@ async function ensureWhisperOffscreen() {
 
     chrome.runtime.onConnect.addListener(onConnect);
   });
+
+  // Now create the document — the listener is already in place
+  await chrome.offscreen.createDocument({
+    url: 'whisper-offscreen.html',
+    reasons: ['WORKERS'],
+    justification: 'Run Whisper speech-to-text model via Transformers.js WebAssembly',
+  });
+
+  await portReady;
 
   whisperOffscreenReady = true;
   console.log('[whisper] Offscreen document connected');
@@ -712,11 +809,18 @@ chrome.webNavigation.onHistoryStateUpdated.addListener(
 // ---------------------------------------------------------------------------
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // Ignore messages not meant for the background
+  // Ignore port-only messages that leak to the runtime message channel.
+  // AUDIO_TRANSCRIBE is intentionally NOT filtered — it comes from the side panel.
   if (message.type === 'WHISPER_TRANSCRIBE' || message.type === 'WHISPER_LOAD_MODEL'
-      || message.type === 'WHISPER_PROGRESS' || message.type === 'WHISPER_RESULT'
-      || message.type === 'MIC_PERMISSION_GRANTED') {
+      || message.type === 'WHISPER_PROGRESS' || message.type === 'WHISPER_RESULT') {
     return false;
+  }
+
+  // Mic permission granted from the permission page — just acknowledge
+  if (message.type === 'MIC_PERMISSION_GRANTED') {
+    console.log('[audio] Microphone permission granted');
+    sendResponse({ ok: true });
+    return true;
   }
 
   // Handle messages that work without an active session
@@ -893,6 +997,64 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       recordingStartNodeId = null;
       return true; // Async response
+    }
+
+    case 'CORRECT_PARENT': {
+      // User corrected the inferred parent via the sanity check toast.
+      // Update the child-of edge: remove old parent edge, add new one.
+      const nodeId = message.nodeId;
+      const newParentId = message.newParentId;
+      const node = session.nodes[nodeId];
+
+      if (!node || !newParentId || !session.nodes[newParentId]) {
+        sendResponse({ ok: false, reason: 'invalid node or parent' });
+        break;
+      }
+
+      const oldParentId = node.inferredParent;
+
+      // Remove old child-of edge (oldParent → node)
+      if (oldParentId) {
+        const idx = session.edges.findIndex(
+          e => e.from === oldParentId && e.to === nodeId && e.type === 'child-of'
+        );
+        if (idx >= 0) session.edges.splice(idx, 1);
+      }
+
+      // Add new child-of edge (newParent → node)
+      addEdge(newParentId, nodeId, 'child-of');
+
+      // Update inferredParent
+      node.inferredParent = newParentId;
+
+      persistSession();
+      console.log('[sanity] Corrected parent of', nodeId, 'from', oldParentId, 'to', newParentId);
+      sendResponse({ ok: true });
+      break;
+    }
+
+    case 'GET_RECENT_NODES': {
+      // Return recently visited nodes for the parent-picker.
+      // Excludes stubs and the node being corrected.
+      const excludeId = message.excludeId;
+      const recent = [];
+      const seen = new Set();
+
+      // Walk visitHistory backwards to get most-recent-first, deduped
+      for (let i = visitHistory.length - 1; i >= 0 && recent.length < 12; i--) {
+        const nid = visitHistory[i];
+        if (seen.has(nid)) continue;
+        if (nid === excludeId) continue;
+        seen.add(nid);
+
+        const n = session.nodes[nid];
+        if (!n || n.stub) continue;
+
+        recent.push({ id: nid, title: n.title, url: n.url });
+      }
+
+      sendResponse({ ok: true, nodes: recent });
+      break;
     }
 
     default:

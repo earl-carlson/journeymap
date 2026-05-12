@@ -42,12 +42,13 @@ function PageNode({ data, selected }) {
         minWidth: 200,
         maxWidth: 260,
         cursor: 'pointer',
-        transition: 'border-color 0.15s, box-shadow 0.15s',
+        transition: 'border-color 0.15s, box-shadow 0.15s, opacity 0.2s',
         boxShadow: selected
           ? '0 0 0 2px rgba(99,102,241,0.3)'
           : hasFlags
           ? `0 0 0 1px ${flagColor}33`
           : 'none',
+        opacity: data.dimmed ? 0.2 : 1,
       }}
     >
       <Handle type="target" position={Position.Left} style={{ background: domainColor, width: 8, height: 8, border: '2px solid #1e1e36' }} />

@@ -1,11 +1,11 @@
 import Dagre from '@dagrejs/dagre';
 
-const NODE_WIDTH = 220;
-const NODE_HEIGHT = 64;
-const MODAL_WIDTH = 180;
-const MODAL_HEIGHT = 50;
-const STUB_WIDTH = 180;
-const STUB_HEIGHT = 52;
+const NODE_WIDTH = 270;
+const NODE_HEIGHT = 68;
+const MODAL_WIDTH = 210;
+const MODAL_HEIGHT = 54;
+const STUB_WIDTH = 230;
+const STUB_HEIGHT = 56;
 
 function getNodeDimensions(node) {
   if (node.data?.isModal) return { width: MODAL_WIDTH, height: MODAL_HEIGHT };
@@ -82,9 +82,9 @@ function layoutHierarchy(rfNodes, rfEdges) {
     const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
     g.setGraph({
       rankdir: 'TB',
-      nodesep: 30,
+      nodesep: 50,
       ranksep: 60,
-      edgesep: 15,
+      edgesep: 20,
       marginx: 30,
       marginy: 30,
     });
@@ -174,9 +174,9 @@ function layoutFlat(rfNodes, rfEdges, mode, direction) {
 
   g.setGraph({
     rankdir: direction,
-    nodesep: 40,
+    nodesep: 50,
     ranksep: 100,
-    edgesep: 20,
+    edgesep: 25,
     marginx: 40,
     marginy: 40,
   });

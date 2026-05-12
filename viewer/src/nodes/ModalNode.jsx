@@ -12,8 +12,9 @@ function ModalNode({ data, selected }) {
         minWidth: 160,
         maxWidth: 200,
         cursor: 'pointer',
-        transition: 'border-color 0.15s, box-shadow 0.15s',
         boxShadow: selected ? '0 0 0 2px rgba(6,182,212,0.2)' : 'none',
+        opacity: data.dimmed ? 0.2 : 1,
+        transition: 'border-color 0.15s, box-shadow 0.15s, opacity 0.2s',
       }}
     >
       <Handle type="target" position={Position.Left} style={{ background: '#06b6d4', width: 7, height: 7, border: '2px solid #141e2e' }} />

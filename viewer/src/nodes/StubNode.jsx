@@ -19,9 +19,9 @@ function StubNode({ data, selected }) {
         padding: '6px 12px',
         minWidth: 160,
         maxWidth: 220,
-        opacity: 0.6,
+        opacity: data.dimmed ? 0.15 : 0.6,
         cursor: 'pointer',
-        transition: 'border-color 0.15s',
+        transition: 'border-color 0.15s, opacity 0.2s',
       }}
     >
       <Handle type="target" position={Position.Left} style={{ background: '#555570', width: 6, height: 6, border: '2px solid #16162a' }} />
