@@ -23,6 +23,10 @@ function PageNode({ data, selected }) {
   const hasFlags = data.flags && data.flags.length > 0;
   const flagColor = hasFlags ? FLAG_COLORS[data.flags[0]] : null;
 
+  const isCollapsed = data.isCollapsed;
+  const hasChildren = (data.directChildCount || 0) > 0;
+  const collapseChildCount = isCollapsed ? (data.hiddenChildren || data.directChildCount || 0) : (data.directChildCount || 0);
+
   // Extract short path from URL
   let shortPath = '';
   try {
@@ -31,6 +35,14 @@ function PageNode({ data, selected }) {
   } catch {
     shortPath = data.url;
   }
+
+  const handleCollapseClick = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (data.onToggleCollapse) data.onToggleCollapse(data.nodeId);
+  };
+
+  const showBottom = hasFlags || hasChildren;
 
   return (
     <div
@@ -112,10 +124,10 @@ function PageNode({ data, selected }) {
         {shortPath}
       </div>
 
-      {/* Flags */}
-      {hasFlags && (
-        <div style={{ display: 'flex', gap: 3, marginTop: 4 }}>
-          {data.flags.map((flag) => (
+      {/* Flags + collapse button + depth badge */}
+      {showBottom && (
+        <div style={{ display: 'flex', gap: 3, marginTop: 4, alignItems: 'center' }}>
+          {hasFlags && data.flags.map((flag) => (
             <span
               key={flag}
               style={{
@@ -131,6 +143,37 @@ function PageNode({ data, selected }) {
               {flag}
             </span>
           ))}
+          {hasChildren && (
+            <button
+              onClick={handleCollapseClick}
+              title={isCollapsed ? `Expand ${collapseChildCount} children` : 'Collapse children'}
+              style={{
+                marginLeft: 'auto',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 3,
+                background: isCollapsed ? 'rgba(75,123,229,0.18)' : 'rgba(255,255,255,0.06)',
+                border: `1px solid ${isCollapsed ? 'rgba(75,123,229,0.35)' : 'rgba(255,255,255,0.1)'}`,
+                borderRadius: 5,
+                padding: '1px 5px',
+                cursor: 'pointer',
+                color: isCollapsed ? '#6B93EA' : '#666688',
+                fontSize: 10,
+                fontWeight: 700,
+                lineHeight: 1,
+                transition: 'background 0.12s, color 0.12s',
+              }}
+            >
+              {isCollapsed ? (
+                <>
+                  <span style={{ fontSize: 11, lineHeight: 1 }}>+</span>
+                  <span>{collapseChildCount}</span>
+                </>
+              ) : (
+                <span style={{ fontSize: 11, lineHeight: 1 }}>−</span>
+              )}
+            </button>
+          )}
         </div>
       )}
     </div>

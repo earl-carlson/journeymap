@@ -210,6 +210,10 @@ export default function App() {
   // Platform filter
   const [platformFilter, setPlatformFilter] = useState(null);
 
+  // Collapse state
+  const [collapsedDomains, setCollapsedDomains] = useState(new Set());
+  const [collapsedNodes, setCollapsedNodes] = useState(new Set());
+
   // -----------------------------------------------------------------------
   // Derived data
   // -----------------------------------------------------------------------
@@ -223,32 +227,120 @@ export default function App() {
   // Build graph from session data
   // -----------------------------------------------------------------------
 
+  // Compute the set of all node IDs that have at least one child
+  const getAllParentIds = useCallback((sessionData) => {
+    const parents = new Set();
+    for (const node of Object.values(sessionData.nodes || {})) {
+      if (node.inferredParent) parents.add(node.inferredParent);
+    }
+    return parents;
+  }, []);
+
+  // Collapse all nodes that have children
+  const collapseAll = useCallback(() => {
+    if (session) setCollapsedNodes(getAllParentIds(session));
+  }, [session, getAllParentIds]);
+
+  // Expand all nodes
+  const expandAll = useCallback(() => {
+    setCollapsedNodes(new Set());
+  }, []);
+
+  // Toggle domain collapse
+  const toggleDomain = useCallback((domain) => {
+    setCollapsedDomains((prev) => {
+      const next = new Set(prev);
+      if (next.has(domain)) next.delete(domain);
+      else next.add(domain);
+      return next;
+    });
+  }, []);
+
+  // Toggle node collapse (subtree)
+  const toggleNodeCollapse = useCallback((nodeId) => {
+    setCollapsedNodes((prev) => {
+      const next = new Set(prev);
+      if (next.has(nodeId)) next.delete(nodeId);
+      else next.add(nodeId);
+      return next;
+    });
+  }, []);
+
   const buildGraph = useCallback(
-    (sessionData, mode, flags, stubs, workflow, platFilter) => {
-      const { nodes: rfNodes, edges: rfEdges } = sessionToGraph(sessionData, {
+    (sessionData, mode, flags, stubs, workflow, platFilter, collapsed, collapsedN) => {
+      const { nodes: rfNodes, edges: rfEdges, domainCounts } = sessionToGraph(sessionData, {
         viewMode: mode,
         flagFilter: flags,
         showStubs: stubs,
         activeWorkflow: workflow,
         platformFilter: platFilter,
+        collapsedDomains: collapsed,
+        collapsedNodes: collapsedN,
       });
 
       const { nodes: positioned, groups } = layoutGraph(rfNodes, rfEdges, mode);
-      // Place group nodes first (behind content nodes) then content nodes on top
-      setNodes([...groups, ...positioned]);
+
+      // Inject onToggle callbacks and counts into group data
+      const enrichedGroups = groups.map((g) => ({
+        ...g,
+        data: {
+          ...g.data,
+          nodeCount: domainCounts?.get(g.data.domain) || 0,
+          collapsed: collapsed.has(g.data.domain),
+          onToggle: () => toggleDomain(g.data.domain),
+        },
+      }));
+
+      // Add collapsed domain placeholders (they won't have layout groups)
+      for (const domain of collapsed) {
+        const count = domainCounts?.get(domain) || 0;
+        if (count === 0) continue;
+        // Check if this domain already has a group
+        if (enrichedGroups.some((g) => g.data.domain === domain)) continue;
+        enrichedGroups.push({
+          id: `group-${domain}`,
+          type: 'domainGroup',
+          position: { x: enrichedGroups.length * 220, y: 0 },
+          data: {
+            domain,
+            width: 200,
+            height: 48,
+            nodeCount: count,
+            collapsed: true,
+            onToggle: () => toggleDomain(domain),
+          },
+          selectable: false,
+          draggable: false,
+          style: { zIndex: -1 },
+        });
+      }
+
+      // Inject collapse callback into node data
+      const nodesWithCallbacks = positioned.map((n) => ({
+        ...n,
+        data: { ...n.data, onToggleCollapse: toggleNodeCollapse },
+      }));
+
+      setNodes([...enrichedGroups, ...nodesWithCallbacks]);
       setEdges(rfEdges);
       setStats(getSessionStats(sessionData));
-      shouldFitView.current = true;
     },
-    [setNodes, setEdges]
+    [setNodes, setEdges, toggleDomain]
   );
 
-  // Rebuild when view mode, filters, or workflow change
+  // Rebuild when any filter/state changes
   useEffect(() => {
     if (session) {
-      buildGraph(session, viewMode, flagFilter, showStubs, activeWorkflow, platformFilter);
+      buildGraph(session, viewMode, flagFilter, showStubs, activeWorkflow, platformFilter, collapsedDomains, collapsedNodes);
     }
-  }, [session, viewMode, flagFilter, showStubs, activeWorkflow, platformFilter, buildGraph]);
+  }, [session, viewMode, flagFilter, showStubs, activeWorkflow, platformFilter, collapsedDomains, collapsedNodes, buildGraph]);
+
+  // Fit view when session loads
+  useEffect(() => {
+    if (session) {
+      shouldFitView.current = true;
+    }
+  }, [session]);
 
   // Fit view only when data changes
   useEffect(() => {
@@ -295,6 +387,7 @@ export default function App() {
         }
 
         const merged = mergeSessions(null, ...sessions);
+        setCollapsedNodes(getAllParentIds(merged));
         setSession(merged);
         setSessionCount(sessions.length);
         setSelectedNode(null);
@@ -304,7 +397,7 @@ export default function App() {
       }
       setLoading(false);
     },
-    []
+    [getAllParentIds]
   );
 
   const pickDirectory = useCallback(async () => {
@@ -375,6 +468,7 @@ export default function App() {
       if (sessions.length === 0) return;
 
       const merged = mergeSessions(session, ...sessions);
+      setCollapsedNodes(getAllParentIds(merged));
       setSession(merged);
       setSessionCount((c) => c + sessions.length);
       setSelectedNode(null);
@@ -410,8 +504,10 @@ export default function App() {
 
   const onNodeClick = useCallback(
     (event, node) => {
+      // Ignore clicks on domain group nodes
+      if (node.type === 'domainGroup') return;
+
       if (definingWorkflow) {
-        // Add this node to the workflow being defined
         const n = session?.nodes[node.id];
         if (n) {
           setDefineSteps((prev) => [
@@ -469,6 +565,8 @@ export default function App() {
     setDefiningWorkflow(false);
     setDefineSteps([]);
     setPlatformFilter(null);
+    setCollapsedDomains(new Set());
+    setCollapsedNodes(new Set());
   }, [setNodes, setEdges]);
 
   // -----------------------------------------------------------------------
@@ -753,6 +851,8 @@ export default function App() {
           >
             {showStubs ? 'Hide' : 'Show'} Stubs
           </button>
+          <button className="toolbar-btn" onClick={collapseAll}>Collapse All</button>
+          <button className="toolbar-btn" onClick={expandAll}>Expand All</button>
           {dirHandle && (
             <button className="toolbar-btn" onClick={refreshDirectory}>
               Refresh
@@ -835,6 +935,7 @@ export default function App() {
           nodeTypes={nodeTypes}
           minZoom={0.05}
           maxZoom={2}
+          zoomOnDoubleClick={false}
           proOptions={{ hideAttribution: true }}
         >
           <Background

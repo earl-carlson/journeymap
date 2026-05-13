@@ -10,6 +10,16 @@ function StubNode({ data, selected }) {
     shortPath = data.url;
   }
 
+  const hasChildren = (data.directChildCount || 0) > 0;
+  const isCollapsed = data.isCollapsed;
+  const collapseChildCount = isCollapsed ? (data.hiddenChildren || data.directChildCount || 0) : (data.directChildCount || 0);
+
+  const handleCollapseClick = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    if (data.onToggleCollapse) data.onToggleCollapse(data.nodeId);
+  };
+
   return (
     <div
       style={{
@@ -57,18 +67,50 @@ function StubNode({ data, selected }) {
         {data.title}
       </div>
 
-      {/* Path */}
-      <div
-        style={{
-          fontSize: 10,
-          color: '#555570',
-          marginTop: 1,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-      >
-        {shortPath}
+      {/* Path + collapse button */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 1 }}>
+        <span
+          style={{
+            fontSize: 10,
+            color: '#555570',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            flex: 1,
+          }}
+        >
+          {shortPath}
+        </span>
+        {hasChildren && (
+          <button
+            onClick={handleCollapseClick}
+            title={isCollapsed ? `Expand ${collapseChildCount} children` : 'Collapse children'}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 3,
+              background: isCollapsed ? 'rgba(85,85,112,0.25)' : 'rgba(255,255,255,0.04)',
+              border: `1px solid ${isCollapsed ? 'rgba(119,119,153,0.4)' : 'rgba(255,255,255,0.08)'}`,
+              borderRadius: 5,
+              padding: '1px 5px',
+              cursor: 'pointer',
+              color: isCollapsed ? '#777799' : '#555570',
+              fontSize: 10,
+              fontWeight: 700,
+              lineHeight: 1,
+              flexShrink: 0,
+            }}
+          >
+            {isCollapsed ? (
+              <>
+                <span style={{ fontSize: 11, lineHeight: 1 }}>+</span>
+                <span>{collapseChildCount}</span>
+              </>
+            ) : (
+              <span style={{ fontSize: 11, lineHeight: 1 }}>−</span>
+            )}
+          </button>
+        )}
       </div>
     </div>
   );

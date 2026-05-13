@@ -51,10 +51,28 @@ function getDomain(url) {
 }
 
 /**
+ * Get all descendant node IDs of a given node via inferredParent chains.
+ */
+function getDescendants(nodeId, session) {
+  const descendants = new Set();
+  const queue = [nodeId];
+  while (queue.length > 0) {
+    const parentId = queue.shift();
+    for (const [id, node] of Object.entries(session.nodes)) {
+      if (node.inferredParent === parentId && !descendants.has(id)) {
+        descendants.add(id);
+        queue.push(id);
+      }
+    }
+  }
+  return descendants;
+}
+
+/**
  * Convert session JSON to { nodes, edges } for React Flow.
  *
  * @param {Object} session - The session.json data
- * @param {Object} options - { viewMode, flagFilter, showStubs, activeWorkflow, platformFilter }
+ * @param {Object} options
  */
 export function sessionToGraph(session, options = {}) {
   const {
@@ -63,6 +81,8 @@ export function sessionToGraph(session, options = {}) {
     showStubs = true,
     activeWorkflow = null,
     platformFilter = null,
+    collapsedDomains = new Set(),
+    collapsedNodes = new Set(),
   } = options;
 
   if (!session || !session.nodes) return { nodes: [], edges: [] };
@@ -72,11 +92,48 @@ export function sessionToGraph(session, options = {}) {
     ? new Set(activeWorkflow.path || [])
     : null;
 
+  // Pre-compute: which nodes are hidden because a parent is collapsed
+  const hiddenByCollapse = new Set();
+  for (const collapsedId of collapsedNodes) {
+    const descendants = getDescendants(collapsedId, session);
+    for (const d of descendants) hiddenByCollapse.add(d);
+  }
+
+  // Pre-compute: count of hidden children per collapsed node
+  const hiddenChildCounts = new Map();
+  for (const collapsedId of collapsedNodes) {
+    const descendants = getDescendants(collapsedId, session);
+    hiddenChildCounts.set(collapsedId, descendants.size);
+  }
+
+  // Pre-compute: direct child count per node (via inferredParent)
+  const directChildCounts = new Map();
+  for (const node of Object.values(session.nodes)) {
+    if (node.inferredParent) {
+      directChildCounts.set(node.inferredParent, (directChildCounts.get(node.inferredParent) || 0) + 1);
+    }
+  }
+
+  // Pre-compute: count of nodes per domain (for collapsed domain badges)
+  const domainCounts = new Map();
+  for (const [id, node] of Object.entries(session.nodes)) {
+    const domain = getDomain(node.url);
+    domainCounts.set(domain, (domainCounts.get(domain) || 0) + 1);
+  }
+
   const rfNodes = [];
   const rfEdges = [];
 
   // Build nodes
   for (const [id, node] of Object.entries(session.nodes)) {
+    const domain = getDomain(node.url);
+
+    // Skip if this domain is collapsed
+    if (collapsedDomains.has(domain)) continue;
+
+    // Skip if hidden by a collapsed parent
+    if (hiddenByCollapse.has(id)) continue;
+
     // Skip stubs if not showing them (unless they're on the active workflow path)
     if (node.stub && !showStubs && !(workflowPathIds && workflowPathIds.has(id))) {
       continue;
@@ -88,13 +145,11 @@ export function sessionToGraph(session, options = {}) {
       if (!platformFilter.includes(nodePlatform)) continue;
     }
 
-    // Flag filtering: if filters active, only show nodes that have at least one matching flag
-    // (but always show nodes connected to flagged nodes, and workflow path nodes)
+    // Flag filtering
     if (flagFilter.length > 0) {
       const hasFlag = node.flags && node.flags.some((f) => flagFilter.includes(f));
       const onWorkflowPath = workflowPathIds && workflowPathIds.has(id);
       if (!hasFlag && !node.stub && !onWorkflowPath) {
-        // Check if this node is a parent of a flagged node
         const isFlaggedParent = Object.values(session.nodes).some(
           (n) => n.inferredParent === id && n.flags?.some((f) => flagFilter.includes(f))
         );
@@ -102,16 +157,14 @@ export function sessionToGraph(session, options = {}) {
       }
     }
 
-    const domain = getDomain(node.url);
     const isModal = node.isModal || id.includes(':modal:');
-
-    // Determine if this node is dimmed (workflow active but node not on path)
     const dimmed = workflowPathIds ? !workflowPathIds.has(id) : false;
+    const hiddenChildren = hiddenChildCounts.get(id) || 0;
 
     rfNodes.push({
       id,
       type: isModal ? 'modalNode' : node.stub ? 'stubNode' : 'pageNode',
-      position: { x: 0, y: 0 }, // Will be set by layout
+      position: { x: 0, y: 0 },
       data: {
         ...node,
         nodeId: id,
@@ -120,6 +173,9 @@ export function sessionToGraph(session, options = {}) {
         isStub: !!node.stub,
         platform: node.platform || 'web',
         dimmed,
+        hiddenChildren,
+        isCollapsed: collapsedNodes.has(id),
+        directChildCount: directChildCounts.get(id) || 0,
       },
     });
   }
@@ -132,20 +188,17 @@ export function sessionToGraph(session, options = {}) {
   if (activeWorkflow) {
     const path = activeWorkflow.path || [];
     for (let i = 0; i < path.length - 1; i++) {
-      // Mark navigate edges along the workflow path
       workflowEdgeKeys.add(`${path[i]}->${path[i + 1]}`);
     }
   }
 
   // Build edges
   for (const edge of session.edges) {
-    // Only include edges where both endpoints are visible
     if (!visibleNodeIds.has(edge.from) || !visibleNodeIds.has(edge.to)) continue;
 
     const type = edge.type || 'navigate';
     const style = EDGE_STYLES[type] || EDGE_STYLES.navigate;
 
-    // Check if this edge is on the workflow path
     const onWorkflowPath = workflowEdgeKeys.has(`${edge.from}->${edge.to}`);
     const dimmedEdge = workflowPathIds ? !onWorkflowPath : false;
 
@@ -159,7 +212,7 @@ export function sessionToGraph(session, options = {}) {
         stroke: onWorkflowPath ? '#1A7A3A' : style.stroke,
         strokeWidth: onWorkflowPath ? 3 : style.strokeWidth,
         strokeDasharray: onWorkflowPath ? undefined : style.strokeDasharray,
-        opacity: dimmedEdge ? 0.15 : style.opacity,
+        opacity: dimmedEdge ? 0.05 : style.opacity,
       },
       data: {
         type,
@@ -173,7 +226,7 @@ export function sessionToGraph(session, options = {}) {
     });
   }
 
-  return { nodes: rfNodes, edges: rfEdges };
+  return { nodes: rfNodes, edges: rfEdges, domainCounts };
 }
 
 /**
