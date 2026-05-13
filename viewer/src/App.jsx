@@ -200,6 +200,7 @@ export default function App() {
   const fileInputRef = useRef(null);
   const reactFlowRef = useRef(null);
   const shouldFitView = useRef(false);
+  const anchorPositions = useRef(null); // snapshot of node positions before a collapse/expand
 
   // Workflow state
   const [showWorkflows, setShowWorkflows] = useState(false);
@@ -258,6 +259,9 @@ export default function App() {
 
   // Toggle node collapse (subtree)
   const toggleNodeCollapse = useCallback((nodeId) => {
+    // Snapshot current positions before the layout rebuilds
+    const currentNodes = reactFlowRef.current?.getNodes?.() || [];
+    anchorPositions.current = new Map(currentNodes.map((n) => [n.id, { ...n.position }]));
     setCollapsedNodes((prev) => {
       const next = new Set(prev);
       if (next.has(nodeId)) next.delete(nodeId);
@@ -279,6 +283,44 @@ export default function App() {
       });
 
       const { nodes: positioned, groups } = layoutGraph(rfNodes, rfEdges, mode);
+
+      // Anchor layout: for each domain cluster, find a node that existed before
+      // and shift the entire cluster so that node stays at its previous screen position.
+      // This prevents the viewport from jumping when expanding/collapsing nodes.
+      const prevPositions = anchorPositions.current;
+      anchorPositions.current = null;
+
+      if (prevPositions && prevPositions.size > 0 && !shouldFitView.current) {
+        // Group new positioned nodes by domain
+        const byDomain = new Map();
+        for (const n of positioned) {
+          const domain = n.data?.domain || 'unknown';
+          if (!byDomain.has(domain)) byDomain.set(domain, []);
+          byDomain.get(domain).push(n);
+        }
+
+        for (const [domain, domainNodes] of byDomain) {
+          // Find a node in this domain that has a known previous position
+          const anchor = domainNodes.find((n) => prevPositions.has(n.id));
+          if (!anchor) continue;
+
+          const prev = prevPositions.get(anchor.id);
+          const dx = prev.x - anchor.position.x;
+          const dy = prev.y - anchor.position.y;
+          if (dx === 0 && dy === 0) continue;
+
+          // Shift all nodes in this domain
+          for (const n of domainNodes) {
+            n.position = { x: n.position.x + dx, y: n.position.y + dy };
+          }
+
+          // Shift the domain group box too
+          const group = groups.find((g) => g.data?.domain === domain);
+          if (group) {
+            group.position = { x: group.position.x + dx, y: group.position.y + dy };
+          }
+        }
+      }
 
       // Inject onToggle callbacks and counts into group data
       const enrichedGroups = groups.map((g) => ({

@@ -134,6 +134,17 @@ export function sessionToGraph(session, options = {}) {
     // Skip if hidden by a collapsed parent
     if (hiddenByCollapse.has(id)) continue;
 
+    // Skip tracking-parameter duplicate roots: nodes with no inferredParent, no children,
+    // and a URL containing common tracking params (_gl=, _ga=, utm_)
+    if (!node.inferredParent && !(directChildCounts.get(id) > 0)) {
+      try {
+        const u = new URL(node.url);
+        if (u.search && (u.search.includes('_gl=') || u.search.includes('_ga=') || u.search.includes('utm_'))) {
+          continue;
+        }
+      } catch {}
+    }
+
     // Skip stubs if not showing them (unless they're on the active workflow path)
     if (node.stub && !showStubs && !(workflowPathIds && workflowPathIds.has(id))) {
       continue;

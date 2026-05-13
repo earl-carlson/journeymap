@@ -225,6 +225,9 @@ function deduplicateByCanonicalUrl(merged) {
   const idRemap = new Map();     // oldId → canonicalId
 
   for (const [id, node] of Object.entries(merged.nodes)) {
+    // Never dedup modal nodes — they are distinct pages, not tracking-param variants
+    if (id.includes(':modal:')) continue;
+
     const canonical = cleanUrl(node.url);
     const canonId = urlHash(canonical);
 
@@ -287,9 +290,12 @@ function deduplicateByCanonicalUrl(merged) {
         target.screenshot = dupe.screenshot;
       }
 
-      // Keep inferredParent (remap it too)
+      // Keep inferredParent (remap it too), but never create a self-reference
       if (!target.inferredParent && dupe.inferredParent) {
-        target.inferredParent = idRemap.get(dupe.inferredParent) || dupe.inferredParent;
+        const remapped = idRemap.get(dupe.inferredParent) || dupe.inferredParent;
+        if (remapped !== canonId) {
+          target.inferredParent = remapped;
+        }
       }
 
       // Remove the duplicate
