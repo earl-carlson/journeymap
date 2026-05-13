@@ -284,40 +284,27 @@ export default function App() {
 
       const { nodes: positioned, groups } = layoutGraph(rfNodes, rfEdges, mode);
 
-      // Anchor layout: for each domain cluster, find a node that existed before
-      // and shift the entire cluster so that node stays at its previous screen position.
-      // This prevents the viewport from jumping when expanding/collapsing nodes.
+      // Anchor layout: find one node that existed before and shift the ENTIRE
+      // layout (all nodes + all groups) uniformly so that node stays in place.
+      // This keeps the clicked node stationary while everything else reflows around it.
       const prevPositions = anchorPositions.current;
       anchorPositions.current = null;
 
       if (prevPositions && prevPositions.size > 0 && !shouldFitView.current) {
-        // Group new positioned nodes by domain
-        const byDomain = new Map();
-        for (const n of positioned) {
-          const domain = n.data?.domain || 'unknown';
-          if (!byDomain.has(domain)) byDomain.set(domain, []);
-          byDomain.get(domain).push(n);
-        }
-
-        for (const [domain, domainNodes] of byDomain) {
-          // Find a node in this domain that has a known previous position
-          const anchor = domainNodes.find((n) => prevPositions.has(n.id));
-          if (!anchor) continue;
-
+        // Find the first node in the new layout that has a known previous position
+        const anchor = positioned.find((n) => prevPositions.has(n.id));
+        if (anchor) {
           const prev = prevPositions.get(anchor.id);
           const dx = prev.x - anchor.position.x;
           const dy = prev.y - anchor.position.y;
-          if (dx === 0 && dy === 0) continue;
 
-          // Shift all nodes in this domain
-          for (const n of domainNodes) {
-            n.position = { x: n.position.x + dx, y: n.position.y + dy };
-          }
-
-          // Shift the domain group box too
-          const group = groups.find((g) => g.data?.domain === domain);
-          if (group) {
-            group.position = { x: group.position.x + dx, y: group.position.y + dy };
+          if (dx !== 0 || dy !== 0) {
+            for (const n of positioned) {
+              n.position = { x: n.position.x + dx, y: n.position.y + dy };
+            }
+            for (const g of groups) {
+              g.position = { x: g.position.x + dx, y: g.position.y + dy };
+            }
           }
         }
       }
