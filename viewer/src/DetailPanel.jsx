@@ -43,12 +43,12 @@ export default function DetailPanel({ node, session, onClose, onAddNote, onToggl
         {data.url}
       </a>
 
-      {/* Screenshot */}
-      {data.screenshotDataUrl && (
+      {/* Screenshot — data URL (local) or path URL (Pages build) */}
+      {(data.screenshotDataUrl || data.screenshot) && (
         <div className="detail-section">
           <div className="detail-section-label">Screenshot</div>
           <img
-            src={data.screenshotDataUrl}
+            src={data.screenshotDataUrl || data.screenshot}
             alt={`Screenshot of ${data.title}`}
             style={{
               width: '100%',
@@ -59,7 +59,8 @@ export default function DetailPanel({ node, session, onClose, onAddNote, onToggl
             onClick={() => {
               const w = window.open();
               if (w) {
-                w.document.write(`<img src="${data.screenshotDataUrl}" style="max-width:100%">`);
+                const src = data.screenshotDataUrl || data.screenshot;
+                w.document.write(`<img src="${src}" style="max-width:100%">`);
                 w.document.title = data.title;
               }
             }}
