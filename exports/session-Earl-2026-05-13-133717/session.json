@@ -1,1918 +1,1751 @@
 {
-  "edges" : [
+  "edges": [
     {
-      "count" : 1,
-      "from" : "c1a506db",
-      "to" : "db51ab61",
-      "type" : "child-of"
+      "count": 1,
+      "from": "c1a506db",
+      "to": "db51ab61",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "c1a506db",
-      "navClass" : "same-domain-other",
-      "to" : "db51ab61",
-      "type" : "navigate"
+      "count": 1,
+      "from": "c1a506db",
+      "navClass": "same-domain-other",
+      "to": "db51ab61",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "c1a506db",
-      "to" : "9222263f",
-      "type" : "child-of"
+      "count": 1,
+      "from": "c1a506db",
+      "to": "9222263f",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "db51ab61",
-      "navClass" : "same-domain-other",
-      "to" : "9222263f",
-      "type" : "navigate"
+      "count": 1,
+      "from": "db51ab61",
+      "navClass": "same-domain-other",
+      "to": "9222263f",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "c1a506db",
-      "to" : "23704ec0",
-      "type" : "child-of"
+      "count": 1,
+      "from": "c1a506db",
+      "to": "23704ec0",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "9222263f",
-      "navClass" : "same-domain-other",
-      "to" : "23704ec0",
-      "type" : "navigate"
+      "count": 1,
+      "from": "9222263f",
+      "navClass": "same-domain-other",
+      "to": "23704ec0",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "d3bd87db",
-      "to" : "f39792fa",
-      "type" : "child-of"
+      "count": 1,
+      "from": "d3bd87db",
+      "to": "f39792fa",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "23704ec0",
-      "navClass" : "same-domain-other",
-      "to" : "f39792fa",
-      "type" : "navigate"
+      "count": 1,
+      "from": "23704ec0",
+      "navClass": "same-domain-other",
+      "to": "f39792fa",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "c1a506db",
-      "to" : "921e758f",
-      "type" : "child-of"
+      "count": 1,
+      "from": "c1a506db",
+      "to": "921e758f",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "f39792fa",
-      "navClass" : "same-domain-other",
-      "to" : "921e758f",
-      "type" : "navigate"
+      "count": 1,
+      "from": "f39792fa",
+      "navClass": "same-domain-other",
+      "to": "921e758f",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "c1a506db",
-      "to" : "d5f724bd",
-      "type" : "child-of"
+      "count": 1,
+      "from": "c1a506db",
+      "to": "d5f724bd",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "921e758f",
-      "navClass" : "same-domain-other",
-      "to" : "d5f724bd",
-      "type" : "navigate"
+      "count": 1,
+      "from": "921e758f",
+      "navClass": "same-domain-other",
+      "to": "d5f724bd",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "c1a506db",
-      "to" : "d6e83e99",
-      "type" : "child-of"
+      "count": 1,
+      "from": "c1a506db",
+      "to": "d6e83e99",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "d5f724bd",
-      "navClass" : "same-domain-other",
-      "to" : "d6e83e99",
-      "type" : "navigate"
+      "count": 1,
+      "from": "d5f724bd",
+      "navClass": "same-domain-other",
+      "to": "d6e83e99",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "d6e83e99",
-      "navClass" : "same-domain-other",
-      "to" : "d5f724bd",
-      "type" : "navigate"
+      "count": 1,
+      "from": "d6e83e99",
+      "navClass": "same-domain-other",
+      "to": "d5f724bd",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "873fa9fb",
-      "to" : "f32173f5",
-      "type" : "child-of"
+      "count": 1,
+      "from": "873fa9fb",
+      "to": "f32173f5",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "d5f724bd",
-      "navClass" : "same-domain-other",
-      "to" : "f32173f5",
-      "type" : "navigate"
+      "count": 1,
+      "from": "d5f724bd",
+      "navClass": "same-domain-other",
+      "to": "f32173f5",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "f32173f5",
-      "to" : "35cd68f3",
-      "type" : "child-of"
+      "count": 1,
+      "from": "f32173f5",
+      "to": "35cd68f3",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "f32173f5",
-      "navClass" : "same-domain-other",
-      "to" : "35cd68f3",
-      "type" : "navigate"
+      "count": 1,
+      "from": "f32173f5",
+      "navClass": "same-domain-other",
+      "to": "35cd68f3",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "35cd68f3",
-      "navClass" : "same-domain-other",
-      "to" : "873fa9fb",
-      "type" : "navigate"
+      "count": 1,
+      "from": "35cd68f3",
+      "navClass": "same-domain-other",
+      "to": "873fa9fb",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "873fa9fb",
-      "to" : "4d4ec17c",
-      "type" : "child-of"
+      "count": 1,
+      "from": "873fa9fb",
+      "to": "4d4ec17c",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "873fa9fb",
-      "navClass" : "same-domain-other",
-      "to" : "4d4ec17c",
-      "type" : "navigate"
+      "count": 1,
+      "from": "873fa9fb",
+      "navClass": "same-domain-other",
+      "to": "4d4ec17c",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "4d4ec17c",
-      "navClass" : "same-domain-other",
-      "to" : "5d632bf0",
-      "type" : "navigate"
+      "count": 1,
+      "from": "4d4ec17c",
+      "navClass": "same-domain-other",
+      "to": "5d632bf0",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "5d632bf0",
-      "to" : "f67d38ad",
-      "type" : "child-of"
+      "count": 1,
+      "from": "5d632bf0",
+      "to": "f67d38ad",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "f67d38ad",
-      "to" : "c4126b54",
-      "type" : "child-of"
+      "count": 1,
+      "from": "f67d38ad",
+      "to": "c4126b54",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "5d632bf0",
-      "navClass" : "same-domain-other",
-      "to" : "c4126b54",
-      "type" : "navigate"
+      "count": 1,
+      "from": "5d632bf0",
+      "navClass": "same-domain-other",
+      "to": "c4126b54",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "f67d38ad",
-      "to" : "aeb5195d",
-      "type" : "child-of"
+      "count": 1,
+      "from": "f67d38ad",
+      "to": "aeb5195d",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "c4126b54",
-      "navClass" : "same-domain-other",
-      "to" : "aeb5195d",
-      "type" : "navigate"
+      "count": 1,
+      "from": "c4126b54",
+      "navClass": "same-domain-other",
+      "to": "aeb5195d",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "f67d38ad",
-      "to" : "f3323971",
-      "type" : "child-of"
+      "count": 1,
+      "from": "f67d38ad",
+      "to": "f3323971",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "aeb5195d",
-      "navClass" : "same-domain-other",
-      "to" : "f3323971",
-      "type" : "navigate"
+      "count": 1,
+      "from": "aeb5195d",
+      "navClass": "same-domain-other",
+      "to": "f3323971",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "f3323971",
-      "to" : "7deb5240",
-      "type" : "child-of"
+      "count": 1,
+      "from": "f3323971",
+      "to": "7deb5240",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "f3323971",
-      "navClass" : "same-domain-other",
-      "to" : "7deb5240",
-      "type" : "navigate"
+      "count": 1,
+      "from": "f3323971",
+      "navClass": "same-domain-other",
+      "to": "7deb5240",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "f3323971",
-      "to" : "9a27cdec",
-      "type" : "child-of"
+      "count": 1,
+      "from": "f3323971",
+      "to": "9a27cdec",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "7deb5240",
-      "navClass" : "same-domain-other",
-      "to" : "9a27cdec",
-      "type" : "navigate"
+      "count": 1,
+      "from": "7deb5240",
+      "navClass": "same-domain-other",
+      "to": "9a27cdec",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "2f2227fd",
-      "to" : "082989c9",
-      "type" : "child-of"
+      "count": 1,
+      "from": "2f2227fd",
+      "to": "082989c9",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "9a27cdec",
-      "navClass" : "same-domain-other",
-      "to" : "082989c9",
-      "type" : "navigate"
+      "count": 1,
+      "from": "9a27cdec",
+      "navClass": "same-domain-other",
+      "to": "082989c9",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "2f2227fd",
-      "to" : "af458a4f",
-      "type" : "child-of"
+      "count": 1,
+      "from": "2f2227fd",
+      "to": "af458a4f",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "082989c9",
-      "navClass" : "same-domain-other",
-      "to" : "af458a4f",
-      "type" : "navigate"
+      "count": 1,
+      "from": "082989c9",
+      "navClass": "same-domain-other",
+      "to": "af458a4f",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "af458a4f",
-      "navClass" : "same-domain-other",
-      "to" : "7780c9c8",
-      "type" : "navigate"
+      "count": 1,
+      "from": "af458a4f",
+      "navClass": "same-domain-other",
+      "to": "7780c9c8",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "7780c9c8",
-      "to" : "91282903",
-      "type" : "child-of"
+      "count": 1,
+      "from": "7780c9c8",
+      "to": "91282903",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "7780c9c8",
-      "navClass" : "same-domain-other",
-      "to" : "91282903",
-      "type" : "navigate"
+      "count": 1,
+      "from": "7780c9c8",
+      "navClass": "same-domain-other",
+      "to": "91282903",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "7780c9c8",
-      "to" : "2004aa5d",
-      "type" : "child-of"
+      "count": 1,
+      "from": "7780c9c8",
+      "to": "2004aa5d",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "91282903",
-      "navClass" : "same-domain-other",
-      "to" : "2004aa5d",
-      "type" : "navigate"
+      "count": 1,
+      "from": "91282903",
+      "navClass": "same-domain-other",
+      "to": "2004aa5d",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "2004aa5d",
-      "to" : "2bfe4b01",
-      "type" : "child-of"
+      "count": 1,
+      "from": "2004aa5d",
+      "to": "2bfe4b01",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "2004aa5d",
-      "navClass" : "same-domain-other",
-      "to" : "2bfe4b01",
-      "type" : "navigate"
+      "count": 1,
+      "from": "2004aa5d",
+      "navClass": "same-domain-other",
+      "to": "2bfe4b01",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "2004aa5d",
-      "to" : "7b52aa5e",
-      "type" : "child-of"
+      "count": 1,
+      "from": "2004aa5d",
+      "to": "7b52aa5e",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "2bfe4b01",
-      "navClass" : "same-domain-other",
-      "to" : "7b52aa5e",
-      "type" : "navigate"
+      "count": 1,
+      "from": "2bfe4b01",
+      "navClass": "same-domain-other",
+      "to": "7b52aa5e",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "2004aa5d",
-      "to" : "ab4ad376",
-      "type" : "child-of"
+      "count": 1,
+      "from": "2004aa5d",
+      "to": "ab4ad376",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "7b52aa5e",
-      "navClass" : "same-domain-other",
-      "to" : "ab4ad376",
-      "type" : "navigate"
+      "count": 1,
+      "from": "7b52aa5e",
+      "navClass": "same-domain-other",
+      "to": "ab4ad376",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "7780c9c8",
-      "to" : "fe5861c2",
-      "type" : "child-of"
+      "count": 1,
+      "from": "7780c9c8",
+      "to": "fe5861c2",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "ab4ad376",
-      "navClass" : "same-domain-other",
-      "to" : "fe5861c2",
-      "type" : "navigate"
+      "count": 1,
+      "from": "ab4ad376",
+      "navClass": "same-domain-other",
+      "to": "fe5861c2",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "fe5861c2",
-      "navClass" : "same-domain-other",
-      "to" : "90ba1b09",
-      "type" : "navigate"
+      "count": 1,
+      "from": "fe5861c2",
+      "navClass": "same-domain-other",
+      "to": "90ba1b09",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "90ba1b09",
-      "to" : "678c72df",
-      "type" : "child-of"
+      "count": 1,
+      "from": "90ba1b09",
+      "to": "678c72df",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "90ba1b09",
-      "navClass" : "same-domain-other",
-      "to" : "678c72df",
-      "type" : "navigate"
+      "count": 1,
+      "from": "90ba1b09",
+      "navClass": "same-domain-other",
+      "to": "678c72df",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "678c72df",
-      "to" : "11f57ec4",
-      "type" : "child-of"
+      "count": 1,
+      "from": "678c72df",
+      "to": "11f57ec4",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "678c72df",
-      "navClass" : "same-domain-other",
-      "to" : "11f57ec4",
-      "type" : "navigate"
+      "count": 1,
+      "from": "678c72df",
+      "navClass": "same-domain-other",
+      "to": "11f57ec4",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "678c72df",
-      "to" : "e5da1e2a",
-      "type" : "child-of"
+      "count": 1,
+      "from": "678c72df",
+      "to": "e5da1e2a",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "11f57ec4",
-      "navClass" : "same-domain-other",
-      "to" : "e5da1e2a",
-      "type" : "navigate"
+      "count": 1,
+      "from": "11f57ec4",
+      "navClass": "same-domain-other",
+      "to": "e5da1e2a",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "e5da1e2a",
-      "navClass" : "same-domain-other",
-      "to" : "2f2227fd",
-      "type" : "navigate"
+      "count": 1,
+      "from": "e5da1e2a",
+      "navClass": "same-domain-other",
+      "to": "2f2227fd",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "2f2227fd",
-      "navClass" : "same-domain-other",
-      "to" : "22c44778",
-      "type" : "navigate"
+      "count": 1,
+      "from": "2f2227fd",
+      "navClass": "same-domain-other",
+      "to": "22c44778",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "22c44778",
-      "to" : "04b91b07",
-      "type" : "child-of"
+      "count": 1,
+      "from": "22c44778",
+      "to": "04b91b07",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "22c44778",
-      "navClass" : "same-domain-other",
-      "to" : "04b91b07",
-      "type" : "navigate"
+      "count": 1,
+      "from": "22c44778",
+      "navClass": "same-domain-other",
+      "to": "04b91b07",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "22c44778",
-      "to" : "63eaebeb",
-      "type" : "child-of"
+      "count": 1,
+      "from": "22c44778",
+      "to": "63eaebeb",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "63eaebeb",
-      "to" : "20a033e1",
-      "type" : "child-of"
+      "count": 1,
+      "from": "63eaebeb",
+      "to": "20a033e1",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "04b91b07",
-      "navClass" : "same-domain-other",
-      "to" : "20a033e1",
-      "type" : "navigate"
+      "count": 1,
+      "from": "04b91b07",
+      "navClass": "same-domain-other",
+      "to": "20a033e1",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "20a033e1",
-      "to" : "10be2d41",
-      "type" : "child-of"
+      "count": 1,
+      "from": "20a033e1",
+      "to": "10be2d41",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "20a033e1",
-      "navClass" : "same-domain-other",
-      "to" : "10be2d41",
-      "type" : "navigate"
+      "count": 1,
+      "from": "20a033e1",
+      "navClass": "same-domain-other",
+      "to": "10be2d41",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "22c44778",
-      "to" : "d3fa5dc2",
-      "type" : "child-of"
+      "count": 1,
+      "from": "22c44778",
+      "to": "d3fa5dc2",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "10be2d41",
-      "navClass" : "same-domain-other",
-      "to" : "d3fa5dc2",
-      "type" : "navigate"
+      "count": 1,
+      "from": "10be2d41",
+      "navClass": "same-domain-other",
+      "to": "d3fa5dc2",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "d3fa5dc2",
-      "to" : "fc823878",
-      "type" : "child-of"
+      "count": 1,
+      "from": "d3fa5dc2",
+      "to": "fc823878",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "d3fa5dc2",
-      "navClass" : "same-domain-other",
-      "to" : "fc823878",
-      "type" : "navigate"
+      "count": 1,
+      "from": "d3fa5dc2",
+      "navClass": "same-domain-other",
+      "to": "fc823878",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "fc823878",
-      "to" : "1ead0718",
-      "type" : "child-of"
+      "count": 1,
+      "from": "fc823878",
+      "to": "1ead0718",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "fc823878",
-      "navClass" : "same-domain-other",
-      "to" : "1ead0718",
-      "type" : "navigate"
+      "count": 1,
+      "from": "fc823878",
+      "navClass": "same-domain-other",
+      "to": "1ead0718",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "fc823878",
-      "to" : "ac89ac1f",
-      "type" : "child-of"
+      "count": 1,
+      "from": "fc823878",
+      "to": "ac89ac1f",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "1ead0718",
-      "navClass" : "same-domain-other",
-      "to" : "ac89ac1f",
-      "type" : "navigate"
+      "count": 1,
+      "from": "1ead0718",
+      "navClass": "same-domain-other",
+      "to": "ac89ac1f",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "22c44778",
-      "to" : "ecde49d9",
-      "type" : "child-of"
+      "count": 1,
+      "from": "22c44778",
+      "to": "ecde49d9",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "ac89ac1f",
-      "navClass" : "same-domain-other",
-      "to" : "ecde49d9",
-      "type" : "navigate"
+      "count": 1,
+      "from": "ac89ac1f",
+      "navClass": "same-domain-other",
+      "to": "ecde49d9",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "22c44778",
-      "to" : "179c48c8",
-      "type" : "child-of"
+      "count": 1,
+      "from": "22c44778",
+      "to": "179c48c8",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "ecde49d9",
-      "navClass" : "same-domain-other",
-      "to" : "179c48c8",
-      "type" : "navigate"
+      "count": 1,
+      "from": "ecde49d9",
+      "navClass": "same-domain-other",
+      "to": "179c48c8",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "179c48c8",
-      "navClass" : "same-domain-other",
-      "to" : "fc1420a4",
-      "type" : "navigate"
+      "count": 1,
+      "from": "179c48c8",
+      "navClass": "same-domain-other",
+      "to": "fc1420a4",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "fc1420a4",
-      "to" : "c846fdb6",
-      "type" : "child-of"
+      "count": 1,
+      "from": "fc1420a4",
+      "to": "c846fdb6",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "fc1420a4",
-      "navClass" : "same-domain-other",
-      "to" : "c846fdb6",
-      "type" : "navigate"
+      "count": 1,
+      "from": "fc1420a4",
+      "navClass": "same-domain-other",
+      "to": "c846fdb6",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "c846fdb6",
-      "to" : "b94bc574",
-      "type" : "child-of"
+      "count": 1,
+      "from": "c846fdb6",
+      "to": "b94bc574",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "c846fdb6",
-      "navClass" : "same-domain-other",
-      "to" : "b94bc574",
-      "type" : "navigate"
+      "count": 1,
+      "from": "c846fdb6",
+      "navClass": "same-domain-other",
+      "to": "b94bc574",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "fc1420a4",
-      "to" : "0e782ab9",
-      "type" : "child-of"
+      "count": 1,
+      "from": "fc1420a4",
+      "to": "0e782ab9",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "b94bc574",
-      "navClass" : "same-domain-other",
-      "to" : "0e782ab9",
-      "type" : "navigate"
+      "count": 1,
+      "from": "b94bc574",
+      "navClass": "same-domain-other",
+      "to": "0e782ab9",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "7a4a92d8",
-      "to" : "8f8e1524",
-      "type" : "child-of"
+      "count": 1,
+      "from": "7a4a92d8",
+      "to": "8f8e1524",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "0e782ab9",
-      "navClass" : "same-domain-other",
-      "to" : "8f8e1524",
-      "type" : "navigate"
+      "count": 1,
+      "from": "0e782ab9",
+      "navClass": "same-domain-other",
+      "to": "8f8e1524",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "8f8e1524",
-      "navClass" : "same-domain-other",
-      "to" : "7e9a4e3a",
-      "type" : "navigate"
+      "count": 1,
+      "from": "8f8e1524",
+      "navClass": "same-domain-other",
+      "to": "7e9a4e3a",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "7e9a4e3a",
-      "navClass" : "same-domain-other",
-      "to" : "08010175",
-      "type" : "navigate"
+      "count": 1,
+      "from": "7e9a4e3a",
+      "navClass": "same-domain-other",
+      "to": "08010175",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "08010175",
-      "to" : "27a4b1d6",
-      "type" : "child-of"
+      "count": 1,
+      "from": "08010175",
+      "to": "27a4b1d6",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "08010175",
-      "navClass" : "same-domain-other",
-      "to" : "27a4b1d6",
-      "type" : "navigate"
+      "count": 1,
+      "from": "08010175",
+      "navClass": "same-domain-other",
+      "to": "27a4b1d6",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "08010175",
-      "to" : "29f40138",
-      "type" : "child-of"
+      "count": 1,
+      "from": "08010175",
+      "to": "29f40138",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "27a4b1d6",
-      "navClass" : "same-domain-other",
-      "to" : "29f40138",
-      "type" : "navigate"
+      "count": 1,
+      "from": "27a4b1d6",
+      "navClass": "same-domain-other",
+      "to": "29f40138",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "29f40138",
-      "navClass" : "same-domain-other",
-      "to" : "c6f2756f",
-      "type" : "navigate"
+      "count": 1,
+      "from": "29f40138",
+      "navClass": "same-domain-other",
+      "to": "c6f2756f",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "c6f2756f",
-      "navClass" : "same-domain-other",
-      "to" : "ea8e5adf",
-      "type" : "navigate"
+      "count": 1,
+      "from": "c6f2756f",
+      "navClass": "same-domain-other",
+      "to": "ea8e5adf",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "ea8e5adf",
-      "navClass" : "same-domain-other",
-      "to" : "52aed863",
-      "type" : "navigate"
+      "count": 1,
+      "from": "ea8e5adf",
+      "navClass": "same-domain-other",
+      "to": "52aed863",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "55d1ebf6",
-      "to" : "0e7eec03",
-      "type" : "child-of"
+      "count": 1,
+      "from": "55d1ebf6",
+      "to": "0e7eec03",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "52aed863",
-      "navClass" : "same-domain-other",
-      "to" : "0e7eec03",
-      "type" : "navigate"
+      "count": 1,
+      "from": "52aed863",
+      "navClass": "same-domain-other",
+      "to": "0e7eec03",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "55d1ebf6",
-      "to" : "43b91d00",
-      "type" : "child-of"
+      "count": 1,
+      "from": "55d1ebf6",
+      "to": "43b91d00",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "0e7eec03",
-      "navClass" : "same-domain-other",
-      "to" : "43b91d00",
-      "type" : "navigate"
+      "count": 1,
+      "from": "0e7eec03",
+      "navClass": "same-domain-other",
+      "to": "43b91d00",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "43b91d00",
-      "to" : "948e2848",
-      "type" : "child-of"
+      "count": 1,
+      "from": "43b91d00",
+      "to": "948e2848",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "43b91d00",
-      "navClass" : "same-domain-other",
-      "to" : "948e2848",
-      "type" : "navigate"
+      "count": 1,
+      "from": "43b91d00",
+      "navClass": "same-domain-other",
+      "to": "948e2848",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "43b91d00",
-      "to" : "251f17f9",
-      "type" : "child-of"
+      "count": 1,
+      "from": "43b91d00",
+      "to": "251f17f9",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "948e2848",
-      "navClass" : "same-domain-other",
-      "to" : "251f17f9",
-      "type" : "navigate"
+      "count": 1,
+      "from": "948e2848",
+      "navClass": "same-domain-other",
+      "to": "251f17f9",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "43b91d00",
-      "to" : "6d319799",
-      "type" : "child-of"
+      "count": 1,
+      "from": "43b91d00",
+      "to": "6d319799",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "251f17f9",
-      "navClass" : "same-domain-other",
-      "to" : "6d319799",
-      "type" : "navigate"
+      "count": 1,
+      "from": "251f17f9",
+      "navClass": "same-domain-other",
+      "to": "6d319799",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "55d1ebf6",
-      "to" : "2ca91220",
-      "type" : "child-of"
+      "count": 1,
+      "from": "55d1ebf6",
+      "to": "2ca91220",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "6d319799",
-      "navClass" : "same-domain-other",
-      "to" : "2ca91220",
-      "type" : "navigate"
+      "count": 1,
+      "from": "6d319799",
+      "navClass": "same-domain-other",
+      "to": "2ca91220",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "55d1ebf6",
-      "to" : "b297676d",
-      "type" : "child-of"
+      "count": 1,
+      "from": "55d1ebf6",
+      "to": "b297676d",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "2ca91220",
-      "navClass" : "same-domain-other",
-      "to" : "b297676d",
-      "type" : "navigate"
+      "count": 1,
+      "from": "2ca91220",
+      "navClass": "same-domain-other",
+      "to": "b297676d",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "55d1ebf6",
-      "to" : "5195c50f",
-      "type" : "child-of"
+      "count": 1,
+      "from": "55d1ebf6",
+      "to": "5195c50f",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "b297676d",
-      "navClass" : "same-domain-other",
-      "to" : "5195c50f",
-      "type" : "navigate"
+      "count": 1,
+      "from": "b297676d",
+      "navClass": "same-domain-other",
+      "to": "5195c50f",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "55d1ebf6",
-      "to" : "2cedcdfd",
-      "type" : "child-of"
+      "count": 1,
+      "from": "55d1ebf6",
+      "to": "2cedcdfd",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "5195c50f",
-      "navClass" : "same-domain-other",
-      "to" : "2cedcdfd",
-      "type" : "navigate"
+      "count": 1,
+      "from": "5195c50f",
+      "navClass": "same-domain-other",
+      "to": "2cedcdfd",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "55d1ebf6",
-      "to" : "8a937453",
-      "type" : "child-of"
+      "count": 1,
+      "from": "55d1ebf6",
+      "to": "8a937453",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "2cedcdfd",
-      "navClass" : "same-domain-other",
-      "to" : "8a937453",
-      "type" : "navigate"
+      "count": 1,
+      "from": "2cedcdfd",
+      "navClass": "same-domain-other",
+      "to": "8a937453",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "55d1ebf6",
-      "to" : "05cca775",
-      "type" : "child-of"
+      "count": 1,
+      "from": "55d1ebf6",
+      "to": "05cca775",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "8a937453",
-      "navClass" : "same-domain-other",
-      "to" : "05cca775",
-      "type" : "navigate"
+      "count": 1,
+      "from": "8a937453",
+      "navClass": "same-domain-other",
+      "to": "05cca775",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "55d1ebf6",
-      "to" : "96b611cd",
-      "type" : "child-of"
+      "count": 1,
+      "from": "55d1ebf6",
+      "to": "96b611cd",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "05cca775",
-      "navClass" : "same-domain-other",
-      "to" : "96b611cd",
-      "type" : "navigate"
+      "count": 1,
+      "from": "05cca775",
+      "navClass": "same-domain-other",
+      "to": "96b611cd",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "55d1ebf6",
-      "to" : "738040df",
-      "type" : "child-of"
+      "count": 1,
+      "from": "55d1ebf6",
+      "to": "738040df",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "96b611cd",
-      "navClass" : "same-domain-other",
-      "to" : "738040df",
-      "type" : "navigate"
+      "count": 1,
+      "from": "96b611cd",
+      "navClass": "same-domain-other",
+      "to": "738040df",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "55d1ebf6",
-      "to" : "1a35ebdb",
-      "type" : "child-of"
+      "count": 1,
+      "from": "55d1ebf6",
+      "to": "1a35ebdb",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "738040df",
-      "navClass" : "same-domain-other",
-      "to" : "1a35ebdb",
-      "type" : "navigate"
+      "count": 1,
+      "from": "738040df",
+      "navClass": "same-domain-other",
+      "to": "1a35ebdb",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "55d1ebf6",
-      "to" : "b0d80165",
-      "type" : "child-of"
+      "count": 1,
+      "from": "55d1ebf6",
+      "to": "b0d80165",
+      "type": "child-of"
     },
     {
-      "count" : 1,
-      "from" : "1a35ebdb",
-      "navClass" : "same-domain-other",
-      "to" : "b0d80165",
-      "type" : "navigate"
+      "count": 1,
+      "from": "1a35ebdb",
+      "navClass": "same-domain-other",
+      "to": "b0d80165",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "b0d80165",
-      "navClass" : "same-domain-other",
-      "to" : "ab30a0c6",
-      "type" : "navigate"
+      "count": 1,
+      "from": "b0d80165",
+      "navClass": "same-domain-other",
+      "to": "ab30a0c6",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "ab30a0c6",
-      "navClass" : "same-domain-other",
-      "to" : "387f509e",
-      "type" : "navigate"
+      "count": 1,
+      "from": "ab30a0c6",
+      "navClass": "same-domain-other",
+      "to": "387f509e",
+      "type": "navigate"
     },
     {
-      "count" : 1,
-      "from" : "387f509e",
-      "navClass" : "same-domain-other",
-      "to" : "82c2d0ae",
-      "type" : "navigate"
+      "count": 1,
+      "from": "387f509e",
+      "navClass": "same-domain-other",
+      "to": "82c2d0ae",
+      "type": "navigate"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "08010175",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "22c44778",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "2f2227fd",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "387f509e",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "52aed863",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "55d1ebf6",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "5d632bf0",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "7780c9c8",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "7a4a92d8",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "7e9a4e3a",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "82c2d0ae",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "873fa9fb",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "90ba1b09",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "ab30a0c6",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "c1a506db",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "c6f2756f",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "d3bd87db",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "ea8e5adf",
+      "type": "child-of"
+    },
+    {
+      "count": 1,
+      "from": "a6da85f6",
+      "to": "fc1420a4",
+      "type": "child-of"
     }
   ],
-  "meta" : {
-    "contributor" : "Earl",
-    "date" : "2026-05-13",
-    "mode" : "map"
+  "meta": {
+    "contributor": "Earl",
+    "date": "2026-05-13",
+    "mode": "map"
   },
-  "nodes" : {
-    "04b91b07" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "22c44778",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/04b91b07.png",
-      "stub" : false,
-      "title" : "MCP Toolkit > Create a profile",
-      "url" : "desktop:\/\/docker-desktop\/mcp-toolkit\/create-a-profile"
-    },
-    "05cca775" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "55d1ebf6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/05cca775.png",
-      "stub" : false,
-      "title" : "Settings > Extensions",
-      "url" : "desktop:\/\/docker-desktop\/settings\/extensions"
-    },
-    "08010175" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/08010175.png",
-      "stub" : false,
-      "title" : "Extensions",
-      "url" : "desktop:\/\/docker-desktop\/extensions"
-    },
-    "082989c9" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "2f2227fd",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/082989c9.png",
-      "stub" : false,
-      "title" : "Kubernetes > Empty State",
-      "url" : "desktop:\/\/docker-desktop\/kubernetes\/empty-state"
-    },
-    "0e782ab9" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "fc1420a4",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/0e782ab9.png",
-      "stub" : false,
-      "title" : "Hub > Developer",
-      "url" : "desktop:\/\/docker-desktop\/hub\/developer"
-    },
-    "0e7eec03" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "55d1ebf6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/0e7eec03.png",
-      "stub" : false,
-      "title" : "Settings > General",
-      "url" : "desktop:\/\/docker-desktop\/settings\/general"
-    },
-    "10be2d41" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "20a033e1",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/10be2d41.png",
-      "stub" : false,
-      "title" : "MCP Toolkit > Profiles > Individual Profile > Tools",
-      "url" : "desktop:\/\/docker-desktop\/mcp-toolkit\/profiles\/individual-profile\/tools"
-    },
-    "11f57ec4" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "678c72df",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/11f57ec4.png",
-      "stub" : false,
-      "title" : "Models > Individual Model > Inspect",
-      "url" : "desktop:\/\/docker-desktop\/models\/individual-model\/inspect"
-    },
-    "179c48c8" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "22c44778",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/179c48c8.png",
-      "stub" : false,
-      "title" : "MCP Toolkit > OAuth",
-      "url" : "desktop:\/\/docker-desktop\/mcp-toolkit\/oauth"
-    },
-    "1a35ebdb" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "55d1ebf6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/1a35ebdb.png",
-      "stub" : false,
-      "title" : "Settings > Advanced",
-      "url" : "desktop:\/\/docker-desktop\/settings\/advanced"
-    },
-    "1ead0718" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "fc823878",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/1ead0718.png",
-      "stub" : false,
-      "title" : "MCP Toolkit > Catalog > Individual Catalogue Item > Tools",
-      "url" : "desktop:\/\/docker-desktop\/mcp-toolkit\/catalog\/individual-catalogue-item\/tools"
-    },
-    "2004aa5d" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "7780c9c8",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/2004aa5d.png",
-      "stub" : false,
-      "title" : "Builds > Individual Build > ",
-      "url" : "desktop:\/\/docker-desktop\/builds\/individual-build\/"
-    },
-    "20a033e1" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "63eaebeb",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/20a033e1.png",
-      "stub" : false,
-      "title" : "MCP Toolkit > Profiles > Individual Profile",
-      "url" : "desktop:\/\/docker-desktop\/mcp-toolkit\/profiles\/individual-profile"
-    },
-    "22c44778" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/22c44778.png",
-      "stub" : false,
-      "title" : "MCP Toolkit",
-      "url" : "desktop:\/\/docker-desktop\/mcp-toolkit"
-    },
-    "23704ec0" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "c1a506db",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/23704ec0.png",
-      "stub" : false,
-      "title" : "Containers > Inspect",
-      "url" : "desktop:\/\/docker-desktop\/containers\/inspect"
-    },
-    "251f17f9" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "43b91d00",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/251f17f9.png",
-      "stub" : false,
-      "title" : "Settings > Resources > Proxies",
-      "url" : "desktop:\/\/docker-desktop\/settings\/resources\/proxies"
-    },
-    "27a4b1d6" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "08010175",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/27a4b1d6.png",
-      "stub" : false,
-      "title" : "Extensions > Browse",
-      "url" : "desktop:\/\/docker-desktop\/extensions\/browse"
-    },
-    "29f40138" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "08010175",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/29f40138.png",
-      "stub" : false,
-      "title" : "Extensions > Create",
-      "url" : "desktop:\/\/docker-desktop\/extensions\/create"
-    },
-    "2bfe4b01" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "2004aa5d",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/2bfe4b01.png",
-      "stub" : false,
-      "title" : "Builds > Individual Build > Logs",
-      "url" : "desktop:\/\/docker-desktop\/builds\/individual-build\/logs"
-    },
-    "2ca91220" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "55d1ebf6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/2ca91220.png",
-      "stub" : false,
-      "title" : "Settings > Docker Engine",
-      "url" : "desktop:\/\/docker-desktop\/settings\/docker-engine"
-    },
-    "2cedcdfd" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "55d1ebf6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/2cedcdfd.png",
-      "stub" : false,
-      "title" : "Settings > Kubernetes",
-      "url" : "desktop:\/\/docker-desktop\/settings\/kubernetes"
-    },
-    "2f2227fd" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "stub" : true,
-      "title" : "Kubernetes (docker-desktop)",
-      "url" : "desktop:\/\/docker-desktop\/kubernetes"
-    },
-    "35cd68f3" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "f32173f5",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/35cd68f3.png",
-      "stub" : false,
-      "title" : "Images > Image View > Recommended Fixes",
-      "url" : "desktop:\/\/docker-desktop\/images\/image-view\/recommended-fixes"
-    },
-    "387f509e" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/387f509e.png",
-      "stub" : false,
-      "title" : "Docker Build Cloud",
-      "url" : "desktop:\/\/docker-desktop\/docker-build-cloud"
-    },
-    "43b91d00" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "55d1ebf6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/43b91d00.png",
-      "stub" : false,
-      "title" : "Settings > Resources",
-      "url" : "desktop:\/\/docker-desktop\/settings\/resources"
-    },
-    "4d4ec17c" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "873fa9fb",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/4d4ec17c.png",
-      "stub" : false,
-      "title" : "Images > My Hub",
-      "url" : "desktop:\/\/docker-desktop\/images\/my-hub"
-    },
-    "5195c50f" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "55d1ebf6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/5195c50f.png",
-      "stub" : false,
-      "title" : "Settings > AI",
-      "url" : "desktop:\/\/docker-desktop\/settings\/ai"
-    },
-    "52aed863" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/52aed863.png",
-      "stub" : false,
-      "title" : "Learning Center",
-      "url" : "desktop:\/\/docker-desktop\/learning-center"
-    },
-    "55d1ebf6" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "stub" : true,
-      "title" : "Settings (docker-desktop)",
-      "url" : "desktop:\/\/docker-desktop\/settings"
-    },
-    "5d632bf0" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/5d632bf0.png",
-      "stub" : false,
-      "title" : "Volumes",
-      "url" : "desktop:\/\/docker-desktop\/volumes"
-    },
-    "63eaebeb" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "22c44778",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "stub" : true,
-      "title" : "Profiles (docker-desktop)",
-      "url" : "desktop:\/\/docker-desktop\/mcp-toolkit\/profiles"
-    },
-    "678c72df" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "90ba1b09",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/678c72df.png",
-      "stub" : false,
-      "title" : "Models > Individual Model",
-      "url" : "desktop:\/\/docker-desktop\/models\/individual-model"
-    },
-    "6d319799" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "43b91d00",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/6d319799.png",
-      "stub" : false,
-      "title" : "Settings > Resources > Network",
-      "url" : "desktop:\/\/docker-desktop\/settings\/resources\/network"
-    },
-    "738040df" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "55d1ebf6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/738040df.png",
-      "stub" : false,
-      "title" : "Settings > Notifications",
-      "url" : "desktop:\/\/docker-desktop\/settings\/notifications"
-    },
-    "7780c9c8" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/7780c9c8.png",
-      "stub" : false,
-      "title" : "Builds",
-      "url" : "desktop:\/\/docker-desktop\/builds"
-    },
-    "7a4a92d8" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "stub" : true,
-      "title" : "Docker Scout (docker-desktop)",
-      "url" : "desktop:\/\/docker-desktop\/docker-scout"
-    },
-    "7b52aa5e" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "2004aa5d",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/7b52aa5e.png",
-      "stub" : false,
-      "title" : "Builds > Individual Build > History",
-      "url" : "desktop:\/\/docker-desktop\/builds\/individual-build\/history"
-    },
-    "7deb5240" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "f3323971",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/7deb5240.png",
-      "stub" : false,
-      "title" : "Volumes > Individual Volume > Exports > Scheduled Export",
-      "url" : "desktop:\/\/docker-desktop\/volumes\/individual-volume\/exports\/scheduled-export"
-    },
-    "7e9a4e3a" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/7e9a4e3a.png",
-      "stub" : false,
-      "title" : "Logs",
-      "url" : "desktop:\/\/docker-desktop\/logs"
-    },
-    "82c2d0ae" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/82c2d0ae.png",
-      "stub" : false,
-      "title" : "Gordon",
-      "url" : "desktop:\/\/docker-desktop\/gordon"
-    },
-    "873fa9fb" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "stub" : true,
-      "title" : "Images (docker-desktop)",
-      "url" : "desktop:\/\/docker-desktop\/images"
-    },
-    "8a937453" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "55d1ebf6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/8a937453.png",
-      "stub" : false,
-      "title" : "Settings > Software Updates",
-      "url" : "desktop:\/\/docker-desktop\/settings\/software-updates"
-    },
-    "8f8e1524" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "7a4a92d8",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/8f8e1524.png",
-      "stub" : false,
-      "title" : "Docker Scout > Empty State",
-      "url" : "desktop:\/\/docker-desktop\/docker-scout\/empty-state"
-    },
-    "90ba1b09" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/90ba1b09.png",
-      "stub" : false,
-      "title" : "Models",
-      "url" : "desktop:\/\/docker-desktop\/models"
-    },
-    "91282903" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "7780c9c8",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/91282903.png",
-      "stub" : false,
-      "title" : "Builds > Active Builds",
-      "url" : "desktop:\/\/docker-desktop\/builds\/active-builds"
-    },
-    "921e758f" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "c1a506db",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/921e758f.png",
-      "stub" : false,
-      "title" : "Containers > Exec",
-      "url" : "desktop:\/\/docker-desktop\/containers\/exec"
-    },
-    "9222263f" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "c1a506db",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/9222263f.png",
-      "stub" : false,
-      "title" : "Containers > Logs",
-      "url" : "desktop:\/\/docker-desktop\/containers\/logs"
-    },
-    "948e2848" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "43b91d00",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/948e2848.png",
-      "stub" : false,
-      "title" : "Settings > Resources > File sharing",
-      "url" : "desktop:\/\/docker-desktop\/settings\/resources\/file-sharing"
-    },
-    "96b611cd" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "55d1ebf6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/96b611cd.png",
-      "stub" : false,
-      "title" : "Settings > Beta features",
-      "url" : "desktop:\/\/docker-desktop\/settings\/beta-features"
-    },
-    "9a27cdec" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "f3323971",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/9a27cdec.png",
-      "stub" : false,
-      "title" : "Volumes > Individual Volume > Exports > Quick Export",
-      "url" : "desktop:\/\/docker-desktop\/volumes\/individual-volume\/exports\/quick-export"
-    },
-    "ab30a0c6" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/ab30a0c6.png",
-      "stub" : false,
-      "title" : "Docker Terminal",
-      "url" : "desktop:\/\/docker-desktop\/docker-terminal"
-    },
-    "ab4ad376" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "2004aa5d",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/ab4ad376.png",
-      "stub" : false,
-      "title" : "Builds > Individual Build > Error",
-      "url" : "desktop:\/\/docker-desktop\/builds\/individual-build\/error"
-    },
-    "ac89ac1f" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "fc823878",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/ac89ac1f.png",
-      "stub" : false,
-      "title" : "MCP Toolkit > Catalog > Individual Catalogue Item > Configuration",
-      "url" : "desktop:\/\/docker-desktop\/mcp-toolkit\/catalog\/individual-catalogue-item\/configuration"
-    },
-    "aeb5195d" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "f67d38ad",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/aeb5195d.png",
-      "stub" : false,
-      "title" : "Volumes > Individual Volume > Container in-use",
-      "url" : "desktop:\/\/docker-desktop\/volumes\/individual-volume\/container-in-use"
-    },
-    "af458a4f" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "2f2227fd",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/af458a4f.png",
-      "stub" : false,
-      "title" : "Kubernetes > Create Cluster",
-      "url" : "desktop:\/\/docker-desktop\/kubernetes\/create-cluster"
-    },
-    "b0d80165" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "55d1ebf6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/b0d80165.png",
-      "stub" : false,
-      "title" : "Settings > Docker Offload",
-      "url" : "desktop:\/\/docker-desktop\/settings\/docker-offload"
-    },
-    "b297676d" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "55d1ebf6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/b297676d.png",
-      "stub" : false,
-      "title" : "Settings > Buildes",
-      "url" : "desktop:\/\/docker-desktop\/settings\/buildes"
-    },
-    "b94bc574" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "c846fdb6",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/b94bc574.png",
-      "stub" : false,
-      "title" : "Hub > Image > Tags",
-      "url" : "desktop:\/\/docker-desktop\/hub\/image\/tags"
-    },
-    "c1a506db" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/c1a506db.png",
-      "stub" : false,
-      "title" : "Containers",
-      "url" : "desktop:\/\/docker-desktop\/containers"
-    },
-    "c4126b54" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "f67d38ad",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/c4126b54.png",
-      "stub" : false,
-      "title" : "Volumes > Individual Volume > Stored Data",
-      "url" : "desktop:\/\/docker-desktop\/volumes\/individual-volume\/stored-data"
-    },
-    "c6f2756f" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/c6f2756f.png",
-      "stub" : false,
-      "title" : "Troubleshoot",
-      "url" : "desktop:\/\/docker-desktop\/troubleshoot"
-    },
-    "c846fdb6" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "fc1420a4",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/c846fdb6.png",
-      "stub" : false,
-      "title" : "Hub > Image",
-      "url" : "desktop:\/\/docker-desktop\/hub\/image"
-    },
-    "d3bd87db" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "stub" : true,
-      "title" : "Contianers (docker-desktop)",
-      "url" : "desktop:\/\/docker-desktop\/contianers"
-    },
-    "d3fa5dc2" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "22c44778",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/d3fa5dc2.png",
-      "stub" : false,
-      "title" : "MCP Toolkit > Catalog",
-      "url" : "desktop:\/\/docker-desktop\/mcp-toolkit\/catalog"
-    },
-    "d5f724bd" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "c1a506db",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/d5f724bd.png",
-      "stub" : false,
-      "title" : "Containers > Files",
-      "url" : "desktop:\/\/docker-desktop\/containers\/files"
-    },
-    "d6e83e99" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "c1a506db",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/d6e83e99.png",
-      "stub" : false,
-      "title" : "Containers > Stats",
-      "url" : "desktop:\/\/docker-desktop\/containers\/stats"
-    },
-    "db51ab61" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "c1a506db",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/db51ab61.png",
-      "stub" : false,
-      "title" : "Containers > Reource Usage",
-      "url" : "desktop:\/\/docker-desktop\/containers\/reource-usage"
-    },
-    "e5da1e2a" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "678c72df",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/e5da1e2a.png",
-      "stub" : false,
-      "title" : "Models > Individual Model > Requests",
-      "url" : "desktop:\/\/docker-desktop\/models\/individual-model\/requests"
-    },
-    "ea8e5adf" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/ea8e5adf.png",
-      "stub" : false,
-      "title" : "Notifications",
-      "url" : "desktop:\/\/docker-desktop\/notifications"
-    },
-    "ecde49d9" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "22c44778",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/ecde49d9.png",
-      "stub" : false,
-      "title" : "MCP Toolkit > Clients",
-      "url" : "desktop:\/\/docker-desktop\/mcp-toolkit\/clients"
-    },
-    "f32173f5" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "873fa9fb",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/f32173f5.png",
-      "stub" : false,
-      "title" : "Images > Image View",
-      "url" : "desktop:\/\/docker-desktop\/images\/image-view"
-    },
-    "f3323971" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "f67d38ad",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/f3323971.png",
-      "stub" : false,
-      "title" : "Volumes > Individual Volume > Exports",
-      "url" : "desktop:\/\/docker-desktop\/volumes\/individual-volume\/exports"
-    },
-    "f39792fa" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "d3bd87db",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/f39792fa.png",
-      "stub" : false,
-      "title" : "Contianers > Bind Mounts",
-      "url" : "desktop:\/\/docker-desktop\/contianers\/bind-mounts"
-    },
-    "f67d38ad" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "5d632bf0",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "stub" : true,
-      "title" : "Individual Volume (docker-desktop)",
-      "url" : "desktop:\/\/docker-desktop\/volumes\/individual-volume"
-    },
-    "fc1420a4" : {
-      "flags" : [
-
-      ],
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/fc1420a4.png",
-      "stub" : false,
-      "title" : "Hub",
-      "url" : "desktop:\/\/docker-desktop\/hub"
-    },
-    "fc823878" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "d3fa5dc2",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/fc823878.png",
-      "stub" : false,
-      "title" : "MCP Toolkit > Catalog > Individual Catalogue Item",
-      "url" : "desktop:\/\/docker-desktop\/mcp-toolkit\/catalog\/individual-catalogue-item"
-    },
-    "fe5861c2" : {
-      "flags" : [
-
-      ],
-      "inferredParent" : "7780c9c8",
-      "notes" : [
-
-      ],
-      "platform" : "desktop",
-      "screenshot" : "screenshots\/fe5861c2.png",
-      "stub" : false,
-      "title" : "Builds > Import Builds",
-      "url" : "desktop:\/\/docker-desktop\/builds\/import-builds"
+  "nodes": {
+    "04b91b07": {
+      "flags": [],
+      "inferredParent": "22c44778",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/04b91b07.png",
+      "stub": false,
+      "title": "MCP Toolkit > Create a profile",
+      "url": "desktop://docker-desktop/mcp-toolkit/create-a-profile"
+    },
+    "05cca775": {
+      "flags": [],
+      "inferredParent": "55d1ebf6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/05cca775.png",
+      "stub": false,
+      "title": "Settings > Extensions",
+      "url": "desktop://docker-desktop/settings/extensions"
+    },
+    "08010175": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/08010175.png",
+      "stub": false,
+      "title": "Extensions",
+      "url": "desktop://docker-desktop/extensions"
+    },
+    "082989c9": {
+      "flags": [],
+      "inferredParent": "2f2227fd",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/082989c9.png",
+      "stub": false,
+      "title": "Kubernetes > Empty State",
+      "url": "desktop://docker-desktop/kubernetes/empty-state"
+    },
+    "0e782ab9": {
+      "flags": [],
+      "inferredParent": "fc1420a4",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/0e782ab9.png",
+      "stub": false,
+      "title": "Hub > Developer",
+      "url": "desktop://docker-desktop/hub/developer"
+    },
+    "0e7eec03": {
+      "flags": [],
+      "inferredParent": "55d1ebf6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/0e7eec03.png",
+      "stub": false,
+      "title": "Settings > General",
+      "url": "desktop://docker-desktop/settings/general"
+    },
+    "10be2d41": {
+      "flags": [],
+      "inferredParent": "20a033e1",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/10be2d41.png",
+      "stub": false,
+      "title": "MCP Toolkit > Profiles > Individual Profile > Tools",
+      "url": "desktop://docker-desktop/mcp-toolkit/profiles/individual-profile/tools"
+    },
+    "11f57ec4": {
+      "flags": [],
+      "inferredParent": "678c72df",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/11f57ec4.png",
+      "stub": false,
+      "title": "Models > Individual Model > Inspect",
+      "url": "desktop://docker-desktop/models/individual-model/inspect"
+    },
+    "179c48c8": {
+      "flags": [],
+      "inferredParent": "22c44778",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/179c48c8.png",
+      "stub": false,
+      "title": "MCP Toolkit > OAuth",
+      "url": "desktop://docker-desktop/mcp-toolkit/oauth"
+    },
+    "1a35ebdb": {
+      "flags": [],
+      "inferredParent": "55d1ebf6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/1a35ebdb.png",
+      "stub": false,
+      "title": "Settings > Advanced",
+      "url": "desktop://docker-desktop/settings/advanced"
+    },
+    "1ead0718": {
+      "flags": [],
+      "inferredParent": "fc823878",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/1ead0718.png",
+      "stub": false,
+      "title": "MCP Toolkit > Catalog > Individual Catalogue Item > Tools",
+      "url": "desktop://docker-desktop/mcp-toolkit/catalog/individual-catalogue-item/tools"
+    },
+    "2004aa5d": {
+      "flags": [],
+      "inferredParent": "7780c9c8",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/2004aa5d.png",
+      "stub": false,
+      "title": "Builds > Individual Build > ",
+      "url": "desktop://docker-desktop/builds/individual-build/"
+    },
+    "20a033e1": {
+      "flags": [],
+      "inferredParent": "63eaebeb",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/20a033e1.png",
+      "stub": false,
+      "title": "MCP Toolkit > Profiles > Individual Profile",
+      "url": "desktop://docker-desktop/mcp-toolkit/profiles/individual-profile"
+    },
+    "22c44778": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/22c44778.png",
+      "stub": false,
+      "title": "MCP Toolkit",
+      "url": "desktop://docker-desktop/mcp-toolkit"
+    },
+    "23704ec0": {
+      "flags": [],
+      "inferredParent": "c1a506db",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/23704ec0.png",
+      "stub": false,
+      "title": "Containers > Inspect",
+      "url": "desktop://docker-desktop/containers/inspect"
+    },
+    "251f17f9": {
+      "flags": [],
+      "inferredParent": "43b91d00",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/251f17f9.png",
+      "stub": false,
+      "title": "Settings > Resources > Proxies",
+      "url": "desktop://docker-desktop/settings/resources/proxies"
+    },
+    "27a4b1d6": {
+      "flags": [],
+      "inferredParent": "08010175",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/27a4b1d6.png",
+      "stub": false,
+      "title": "Extensions > Browse",
+      "url": "desktop://docker-desktop/extensions/browse"
+    },
+    "29f40138": {
+      "flags": [],
+      "inferredParent": "08010175",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/29f40138.png",
+      "stub": false,
+      "title": "Extensions > Create",
+      "url": "desktop://docker-desktop/extensions/create"
+    },
+    "2bfe4b01": {
+      "flags": [],
+      "inferredParent": "2004aa5d",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/2bfe4b01.png",
+      "stub": false,
+      "title": "Builds > Individual Build > Logs",
+      "url": "desktop://docker-desktop/builds/individual-build/logs"
+    },
+    "2ca91220": {
+      "flags": [],
+      "inferredParent": "55d1ebf6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/2ca91220.png",
+      "stub": false,
+      "title": "Settings > Docker Engine",
+      "url": "desktop://docker-desktop/settings/docker-engine"
+    },
+    "2cedcdfd": {
+      "flags": [],
+      "inferredParent": "55d1ebf6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/2cedcdfd.png",
+      "stub": false,
+      "title": "Settings > Kubernetes",
+      "url": "desktop://docker-desktop/settings/kubernetes"
+    },
+    "2f2227fd": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "stub": true,
+      "title": "Kubernetes (docker-desktop)",
+      "url": "desktop://docker-desktop/kubernetes"
+    },
+    "35cd68f3": {
+      "flags": [],
+      "inferredParent": "f32173f5",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/35cd68f3.png",
+      "stub": false,
+      "title": "Images > Image View > Recommended Fixes",
+      "url": "desktop://docker-desktop/images/image-view/recommended-fixes"
+    },
+    "387f509e": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/387f509e.png",
+      "stub": false,
+      "title": "Docker Build Cloud",
+      "url": "desktop://docker-desktop/docker-build-cloud"
+    },
+    "43b91d00": {
+      "flags": [],
+      "inferredParent": "55d1ebf6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/43b91d00.png",
+      "stub": false,
+      "title": "Settings > Resources",
+      "url": "desktop://docker-desktop/settings/resources"
+    },
+    "4d4ec17c": {
+      "flags": [],
+      "inferredParent": "873fa9fb",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/4d4ec17c.png",
+      "stub": false,
+      "title": "Images > My Hub",
+      "url": "desktop://docker-desktop/images/my-hub"
+    },
+    "5195c50f": {
+      "flags": [],
+      "inferredParent": "55d1ebf6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/5195c50f.png",
+      "stub": false,
+      "title": "Settings > AI",
+      "url": "desktop://docker-desktop/settings/ai"
+    },
+    "52aed863": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/52aed863.png",
+      "stub": false,
+      "title": "Learning Center",
+      "url": "desktop://docker-desktop/learning-center"
+    },
+    "55d1ebf6": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "stub": true,
+      "title": "Settings (docker-desktop)",
+      "url": "desktop://docker-desktop/settings"
+    },
+    "5d632bf0": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/5d632bf0.png",
+      "stub": false,
+      "title": "Volumes",
+      "url": "desktop://docker-desktop/volumes"
+    },
+    "63eaebeb": {
+      "flags": [],
+      "inferredParent": "22c44778",
+      "notes": [],
+      "platform": "desktop",
+      "stub": true,
+      "title": "Profiles (docker-desktop)",
+      "url": "desktop://docker-desktop/mcp-toolkit/profiles"
+    },
+    "678c72df": {
+      "flags": [],
+      "inferredParent": "90ba1b09",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/678c72df.png",
+      "stub": false,
+      "title": "Models > Individual Model",
+      "url": "desktop://docker-desktop/models/individual-model"
+    },
+    "6d319799": {
+      "flags": [],
+      "inferredParent": "43b91d00",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/6d319799.png",
+      "stub": false,
+      "title": "Settings > Resources > Network",
+      "url": "desktop://docker-desktop/settings/resources/network"
+    },
+    "738040df": {
+      "flags": [],
+      "inferredParent": "55d1ebf6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/738040df.png",
+      "stub": false,
+      "title": "Settings > Notifications",
+      "url": "desktop://docker-desktop/settings/notifications"
+    },
+    "7780c9c8": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/7780c9c8.png",
+      "stub": false,
+      "title": "Builds",
+      "url": "desktop://docker-desktop/builds"
+    },
+    "7a4a92d8": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "stub": true,
+      "title": "Docker Scout (docker-desktop)",
+      "url": "desktop://docker-desktop/docker-scout"
+    },
+    "7b52aa5e": {
+      "flags": [],
+      "inferredParent": "2004aa5d",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/7b52aa5e.png",
+      "stub": false,
+      "title": "Builds > Individual Build > History",
+      "url": "desktop://docker-desktop/builds/individual-build/history"
+    },
+    "7deb5240": {
+      "flags": [],
+      "inferredParent": "f3323971",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/7deb5240.png",
+      "stub": false,
+      "title": "Volumes > Individual Volume > Exports > Scheduled Export",
+      "url": "desktop://docker-desktop/volumes/individual-volume/exports/scheduled-export"
+    },
+    "7e9a4e3a": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/7e9a4e3a.png",
+      "stub": false,
+      "title": "Logs",
+      "url": "desktop://docker-desktop/logs"
+    },
+    "82c2d0ae": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/82c2d0ae.png",
+      "stub": false,
+      "title": "Gordon",
+      "url": "desktop://docker-desktop/gordon"
+    },
+    "873fa9fb": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "stub": true,
+      "title": "Images (docker-desktop)",
+      "url": "desktop://docker-desktop/images"
+    },
+    "8a937453": {
+      "flags": [],
+      "inferredParent": "55d1ebf6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/8a937453.png",
+      "stub": false,
+      "title": "Settings > Software Updates",
+      "url": "desktop://docker-desktop/settings/software-updates"
+    },
+    "8f8e1524": {
+      "flags": [],
+      "inferredParent": "7a4a92d8",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/8f8e1524.png",
+      "stub": false,
+      "title": "Docker Scout > Empty State",
+      "url": "desktop://docker-desktop/docker-scout/empty-state"
+    },
+    "90ba1b09": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/90ba1b09.png",
+      "stub": false,
+      "title": "Models",
+      "url": "desktop://docker-desktop/models"
+    },
+    "91282903": {
+      "flags": [],
+      "inferredParent": "7780c9c8",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/91282903.png",
+      "stub": false,
+      "title": "Builds > Active Builds",
+      "url": "desktop://docker-desktop/builds/active-builds"
+    },
+    "921e758f": {
+      "flags": [],
+      "inferredParent": "c1a506db",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/921e758f.png",
+      "stub": false,
+      "title": "Containers > Exec",
+      "url": "desktop://docker-desktop/containers/exec"
+    },
+    "9222263f": {
+      "flags": [],
+      "inferredParent": "c1a506db",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/9222263f.png",
+      "stub": false,
+      "title": "Containers > Logs",
+      "url": "desktop://docker-desktop/containers/logs"
+    },
+    "948e2848": {
+      "flags": [],
+      "inferredParent": "43b91d00",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/948e2848.png",
+      "stub": false,
+      "title": "Settings > Resources > File sharing",
+      "url": "desktop://docker-desktop/settings/resources/file-sharing"
+    },
+    "96b611cd": {
+      "flags": [],
+      "inferredParent": "55d1ebf6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/96b611cd.png",
+      "stub": false,
+      "title": "Settings > Beta features",
+      "url": "desktop://docker-desktop/settings/beta-features"
+    },
+    "9a27cdec": {
+      "flags": [],
+      "inferredParent": "f3323971",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/9a27cdec.png",
+      "stub": false,
+      "title": "Volumes > Individual Volume > Exports > Quick Export",
+      "url": "desktop://docker-desktop/volumes/individual-volume/exports/quick-export"
+    },
+    "a6da85f6": {
+      "flags": [],
+      "inferredParent": null,
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": null,
+      "stub": true,
+      "title": "Docker Desktop",
+      "url": "desktop://docker-desktop"
+    },
+    "ab30a0c6": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/ab30a0c6.png",
+      "stub": false,
+      "title": "Docker Terminal",
+      "url": "desktop://docker-desktop/docker-terminal"
+    },
+    "ab4ad376": {
+      "flags": [],
+      "inferredParent": "2004aa5d",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/ab4ad376.png",
+      "stub": false,
+      "title": "Builds > Individual Build > Error",
+      "url": "desktop://docker-desktop/builds/individual-build/error"
+    },
+    "ac89ac1f": {
+      "flags": [],
+      "inferredParent": "fc823878",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/ac89ac1f.png",
+      "stub": false,
+      "title": "MCP Toolkit > Catalog > Individual Catalogue Item > Configuration",
+      "url": "desktop://docker-desktop/mcp-toolkit/catalog/individual-catalogue-item/configuration"
+    },
+    "aeb5195d": {
+      "flags": [],
+      "inferredParent": "f67d38ad",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/aeb5195d.png",
+      "stub": false,
+      "title": "Volumes > Individual Volume > Container in-use",
+      "url": "desktop://docker-desktop/volumes/individual-volume/container-in-use"
+    },
+    "af458a4f": {
+      "flags": [],
+      "inferredParent": "2f2227fd",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/af458a4f.png",
+      "stub": false,
+      "title": "Kubernetes > Create Cluster",
+      "url": "desktop://docker-desktop/kubernetes/create-cluster"
+    },
+    "b0d80165": {
+      "flags": [],
+      "inferredParent": "55d1ebf6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/b0d80165.png",
+      "stub": false,
+      "title": "Settings > Docker Offload",
+      "url": "desktop://docker-desktop/settings/docker-offload"
+    },
+    "b297676d": {
+      "flags": [],
+      "inferredParent": "55d1ebf6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/b297676d.png",
+      "stub": false,
+      "title": "Settings > Buildes",
+      "url": "desktop://docker-desktop/settings/buildes"
+    },
+    "b94bc574": {
+      "flags": [],
+      "inferredParent": "c846fdb6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/b94bc574.png",
+      "stub": false,
+      "title": "Hub > Image > Tags",
+      "url": "desktop://docker-desktop/hub/image/tags"
+    },
+    "c1a506db": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/c1a506db.png",
+      "stub": false,
+      "title": "Containers",
+      "url": "desktop://docker-desktop/containers"
+    },
+    "c4126b54": {
+      "flags": [],
+      "inferredParent": "f67d38ad",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/c4126b54.png",
+      "stub": false,
+      "title": "Volumes > Individual Volume > Stored Data",
+      "url": "desktop://docker-desktop/volumes/individual-volume/stored-data"
+    },
+    "c6f2756f": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/c6f2756f.png",
+      "stub": false,
+      "title": "Troubleshoot",
+      "url": "desktop://docker-desktop/troubleshoot"
+    },
+    "c846fdb6": {
+      "flags": [],
+      "inferredParent": "fc1420a4",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/c846fdb6.png",
+      "stub": false,
+      "title": "Hub > Image",
+      "url": "desktop://docker-desktop/hub/image"
+    },
+    "d3bd87db": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "stub": true,
+      "title": "Contianers (docker-desktop)",
+      "url": "desktop://docker-desktop/contianers"
+    },
+    "d3fa5dc2": {
+      "flags": [],
+      "inferredParent": "22c44778",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/d3fa5dc2.png",
+      "stub": false,
+      "title": "MCP Toolkit > Catalog",
+      "url": "desktop://docker-desktop/mcp-toolkit/catalog"
+    },
+    "d5f724bd": {
+      "flags": [],
+      "inferredParent": "c1a506db",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/d5f724bd.png",
+      "stub": false,
+      "title": "Containers > Files",
+      "url": "desktop://docker-desktop/containers/files"
+    },
+    "d6e83e99": {
+      "flags": [],
+      "inferredParent": "c1a506db",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/d6e83e99.png",
+      "stub": false,
+      "title": "Containers > Stats",
+      "url": "desktop://docker-desktop/containers/stats"
+    },
+    "db51ab61": {
+      "flags": [],
+      "inferredParent": "c1a506db",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/db51ab61.png",
+      "stub": false,
+      "title": "Containers > Reource Usage",
+      "url": "desktop://docker-desktop/containers/reource-usage"
+    },
+    "e5da1e2a": {
+      "flags": [],
+      "inferredParent": "678c72df",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/e5da1e2a.png",
+      "stub": false,
+      "title": "Models > Individual Model > Requests",
+      "url": "desktop://docker-desktop/models/individual-model/requests"
+    },
+    "ea8e5adf": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/ea8e5adf.png",
+      "stub": false,
+      "title": "Notifications",
+      "url": "desktop://docker-desktop/notifications"
+    },
+    "ecde49d9": {
+      "flags": [],
+      "inferredParent": "22c44778",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/ecde49d9.png",
+      "stub": false,
+      "title": "MCP Toolkit > Clients",
+      "url": "desktop://docker-desktop/mcp-toolkit/clients"
+    },
+    "f32173f5": {
+      "flags": [],
+      "inferredParent": "873fa9fb",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/f32173f5.png",
+      "stub": false,
+      "title": "Images > Image View",
+      "url": "desktop://docker-desktop/images/image-view"
+    },
+    "f3323971": {
+      "flags": [],
+      "inferredParent": "f67d38ad",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/f3323971.png",
+      "stub": false,
+      "title": "Volumes > Individual Volume > Exports",
+      "url": "desktop://docker-desktop/volumes/individual-volume/exports"
+    },
+    "f39792fa": {
+      "flags": [],
+      "inferredParent": "d3bd87db",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/f39792fa.png",
+      "stub": false,
+      "title": "Contianers > Bind Mounts",
+      "url": "desktop://docker-desktop/contianers/bind-mounts"
+    },
+    "f67d38ad": {
+      "flags": [],
+      "inferredParent": "5d632bf0",
+      "notes": [],
+      "platform": "desktop",
+      "stub": true,
+      "title": "Individual Volume (docker-desktop)",
+      "url": "desktop://docker-desktop/volumes/individual-volume"
+    },
+    "fc1420a4": {
+      "flags": [],
+      "inferredParent": "a6da85f6",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/fc1420a4.png",
+      "stub": false,
+      "title": "Hub",
+      "url": "desktop://docker-desktop/hub"
+    },
+    "fc823878": {
+      "flags": [],
+      "inferredParent": "d3fa5dc2",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/fc823878.png",
+      "stub": false,
+      "title": "MCP Toolkit > Catalog > Individual Catalogue Item",
+      "url": "desktop://docker-desktop/mcp-toolkit/catalog/individual-catalogue-item"
+    },
+    "fe5861c2": {
+      "flags": [],
+      "inferredParent": "7780c9c8",
+      "notes": [],
+      "platform": "desktop",
+      "screenshot": "screenshots/fe5861c2.png",
+      "stub": false,
+      "title": "Builds > Import Builds",
+      "url": "desktop://docker-desktop/builds/import-builds"
     }
   },
-  "workflows" : [
-
-  ]
+  "workflows": []
 }

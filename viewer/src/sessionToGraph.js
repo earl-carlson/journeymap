@@ -81,6 +81,7 @@ export function sessionToGraph(session, options = {}) {
     viewMode = 'hierarchy',
     flagFilter = [],
     showStubs = true,
+    showModals = false,
     activeWorkflow = null,
     platformFilter = null,
     collapsedDomains = new Set(),
@@ -135,6 +136,16 @@ export function sessionToGraph(session, options = {}) {
 
     // Skip if hidden by a collapsed parent
     if (hiddenByCollapse.has(id)) continue;
+
+    // Modal filtering
+    const isModalNode = node.isModal || id.includes(':modal:');
+    if (isModalNode) {
+      // Always skip orphaned modals (no parent or parent missing from session)
+      const parent = node.inferredParent && session.nodes[node.inferredParent];
+      if (!parent) continue;
+      // When modals are hidden (default), skip all of them
+      if (!showModals) continue;
+    }
 
     // Skip tracking-parameter duplicate roots: nodes with no inferredParent, no children,
     // and a URL containing common tracking params (_gl=, _ga=, utm_)

@@ -192,6 +192,7 @@ export default function App() {
   const [viewMode, setViewMode] = useState('hierarchy');
   const [flagFilter, setFlagFilter] = useState([]);
   const [showStubs, setShowStubs] = useState(true);
+  const [showModals, setShowModals] = useState(false);
   const [stats, setStats] = useState(null);
   const [sessionCount, setSessionCount] = useState(0);
   const [dirHandle, setDirHandle] = useState(null);
@@ -237,9 +238,12 @@ export default function App() {
     return parents;
   }, []);
 
-  // Collapse all nodes that have children
+  // Collapse all nodes that have children, then refit the view
   const collapseAll = useCallback(() => {
-    if (session) setCollapsedNodes(getAllParentIds(session));
+    if (session) {
+      shouldFitView.current = true;
+      setCollapsedNodes(getAllParentIds(session));
+    }
   }, [session, getAllParentIds]);
 
   // Expand all nodes
@@ -271,11 +275,12 @@ export default function App() {
   }, []);
 
   const buildGraph = useCallback(
-    (sessionData, mode, flags, stubs, workflow, platFilter, collapsed, collapsedN) => {
+    (sessionData, mode, flags, stubs, modals, workflow, platFilter, collapsed, collapsedN) => {
       const { nodes: rfNodes, edges: rfEdges, domainCounts } = sessionToGraph(sessionData, {
         viewMode: mode,
         flagFilter: flags,
         showStubs: stubs,
+        showModals: modals,
         activeWorkflow: workflow,
         platformFilter: platFilter,
         collapsedDomains: collapsed,
@@ -360,9 +365,9 @@ export default function App() {
   // Rebuild when any filter/state changes
   useEffect(() => {
     if (session) {
-      buildGraph(session, viewMode, flagFilter, showStubs, activeWorkflow, platformFilter, collapsedDomains, collapsedNodes);
+      buildGraph(session, viewMode, flagFilter, showStubs, showModals, activeWorkflow, platformFilter, collapsedDomains, collapsedNodes);
     }
-  }, [session, viewMode, flagFilter, showStubs, activeWorkflow, platformFilter, collapsedDomains, collapsedNodes, buildGraph]);
+  }, [session, viewMode, flagFilter, showStubs, showModals, activeWorkflow, platformFilter, collapsedDomains, collapsedNodes, buildGraph]);
 
   // Fit view when session loads
   useEffect(() => {
@@ -902,6 +907,12 @@ export default function App() {
             onClick={() => setShowStubs(!showStubs)}
           >
             {showStubs ? 'Hide' : 'Show'} Stubs
+          </button>
+          <button
+            className={`toolbar-btn ${showModals ? 'active' : ''}`}
+            onClick={() => setShowModals(!showModals)}
+          >
+            {showModals ? 'Hide' : 'Show'} Modals
           </button>
           <button className="toolbar-btn" onClick={collapseAll}>Collapse All</button>
           <button className="toolbar-btn" onClick={expandAll}>Expand All</button>
