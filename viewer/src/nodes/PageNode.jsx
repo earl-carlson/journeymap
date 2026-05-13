@@ -47,15 +47,17 @@ function PageNode({ data, selected }) {
   return (
     <div
       style={{
-        background: selected ? '#2a2a4a' : '#1e1e36',
-        border: `2px solid ${selected ? '#4B7BE5' : flagColor || domainColor}`,
+        background: data.isDropTarget ? '#1a2a1a' : selected ? '#2a2a4a' : '#1e1e36',
+        border: `2px solid ${data.isDropTarget ? '#22c55e' : selected ? '#4B7BE5' : flagColor || domainColor}`,
         borderRadius: 10,
         padding: '8px 12px',
         minWidth: 200,
         maxWidth: 260,
         cursor: 'pointer',
-        transition: 'border-color 0.15s, box-shadow 0.15s, opacity 0.2s',
-        boxShadow: selected
+        transition: 'border-color 0.15s, box-shadow 0.15s, opacity 0.2s, background 0.15s',
+        boxShadow: data.isDropTarget
+          ? '0 0 0 3px rgba(34,197,94,0.3)'
+          : selected
           ? '0 0 0 2px rgba(75,123,229,0.25)'
           : hasFlags
           ? `0 0 0 1px ${flagColor}33`

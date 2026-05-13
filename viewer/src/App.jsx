@@ -206,6 +206,8 @@ export default function App() {
   // Edit mode
   const [editMode, setEditMode] = useState(false);
   const undoStack = useRef([]); // array of session snapshots (most recent last)
+  const [dragOverNodeId, setDragOverNodeId] = useState(null); // node being hovered during drag-to-reparent
+  const [unsavedChanges, setUnsavedChanges] = useState(0);
 
   // Workflow state
   const [showWorkflows, setShowWorkflows] = useState(false);
@@ -373,6 +375,16 @@ export default function App() {
     }
   }, [session, viewMode, flagFilter, showStubs, showModals, activeWorkflow, platformFilter, collapsedDomains, collapsedNodes, buildGraph]);
 
+  // Inject dropTarget flag into node data during drag-to-reparent
+  useEffect(() => {
+    setNodes((nds) =>
+      nds.map((n) => ({
+        ...n,
+        data: { ...n.data, isDropTarget: n.id === dragOverNodeId },
+      }))
+    );
+  }, [dragOverNodeId, setNodes]);
+
   // Fit view when session loads
   useEffect(() => {
     if (session) {
@@ -401,6 +413,7 @@ export default function App() {
         // Push snapshot to undo stack if this is an undoable edit
         if (undoable) {
           undoStack.current = [...undoStack.current, structuredClone(prev)].slice(-50);
+          setUnsavedChanges((c) => c + 1);
         }
         const next = structuredClone(prev);
         mutator(next);
@@ -418,11 +431,22 @@ export default function App() {
     if (undoStack.current.length === 0) return;
     const prev = undoStack.current[undoStack.current.length - 1];
     undoStack.current = undoStack.current.slice(0, -1);
+    setUnsavedChanges((c) => Math.max(0, c - 1));
     setSession(prev);
     if (dirHandle) {
       writeBackSession(dirHandle, prev).catch(() => {});
     }
   }, [dirHandle]);
+
+  const saveNow = useCallback(async () => {
+    if (!dirHandle || !session) return;
+    try {
+      await writeBackSession(dirHandle, session);
+      setUnsavedChanges(0);
+    } catch (err) {
+      console.error('[save] Failed:', err);
+    }
+  }, [dirHandle, session]);
 
   // -----------------------------------------------------------------------
   // Directory-based loading (read-write)
@@ -713,6 +737,40 @@ export default function App() {
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
   }, [editMode, undo]);
+
+  // -----------------------------------------------------------------------
+  // Drag-to-reparent handlers (edit mode only)
+  // -----------------------------------------------------------------------
+
+  const onNodeDrag = useCallback((_event, draggedNode) => {
+    if (!editMode) return;
+    const rf = reactFlowRef.current;
+    if (!rf) return;
+
+    // Find which node the dragged node's center is overlapping
+    const allNodes = rf.getNodes();
+    const dx = draggedNode.position.x + (draggedNode.measured?.width ?? 220) / 2;
+    const dy = draggedNode.position.y + (draggedNode.measured?.height ?? 60) / 2;
+
+    const hit = allNodes.find((n) => {
+      if (n.id === draggedNode.id) return false;
+      if (n.type === 'domainGroup') return false;
+      const w = n.measured?.width ?? 220;
+      const h = n.measured?.height ?? 60;
+      return dx >= n.position.x && dx <= n.position.x + w &&
+             dy >= n.position.y && dy <= n.position.y + h;
+    });
+
+    setDragOverNodeId(hit ? hit.id : null);
+  }, [editMode]);
+
+  const onNodeDragStop = useCallback((_event, draggedNode) => {
+    if (!editMode) return;
+    if (dragOverNodeId && dragOverNodeId !== draggedNode.id) {
+      changeParent(draggedNode.id, dragOverNodeId);
+    }
+    setDragOverNodeId(null);
+  }, [editMode, dragOverNodeId, changeParent]);
 
   // -----------------------------------------------------------------------
   // Workflow actions
@@ -1021,6 +1079,16 @@ export default function App() {
                   ↩ Undo
                 </button>
               )}
+              {unsavedChanges > 0 && (
+                <button
+                  className="toolbar-btn"
+                  onClick={saveNow}
+                  style={{ borderColor: '#22c55e', color: '#22c55e' }}
+                  title="Save changes to disk"
+                >
+                  ↓ Save{unsavedChanges > 1 ? ` (${unsavedChanges})` : ''}
+                </button>
+              )}
             </>
           )}
           <button
@@ -1097,6 +1165,9 @@ export default function App() {
           onNodeClick={onNodeClick}
           onPaneClick={onPaneClick}
           onInit={onInit}
+          onNodeDrag={editMode ? onNodeDrag : undefined}
+          onNodeDragStop={editMode ? onNodeDragStop : undefined}
+          nodesDraggable={true}
           nodeTypes={nodeTypes}
           minZoom={0.05}
           maxZoom={2}

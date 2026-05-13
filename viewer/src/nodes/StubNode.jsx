@@ -23,15 +23,16 @@ function StubNode({ data, selected }) {
   return (
     <div
       style={{
-        background: '#16162a',
-        border: `1.5px dashed ${selected ? '#4B7BE5' : '#333355'}`,
+        background: data.isDropTarget ? '#1a2a1a' : '#16162a',
+        border: `1.5px ${data.isDropTarget ? 'solid #22c55e' : `dashed ${selected ? '#4B7BE5' : '#333355'}`}`,
         borderRadius: 10,
         padding: '6px 12px',
         minWidth: 160,
         maxWidth: 220,
-        opacity: data.dimmed ? 0.15 : 0.6,
+        opacity: data.dimmed ? 0.15 : data.isDropTarget ? 1 : 0.6,
         cursor: 'pointer',
-        transition: 'border-color 0.15s, opacity 0.2s',
+        transition: 'border-color 0.15s, opacity 0.2s, background 0.15s',
+        boxShadow: data.isDropTarget ? '0 0 0 3px rgba(34,197,94,0.3)' : 'none',
       }}
     >
       <Handle type="target" position={Position.Left} style={{ background: '#555570', width: 6, height: 6, border: '2px solid #16162a' }} />
