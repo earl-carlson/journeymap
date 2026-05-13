@@ -459,8 +459,25 @@ export default function App() {
     await loadFromDirectory(dirHandle);
   }, [dirHandle, loadFromDirectory]);
 
-  // Try to restore saved directory handle on mount
+  // Auto-load bundled sessions (GitHub Pages build)
   useEffect(() => {
+    const bundled = window.__BUNDLED_SESSIONS__;
+    if (bundled && bundled.length > 0) {
+      setLoading(true);
+      try {
+        const merged = mergeSessions(null, ...bundled);
+        setCollapsedNodes(getAllParentIds(merged));
+        setSession(merged);
+        setSessionCount(bundled.length);
+        setSelectedNode(null);
+      } catch (err) {
+        console.error('[bundled] Failed to load bundled sessions:', err);
+      }
+      setLoading(false);
+      return; // skip IndexedDB restore — not needed in Pages mode
+    }
+
+    // Try to restore saved directory handle on mount (local mode)
     (async () => {
       const handle = await loadDirHandle();
       if (handle) {
@@ -468,7 +485,7 @@ export default function App() {
         setDirName(handle.name);
       }
     })();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // -----------------------------------------------------------------------
   // File loading (drag-and-drop / file picker fallback)
