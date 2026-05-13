@@ -203,6 +203,10 @@ export default function App() {
   const shouldFitView = useRef(false);
   const anchorPositions = useRef(null); // snapshot of node positions before a collapse/expand
 
+  // Edit mode
+  const [editMode, setEditMode] = useState(false);
+  const undoStack = useRef([]); // array of session snapshots (most recent last)
+
   // Workflow state
   const [showWorkflows, setShowWorkflows] = useState(false);
   const [activeWorkflow, setActiveWorkflow] = useState(null);
@@ -391,9 +395,13 @@ export default function App() {
   // -----------------------------------------------------------------------
 
   const mutateSession = useCallback(
-    (mutator) => {
+    (mutator, { undoable = false } = {}) => {
       setSession((prev) => {
         if (!prev) return prev;
+        // Push snapshot to undo stack if this is an undoable edit
+        if (undoable) {
+          undoStack.current = [...undoStack.current, structuredClone(prev)].slice(-50);
+        }
         const next = structuredClone(prev);
         mutator(next);
         // Write back asynchronously
@@ -405,6 +413,16 @@ export default function App() {
     },
     [dirHandle]
   );
+
+  const undo = useCallback(() => {
+    if (undoStack.current.length === 0) return;
+    const prev = undoStack.current[undoStack.current.length - 1];
+    undoStack.current = undoStack.current.slice(0, -1);
+    setSession(prev);
+    if (dirHandle) {
+      writeBackSession(dirHandle, prev).catch(() => {});
+    }
+  }, [dirHandle]);
 
   // -----------------------------------------------------------------------
   // Directory-based loading (read-write)
@@ -625,6 +643,76 @@ export default function App() {
     setCollapsedDomains(new Set());
     setCollapsedNodes(new Set());
   }, [setNodes, setEdges]);
+
+  // -----------------------------------------------------------------------
+  // Edit actions
+  // -----------------------------------------------------------------------
+
+  const renameNode = useCallback((nodeId, newTitle) => {
+    mutateSession((s) => {
+      if (s.nodes[nodeId]) s.nodes[nodeId].title = newTitle;
+    }, { undoable: true });
+    // Keep selectedNode data in sync
+    setSelectedNode((prev) => {
+      if (!prev || prev.id !== nodeId) return prev;
+      return { ...prev, data: { ...prev.data, title: newTitle } };
+    });
+  }, [mutateSession]);
+
+  const deleteNode = useCallback((nodeId) => {
+    mutateSession((s) => {
+      const node = s.nodes[nodeId];
+      if (!node) return;
+      const parentId = node.inferredParent || null;
+      // Re-parent all direct children to this node's parent
+      for (const [id, n] of Object.entries(s.nodes)) {
+        if (n.inferredParent === nodeId) {
+          n.inferredParent = parentId;
+        }
+      }
+      // Remove all edges touching this node
+      s.edges = s.edges.filter((e) => e.from !== nodeId && e.to !== nodeId);
+      // Remove the node
+      delete s.nodes[nodeId];
+    }, { undoable: true });
+    setSelectedNode(null);
+  }, [mutateSession]);
+
+  const changeParent = useCallback((nodeId, newParentId) => {
+    mutateSession((s) => {
+      const node = s.nodes[nodeId];
+      if (!node) return;
+      const oldParentId = node.inferredParent;
+      // Update inferredParent
+      node.inferredParent = newParentId || null;
+      // Remove old child-of edge
+      s.edges = s.edges.filter(
+        (e) => !(e.from === oldParentId && e.to === nodeId && e.type === 'child-of')
+      );
+      // Add new child-of edge
+      if (newParentId) {
+        const exists = s.edges.some(
+          (e) => e.from === newParentId && e.to === nodeId && e.type === 'child-of'
+        );
+        if (!exists) {
+          s.edges.push({ from: newParentId, to: nodeId, type: 'child-of', count: 1 });
+        }
+      }
+    }, { undoable: true });
+  }, [mutateSession]);
+
+  // Keyboard shortcut: Cmd+Z to undo in edit mode
+  React.useEffect(() => {
+    if (!editMode) return;
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        undo();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [editMode, undo]);
 
   // -----------------------------------------------------------------------
   // Workflow actions
@@ -917,9 +1005,23 @@ export default function App() {
           <button className="toolbar-btn" onClick={collapseAll}>Collapse All</button>
           <button className="toolbar-btn" onClick={expandAll}>Expand All</button>
           {dirHandle && (
-            <button className="toolbar-btn" onClick={refreshDirectory}>
-              Refresh
-            </button>
+            <>
+              <button className="toolbar-btn" onClick={refreshDirectory}>
+                Refresh
+              </button>
+              <button
+                className={`toolbar-btn ${editMode ? 'active' : ''}`}
+                onClick={() => setEditMode((m) => !m)}
+                style={editMode ? { borderColor: '#f59e0b', color: '#f59e0b' } : {}}
+              >
+                {editMode ? '✎ Editing' : '✎ Edit'}
+              </button>
+              {editMode && undoStack.current.length > 0 && (
+                <button className="toolbar-btn" onClick={undo} title="Undo (⌘Z)">
+                  ↩ Undo
+                </button>
+              )}
+            </>
           )}
           <button
             className="toolbar-btn"
@@ -1091,7 +1193,11 @@ export default function App() {
         <DetailPanel
           node={selectedNode}
           session={session}
+          editMode={editMode}
           onClose={() => setSelectedNode(null)}
+          onRename={renameNode}
+          onDelete={deleteNode}
+          onChangeParent={changeParent}
           onAddNote={(nodeId, text) => {
             mutateSession((s) => {
               if (s.nodes[nodeId]) {
