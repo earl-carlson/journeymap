@@ -563,9 +563,15 @@ export default function App() {
         }
         return;
       }
+
+      // Auto expand/collapse if the node has children
+      if (node.data?.directChildCount > 0) {
+        toggleNodeCollapse(node.id);
+      }
+
       setSelectedNode(node);
     },
-    [definingWorkflow, session]
+    [definingWorkflow, session, toggleNodeCollapse]
   );
 
   const onPaneClick = useCallback(() => {

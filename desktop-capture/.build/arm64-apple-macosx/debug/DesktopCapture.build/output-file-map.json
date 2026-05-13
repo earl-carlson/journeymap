@@ -1,0 +1,47 @@
+{
+  "": {
+    "swift-dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/master.swiftdeps"
+  },
+  "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/AppDelegate.swift": {
+    "dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/AppDelegate.d",
+    "object": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/AppDelegate.swift.o",
+    "swiftmodule": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/AppDelegate~partial.swiftmodule",
+    "swift-dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/AppDelegate.swiftdeps",
+    "diagnostics": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/AppDelegate.dia"
+  },
+  "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Exporter.swift": {
+    "dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Exporter.d",
+    "object": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Exporter.swift.o",
+    "swiftmodule": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Exporter~partial.swiftmodule",
+    "swift-dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Exporter.swiftdeps",
+    "diagnostics": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Exporter.dia"
+  },
+  "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Hash.swift": {
+    "dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Hash.d",
+    "object": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Hash.swift.o",
+    "swiftmodule": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Hash~partial.swiftmodule",
+    "swift-dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Hash.swiftdeps",
+    "diagnostics": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Hash.dia"
+  },
+  "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Screenshotter.swift": {
+    "dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Screenshotter.d",
+    "object": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Screenshotter.swift.o",
+    "swiftmodule": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Screenshotter~partial.swiftmodule",
+    "swift-dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Screenshotter.swiftdeps",
+    "diagnostics": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Screenshotter.dia"
+  },
+  "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Session.swift": {
+    "dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Session.d",
+    "object": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Session.swift.o",
+    "swiftmodule": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Session~partial.swiftmodule",
+    "swift-dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Session.swiftdeps",
+    "diagnostics": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/Session.dia"
+  },
+  "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/main.swift": {
+    "dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/main.d",
+    "object": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/main.swift.o",
+    "swiftmodule": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/main~partial.swiftmodule",
+    "swift-dependencies": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/main.swiftdeps",
+    "diagnostics": "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/debug/DesktopCapture.build/main.dia"
+  }
+}

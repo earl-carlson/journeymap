@@ -44,7 +44,9 @@ const EDGE_STYLES = {
  */
 function getDomain(url) {
   try {
-    return new URL(url).hostname;
+    const parsed = new URL(url);
+    // desktop:// URLs use the host as the app name (e.g. "docker-desktop")
+    return parsed.hostname || parsed.host || 'unknown';
   } catch {
     return 'unknown';
   }

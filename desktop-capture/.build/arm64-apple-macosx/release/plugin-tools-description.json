@@ -1,0 +1,338 @@
+{
+  "builtTestProducts" : [
+
+  ],
+  "copyCommands" : {
+
+  },
+  "explicitTargetDependencyImportCheckingMode" : {
+    "none" : {
+
+    }
+  },
+  "generatedSourceTargetSet" : [
+
+  ],
+  "pluginDescriptions" : [
+
+  ],
+  "swiftCommands" : {
+    "C.DesktopCapture-arm64-apple-macosx15.0-release.module" : {
+      "executable" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "fileList" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/sources",
+      "importPath" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/Modules",
+      "inputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/AppDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Exporter.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Hash.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Screenshotter.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Session.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/main.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/swift-version--58304C5D6DBC2206.txt"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/sources"
+        }
+      ],
+      "isLibrary" : false,
+      "moduleName" : "DesktopCapture",
+      "moduleOutputPath" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/Modules/DesktopCapture.swiftmodule",
+      "objects" : [
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/AppDelegate.swift.o",
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/Exporter.swift.o",
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/Hash.swift.o",
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/Screenshotter.swift.o",
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/Session.swift.o",
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/main.swift.o"
+      ],
+      "otherArguments" : [
+        "-target",
+        "arm64-apple-macosx13.0",
+        "-whole-module-optimization",
+        "-num-threads",
+        "10",
+        "-serialize-diagnostics",
+        "-O",
+        "-j10",
+        "-DSWIFT_PACKAGE",
+        "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+        "-module-cache-path",
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/ModuleCache",
+        "-parseable-output",
+        "-Xfrontend",
+        "-entry-point-function-name",
+        "-Xfrontend",
+        "DesktopCapture_main",
+        "-swift-version",
+        "5",
+        "-plugin-path",
+        "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+        "-sdk",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-F",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-I",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-L",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+        "-g",
+        "-Xcc",
+        "-isysroot",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+        "-Xcc",
+        "-F",
+        "-Xcc",
+        "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+        "-Xcc",
+        "-fPIC",
+        "-Xcc",
+        "-g",
+        "-package-name",
+        "desktop_capture"
+      ],
+      "outputFileMapPath" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/output-file-map.json",
+      "outputs" : [
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/AppDelegate.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/Exporter.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/Hash.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/Screenshotter.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/Session.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/main.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/Modules/DesktopCapture.swiftmodule"
+        }
+      ],
+      "prepareForIndexing" : false,
+      "sources" : [
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/AppDelegate.swift",
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Exporter.swift",
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Hash.swift",
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Screenshotter.swift",
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Session.swift",
+        "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/main.swift"
+      ],
+      "tempsPath" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build",
+      "wholeModuleOptimization" : true
+    }
+  },
+  "swiftFrontendCommands" : {
+
+  },
+  "swiftTargetScanArgs" : {
+    "DesktopCapture" : [
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc",
+      "-module-name",
+      "DesktopCapture",
+      "-package-name",
+      "desktop_capture",
+      "-c",
+      "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/AppDelegate.swift",
+      "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Exporter.swift",
+      "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Hash.swift",
+      "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Screenshotter.swift",
+      "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Session.swift",
+      "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/main.swift",
+      "-I",
+      "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/Modules",
+      "-target",
+      "arm64-apple-macosx13.0",
+      "-whole-module-optimization",
+      "-num-threads",
+      "10",
+      "-serialize-diagnostics",
+      "-O",
+      "-j10",
+      "-DSWIFT_PACKAGE",
+      "-DSWIFT_MODULE_RESOURCE_BUNDLE_UNAVAILABLE",
+      "-module-cache-path",
+      "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/ModuleCache",
+      "-parseable-output",
+      "-Xfrontend",
+      "-entry-point-function-name",
+      "-Xfrontend",
+      "DesktopCapture_main",
+      "-swift-version",
+      "5",
+      "-plugin-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins/testing",
+      "-sdk",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-F",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-I",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-L",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/usr/lib",
+      "-g",
+      "-Xcc",
+      "-isysroot",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX26.2.sdk",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/Frameworks",
+      "-Xcc",
+      "-F",
+      "-Xcc",
+      "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/Library/PrivateFrameworks",
+      "-Xcc",
+      "-fPIC",
+      "-Xcc",
+      "-g",
+      "-package-name",
+      "desktop_capture",
+      "-driver-use-frontend-path",
+      "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+    ]
+  },
+  "targetDependencyMap" : {
+    "DesktopCapture" : [
+
+    ]
+  },
+  "testDiscoveryCommands" : {
+
+  },
+  "testEntryPointCommands" : {
+
+  },
+  "traitConfiguration" : {
+    "default" : {
+
+    }
+  },
+  "writeCommands" : {
+    "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/sources" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<sources-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/AppDelegate.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Exporter.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Hash.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Screenshotter.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/Session.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/Sources/DesktopCapture/main.swift"
+        }
+      ],
+      "outputFilePath" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/sources"
+    },
+    "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.product/Objects.LinkFileList" : {
+      "alwaysOutOfDate" : false,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<link-file-list>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/AppDelegate.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/Exporter.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/Hash.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/Screenshotter.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/Session.swift.o"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.build/main.swift.o"
+        }
+      ],
+      "outputFilePath" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/DesktopCapture.product/Objects.LinkFileList"
+    },
+    "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/swift-version--58304C5D6DBC2206.txt" : {
+      "alwaysOutOfDate" : true,
+      "inputs" : [
+        {
+          "kind" : "virtual",
+          "name" : "<swift-get-version>"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc"
+        }
+      ],
+      "outputFilePath" : "/Users/earl/Documents/GitHub/journeymap/desktop-capture/.build/arm64-apple-macosx/release/swift-version--58304C5D6DBC2206.txt"
+    }
+  }
+}
