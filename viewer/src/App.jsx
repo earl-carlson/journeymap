@@ -216,7 +216,8 @@ export default function App() {
   const [defineSteps, setDefineSteps] = useState([]);
 
   // Platform filter
-  const [platformFilter, setPlatformFilter] = useState(null);
+   const [platformFilter, setPlatformFilter] = useState(null);
+  const [domainList, setDomainList] = useState([]); // ordered list of domains in current session
 
   // Collapse state
   const [collapsedDomains, setCollapsedDomains] = useState(new Set());
@@ -292,6 +293,26 @@ export default function App() {
         collapsedDomains: collapsed,
         collapsedNodes: collapsedN,
       });
+
+      // Keep domain list in sync (all domains, regardless of collapsed state)
+      const allDomains = sessionToGraph(sessionData, {
+        viewMode: mode,
+        flagFilter: [],
+        showStubs: stubs,
+        showModals: false,
+        collapsedDomains: new Set(),
+        collapsedNodes: new Set(),
+      }).domainCounts;
+      setDomainList(
+        [...(allDomains?.keys() || [])]
+          .filter(Boolean)
+          .sort((a, b) => {
+            // Sort: docker.com properties first, then others
+            const aD = a.replace('www.', '').replace('.docker.com', '');
+            const bD = b.replace('www.', '').replace('.docker.com', '');
+            return aD.localeCompare(bD);
+          })
+      );
 
       const { nodes: positioned, groups } = layoutGraph(rfNodes, rfEdges, mode);
 
@@ -1022,26 +1043,7 @@ export default function App() {
         {/* Toolbar */}
         <div className="toolbar">
           <span className="toolbar-title">IA Mapper</span>
-          <div className="view-toggle">
-            <button
-              className={viewMode === 'hierarchy' ? 'active' : ''}
-              onClick={() => setViewMode('hierarchy')}
-            >
-              Hierarchy
-            </button>
-            <button
-              className={viewMode === 'navigation' ? 'active' : ''}
-              onClick={() => setViewMode('navigation')}
-            >
-              Navigation
-            </button>
-            <button
-              className={viewMode === 'all' ? 'active' : ''}
-              onClick={() => setViewMode('all')}
-            >
-              All
-            </button>
-          </div>
+
           <button
             className={`toolbar-btn ${showWorkflows ? 'active' : ''}`}
             onClick={() => setShowWorkflows(!showWorkflows)}
@@ -1110,36 +1112,28 @@ export default function App() {
           />
         </div>
 
-        {/* Flag + platform filters */}
-        <div className="filter-bar">
-          {['broken', 'confusing', 'missing', 'good'].map((flag) => (
-            <button
-              key={flag}
-              className={`filter-btn ${flag} ${
-                flagFilter.includes(flag) ? 'active' : ''
-              }`}
-              onClick={() => toggleFlag(flag)}
-            >
-              {flag}
-            </button>
-          ))}
-          {stats && stats.platforms && stats.platforms.length > 1 && (
-            <>
-              <span className="filter-separator" />
-              {stats.platforms.map((p) => (
+        {/* Domain filters */}
+        {domainList.length > 0 && (
+          <div className="filter-bar">
+            {domainList.map((domain) => {
+              const hidden = collapsedDomains.has(domain);
+              // Shorten label: strip .docker.com, keep subdomain
+              const label = domain
+                .replace(/\.docker\.com$/, '')
+                .replace(/^www$/, 'www');
+              return (
                 <button
-                  key={p}
-                  className={`filter-btn platform ${
-                    !platformFilter || platformFilter.includes(p) ? 'active' : ''
-                  }`}
-                  onClick={() => togglePlatform(p)}
+                  key={domain}
+                  className={`filter-btn domain-filter ${hidden ? '' : 'active'}`}
+                  onClick={() => toggleDomain(domain)}
+                  title={domain}
                 >
-                  {p}
+                  {label}
                 </button>
-              ))}
-            </>
-          )}
-        </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Define mode banner */}
         {definingWorkflow && (
