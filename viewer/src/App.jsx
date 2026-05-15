@@ -772,6 +772,64 @@ export default function App() {
     }, { undoable: true });
   }, [mutateSession]);
 
+  const mergeNode = useCallback((fromId, intoId) => {
+    mutateSession((s) => {
+      const from = s.nodes[fromId];
+      const into = s.nodes[intoId];
+      if (!from || !into) return;
+
+      // Merge notes (deduplicate by text)
+      const existingTexts = new Set((into.notes || []).map((n) => typeof n === 'string' ? n : n.text));
+      for (const note of (from.notes || [])) {
+        const text = typeof note === 'string' ? note : note.text;
+        if (!existingTexts.has(text)) {
+          if (!into.notes) into.notes = [];
+          into.notes.push(note);
+        }
+      }
+
+      // Merge flags
+      for (const flag of (from.flags || [])) {
+        if (!into.flags) into.flags = [];
+        if (!into.flags.includes(flag)) into.flags.push(flag);
+      }
+
+      // Redirect all children of fromId to intoId
+      for (const node of Object.values(s.nodes)) {
+        if (node.inferredParent === fromId) {
+          node.inferredParent = intoId;
+        }
+      }
+
+      // Redirect all edges from/to fromId → intoId, dedup
+      const redirected = [];
+      for (const edge of s.edges) {
+        const e = { ...edge };
+        if (e.from === fromId) e.from = intoId;
+        if (e.to === fromId) e.to = intoId;
+        // Skip self-loops and exact dupes
+        if (e.from === e.to) continue;
+        const exists = redirected.some(
+          (r) => r.from === e.from && r.to === e.to && r.type === e.type
+        );
+        if (exists) {
+          // Accumulate count on the existing edge
+          const idx = redirected.findIndex(
+            (r) => r.from === e.from && r.to === e.to && r.type === e.type
+          );
+          redirected[idx].count = (redirected[idx].count || 1) + (e.count || 1);
+        } else {
+          redirected.push(e);
+        }
+      }
+      s.edges = redirected;
+
+      // Delete the merged-from node
+      delete s.nodes[fromId];
+    }, { undoable: true });
+    setSelectedNode(null);
+  }, [mutateSession]);
+
   // Keyboard shortcut: Cmd+Z to undo in edit mode
   React.useEffect(() => {
     if (!editMode) return;
@@ -1316,6 +1374,7 @@ export default function App() {
           onRename={renameNode}
           onDelete={deleteNode}
           onChangeParent={changeParent}
+          onMerge={mergeNode}
           onAddNote={(nodeId, text) => {
             mutateSession((s) => {
               if (s.nodes[nodeId]) {

@@ -5,7 +5,7 @@ const FLAG_OPTIONS = ['broken', 'confusing', 'missing', 'good'];
 // ---------------------------------------------------------------------------
 // ParentPicker — searchable dropdown of all nodes
 // ---------------------------------------------------------------------------
-function ParentPicker({ nodeId, currentParentId, session, onSelect, onClose }) {
+function ParentPicker({ nodeId, currentParentId, session, onSelect, onClose, placeholder = 'Search nodes…' }) {
   const [query, setQuery] = useState('');
   const inputRef = useRef(null);
 
@@ -52,7 +52,7 @@ function ParentPicker({ nodeId, currentParentId, session, onSelect, onClose }) {
             ref={inputRef}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search nodes…"
+            placeholder={placeholder}
             style={{
               width: '100%',
               background: '#0d0d1a',
@@ -112,7 +112,7 @@ function ParentPicker({ nodeId, currentParentId, session, onSelect, onClose }) {
 // ---------------------------------------------------------------------------
 export default function DetailPanel({
   node, session, editMode,
-  onClose, onRename, onDelete, onChangeParent, onAddNote, onToggleFlag,
+  onClose, onRename, onDelete, onChangeParent, onMerge, onAddNote, onToggleFlag,
 }) {
   if (!node) return null;
 
@@ -120,6 +120,7 @@ export default function DetailPanel({
   const [editingTitle, setEditingTitle] = useState(false);
   const [titleDraft, setTitleDraft] = useState('');
   const [showParentPicker, setShowParentPicker] = useState(false);
+  const [showMergePicker, setShowMergePicker] = useState(false);
   const titleInputRef = useRef(null);
 
   const data = node.data;
@@ -167,6 +168,22 @@ export default function DetailPanel({
           session={session}
           onSelect={(newParentId) => onChangeParent?.(node.id, newParentId)}
           onClose={() => setShowParentPicker(false)}
+        />
+      )}
+      {showMergePicker && (
+        <ParentPicker
+          nodeId={node.id}
+          currentParentId={null}
+          session={session}
+          placeholder="Search node to merge into…"
+          onSelect={(targetId) => {
+            if (!targetId) return;
+            const targetTitle = session.nodes[targetId]?.title || targetId;
+            if (window.confirm(`Merge "${data.title}" into "${targetTitle}"?\n\nThis node will be deleted. Its children, edges, notes, and flags will be moved to "${targetTitle}".`)) {
+              onMerge?.(node.id, targetId);
+            }
+          }}
+          onClose={() => setShowMergePicker(false)}
         />
       )}
 
@@ -240,6 +257,21 @@ export default function DetailPanel({
             title="Change parent"
           >
             ↖ {parentNode ? parentNode.title : '(no parent)'}
+          </button>
+          <button
+            onClick={() => setShowMergePicker(true)}
+            style={{
+              background: '#1a1a2e',
+              border: '1px solid #444466',
+              borderRadius: 6,
+              color: '#8888cc',
+              fontSize: 12,
+              padding: '5px 10px',
+              cursor: 'pointer',
+            }}
+            title="Merge this node into another"
+          >
+            ⇒ Merge
           </button>
           <button
             onClick={() => {
