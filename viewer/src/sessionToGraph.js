@@ -92,13 +92,16 @@ export function sessionToGraph(session, options = {}) {
   if (!session || !session.nodes) return { nodes: [], edges: [] };
 
   // Build the set of node IDs on the active workflow path + step index map
-  const workflowPathIds = activeWorkflow
-    ? new Set(activeWorkflow.path || [])
-    : null;
+  // Filter out stub nodes — they were never directly visited and add noise
+  const workflowPath = activeWorkflow
+    ? (activeWorkflow.path || []).filter((id) => {
+        const n = session.nodes[id];
+        return n && !n.stub;
+      })
+    : [];
+  const workflowPathIds = activeWorkflow ? new Set(workflowPath) : null;
   const workflowStepIndex = new Map(); // nodeId -> 1-based step number
-  if (activeWorkflow) {
-    (activeWorkflow.path || []).forEach((id, i) => workflowStepIndex.set(id, i + 1));
-  }
+  workflowPath.forEach((id, i) => workflowStepIndex.set(id, i + 1));
 
   // Pre-compute: which nodes are hidden because a parent is collapsed
   const hiddenByCollapse = new Set();
@@ -219,11 +222,8 @@ export function sessionToGraph(session, options = {}) {
 
   // Build workflow path edges set for highlighting
   const workflowEdgeKeys = new Set();
-  if (activeWorkflow) {
-    const path = activeWorkflow.path || [];
-    for (let i = 0; i < path.length - 1; i++) {
-      workflowEdgeKeys.add(`${path[i]}->${path[i + 1]}`);
-    }
+  for (let i = 0; i < workflowPath.length - 1; i++) {
+    workflowEdgeKeys.add(`${workflowPath[i]}->${workflowPath[i + 1]}`);
   }
 
   // Build edges
@@ -261,11 +261,10 @@ export function sessionToGraph(session, options = {}) {
   }
 
   // Add sequential workflow step edges (numbered arrows on top of existing edges)
-  if (activeWorkflow) {
-    const path = activeWorkflow.path || [];
-    for (let i = 0; i < path.length - 1; i++) {
-      const from = path[i];
-      const to   = path[i + 1];
+  if (activeWorkflow && workflowPath.length > 0) {
+    for (let i = 0; i < workflowPath.length - 1; i++) {
+      const from = workflowPath[i];
+      const to   = workflowPath[i + 1];
       if (!visibleNodeIds.has(from) || !visibleNodeIds.has(to)) continue;
       if (from === to) continue;
       rfEdges.push({
