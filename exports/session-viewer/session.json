@@ -2628,15 +2628,6 @@
       "stub": false,
       "inferredParent": "d129b357"
     },
-    "e399212e": {
-      "url": "https://app.docker.com/accounts/earlcarlson780/cloud/intro?returnTo=%2Faccounts%2Fearlcarlson780%2Fcloud%2Foverview",
-      "title": "Docker",
-      "screenshot": "screenshots/e399212e.png",
-      "notes": [],
-      "flags": [],
-      "stub": false,
-      "inferredParent": "e268d17d"
-    },
     "34196c3a": {
       "url": "https://app.docker.com/accounts/earlcarlson780/cloud/intro?returnTo=%2Faccounts%2Fearlcarlson780%2Fcloud%2Fbuilds",
       "title": "Docker",
@@ -12737,37 +12728,10 @@
       "navClass": "same-domain-sibling"
     },
     {
-      "from": "a2a24744",
-      "to": "e399212e",
-      "type": "navigate",
-      "count": 2,
-      "navClass": "same-domain-other"
-    },
-    {
-      "from": "e268d17d",
-      "to": "e399212e",
-      "type": "child-of",
-      "count": 1
-    },
-    {
-      "from": "e399212e",
-      "to": "34196c3a",
-      "type": "navigate",
-      "count": 6,
-      "navClass": "same-domain-sibling"
-    },
-    {
       "from": "e268d17d",
       "to": "34196c3a",
       "type": "child-of",
       "count": 1
-    },
-    {
-      "from": "34196c3a",
-      "to": "e399212e",
-      "type": "navigate",
-      "count": 2,
-      "navClass": "same-domain-sibling"
     },
     {
       "from": "34196c3a",
@@ -12907,13 +12871,6 @@
     {
       "from": "11e53ee6",
       "to": "b64b0a12",
-      "type": "navigate",
-      "count": 2,
-      "navClass": "same-domain-sibling"
-    },
-    {
-      "from": "b64b0a12",
-      "to": "e399212e",
       "type": "navigate",
       "count": 2,
       "navClass": "same-domain-sibling"

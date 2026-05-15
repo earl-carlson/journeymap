@@ -15,6 +15,7 @@ import StubNode from './nodes/StubNode';
 import ModalNode from './nodes/ModalNode';
 import DomainGroup from './nodes/DomainGroup';
 import DetailPanel from './DetailPanel';
+import MultiSelectBar from './MultiSelectBar';
 import WorkflowPanel from './WorkflowPanel';
 import { sessionToGraph, getSessionStats } from './sessionToGraph';
 import { layoutGraph } from './layout';
@@ -189,6 +190,7 @@ export default function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNode, setSelectedNode] = useState(null);
+  const [selectedNodes, setSelectedNodes] = useState(new Set()); // multi-select IDs
   const [viewMode, setViewMode] = useState('hierarchy');
   const [flagFilter, setFlagFilter] = useState([]);
   const [showStubs, setShowStubs] = useState(true);
@@ -428,6 +430,17 @@ export default function App() {
     );
   }, [dragOverNodeId, setNodes]);
 
+  // Sync multi-select highlight into node data
+  useEffect(() => {
+    if (selectedNodes.size === 0) return;
+    setNodes((nds) =>
+      nds.map((n) => ({
+        ...n,
+        selected: selectedNodes.has(n.id),
+      }))
+    );
+  }, [selectedNodes, setNodes]);
+
   // Fit view only when a genuinely new session is loaded (not on mutations).
   // Use meta.date + node count as a cheap identity signal.
   useEffect(() => {
@@ -644,7 +657,6 @@ export default function App() {
 
   const onNodeClick = useCallback(
     (event, node) => {
-      // Ignore clicks on domain group nodes
       if (node.type === 'domainGroup') return;
 
       if (definingWorkflow) {
@@ -658,19 +670,34 @@ export default function App() {
         return;
       }
 
-      // Auto expand/collapse if the node has children
+      // Shift+click: multi-select (edit mode only)
+      if (event.shiftKey && editMode) {
+        setSelectedNodes((prev) => {
+          const next = new Set(prev);
+          // Always include the previously single-selected node when starting a multi-select
+          if (selectedNode && next.size === 0) next.add(selectedNode.id);
+          if (next.has(node.id)) next.delete(node.id);
+          else next.add(node.id);
+          return next;
+        });
+        setSelectedNode(null);
+        return;
+      }
+
+      // Regular click: clear multi-select, expand/collapse, single select
+      setSelectedNodes(new Set());
       if (node.data?.directChildCount > 0) {
         toggleNodeCollapse(node.id);
       }
-
       setSelectedNode(node);
     },
-    [definingWorkflow, session, toggleNodeCollapse]
+    [definingWorkflow, session, toggleNodeCollapse, editMode, selectedNode]
   );
 
   const onPaneClick = useCallback(() => {
     if (!definingWorkflow) {
       setSelectedNode(null);
+      setSelectedNodes(new Set());
     }
   }, [definingWorkflow]);
 
@@ -735,17 +762,29 @@ export default function App() {
       const node = s.nodes[nodeId];
       if (!node) return;
       const parentId = node.inferredParent || null;
-      // Re-parent all direct children to this node's parent
-      for (const [id, n] of Object.entries(s.nodes)) {
-        if (n.inferredParent === nodeId) {
-          n.inferredParent = parentId;
-        }
+      for (const [, n] of Object.entries(s.nodes)) {
+        if (n.inferredParent === nodeId) n.inferredParent = parentId;
       }
-      // Remove all edges touching this node
       s.edges = s.edges.filter((e) => e.from !== nodeId && e.to !== nodeId);
-      // Remove the node
       delete s.nodes[nodeId];
     }, { undoable: true });
+    setSelectedNode(null);
+  }, [mutateSession]);
+
+  const deleteNodes = useCallback((nodeIds) => {
+    mutateSession((s) => {
+      for (const nodeId of nodeIds) {
+        const node = s.nodes[nodeId];
+        if (!node) continue;
+        const parentId = node.inferredParent || null;
+        for (const [, n] of Object.entries(s.nodes)) {
+          if (n.inferredParent === nodeId) n.inferredParent = parentId;
+        }
+        s.edges = s.edges.filter((e) => e.from !== nodeId && e.to !== nodeId);
+        delete s.nodes[nodeId];
+      }
+    }, { undoable: true });
+    setSelectedNodes(new Set());
     setSelectedNode(null);
   }, [mutateSession]);
 
@@ -770,6 +809,53 @@ export default function App() {
         }
       }
     }, { undoable: true });
+  }, [mutateSession]);
+
+  const mergeNodes = useCallback((fromIds, intoId) => {
+    mutateSession((s) => {
+      for (const fromId of fromIds) {
+        if (fromId === intoId) continue;
+        const from = s.nodes[fromId];
+        const into = s.nodes[intoId];
+        if (!from || !into) continue;
+
+        // Merge notes
+        const existingTexts = new Set((into.notes || []).map((n) => typeof n === 'string' ? n : n.text));
+        for (const note of (from.notes || [])) {
+          const text = typeof note === 'string' ? note : note.text;
+          if (!existingTexts.has(text)) {
+            if (!into.notes) into.notes = [];
+            into.notes.push(note);
+          }
+        }
+        // Merge flags
+        for (const flag of (from.flags || [])) {
+          if (!into.flags) into.flags = [];
+          if (!into.flags.includes(flag)) into.flags.push(flag);
+        }
+        // Redirect children
+        for (const node of Object.values(s.nodes)) {
+          if (node.inferredParent === fromId) node.inferredParent = intoId;
+        }
+        // Redirect edges
+        for (const edge of s.edges) {
+          if (edge.from === fromId) edge.from = intoId;
+          if (edge.to === fromId) edge.to = intoId;
+        }
+        // Remove self-loops and deduplicate
+        const seen = new Set();
+        s.edges = s.edges.filter((e) => {
+          if (e.from === e.to) return false;
+          const key = `${e.from}|${e.to}|${e.type}`;
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+        delete s.nodes[fromId];
+      }
+    }, { undoable: true });
+    setSelectedNodes(new Set());
+    setSelectedNode(null);
   }, [mutateSession]);
 
   const mergeNode = useCallback((fromId, intoId) => {
@@ -1364,8 +1450,23 @@ export default function App() {
         )}
       </div>
 
+      {/* Multi-select action bar */}
+      {editMode && selectedNodes.size > 1 && session && (
+        <MultiSelectBar
+          selectedIds={selectedNodes}
+          session={session}
+          onDeleteAll={() => {
+            if (window.confirm(`Delete ${selectedNodes.size} nodes? Their children will be re-parented.`)) {
+              deleteNodes([...selectedNodes]);
+            }
+          }}
+          onMergeAll={(targetId) => mergeNodes([...selectedNodes].filter((id) => id !== targetId), targetId)}
+          onClear={() => setSelectedNodes(new Set())}
+        />
+      )}
+
       {/* Detail panel */}
-      {selectedNode && session && !definingWorkflow && (
+      {selectedNode && session && !definingWorkflow && selectedNodes.size === 0 && (
         <DetailPanel
           node={selectedNode}
           session={session}
