@@ -1088,23 +1088,49 @@ export default function App() {
   const handleSelectWorkflow = useCallback((wf) => {
     setActiveWorkflow(wf);
     setSelectedNode(null);
-    // Fit view to workflow nodes after graph rebuilds
-    if (wf && wf.path && wf.path.length > 0) {
+
+    if (wf && wf.path && wf.path.length > 0 && session) {
+      // Collapse everything, then re-expand ancestors of workflow path nodes
+      // so the path nodes are actually visible
+      const allCollapsed = getAllParentIds(session);
+
+      // Walk up the inferredParent chain for each path node, collecting ancestors
+      const pathNodes = wf.path.filter((id) => {
+        const n = session.nodes[id];
+        return n && !n.stub;
+      });
+
+      const ancestorsToExpand = new Set();
+      for (const nodeId of pathNodes) {
+        let current = session.nodes[nodeId];
+        while (current && current.inferredParent) {
+          ancestorsToExpand.add(current.inferredParent);
+          current = session.nodes[current.inferredParent];
+        }
+      }
+
+      // Remove ancestors-of-path from the collapsed set so they stay open
+      const collapsed = new Set([...allCollapsed].filter((id) => !ancestorsToExpand.has(id)));
+      setCollapsedNodes(collapsed);
+
+      // Fit view to workflow nodes after graph rebuilds
       setTimeout(() => {
         const rf = reactFlowRef.current;
         if (!rf) return;
         rf.fitView({
-          nodes: wf.path.map((id) => ({ id })),
+          nodes: pathNodes.map((id) => ({ id })),
           padding: 0.25,
           duration: 400,
         });
-      }, 120);
+      }, 150);
     }
-  }, []);
+  }, [session, getAllParentIds]);
 
   const handleDeselectWorkflow = useCallback(() => {
     setActiveWorkflow(null);
-  }, []);
+    // Restore full collapse state when deselecting
+    if (session) setCollapsedNodes(getAllParentIds(session));
+  }, [session, getAllParentIds]);
 
   const handleStartDefine = useCallback(() => {
     setDefiningWorkflow(true);
