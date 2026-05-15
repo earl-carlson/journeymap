@@ -1409,6 +1409,21 @@ export default function App() {
             {domainList.length > 0 && (
               <>
                 <div className="filter-tray-divider" />
+                <div className="filter-tray-section" style={{ justifyContent: 'space-between' }}>
+                  <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Domains</span>
+                  <div style={{ display: 'flex', gap: 4 }}>
+                    <button
+                      className="tray-btn"
+                      style={{ padding: '2px 8px', fontSize: 10 }}
+                      onClick={() => setHiddenDomains(new Set())}
+                    >All</button>
+                    <button
+                      className="tray-btn"
+                      style={{ padding: '2px 8px', fontSize: 10 }}
+                      onClick={() => setHiddenDomains(new Set(domainList))}
+                    >None</button>
+                  </div>
+                </div>
                 <div className="filter-tray-section filter-tray-domains">
                   {domainList.map((domain) => {
                     const hidden = hiddenDomains.has(domain);
