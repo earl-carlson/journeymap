@@ -784,11 +784,8 @@ export default function App() {
         return;
       }
 
-      // Regular click: clear multi-select, expand/collapse, single select
+      // Regular click: clear multi-select, single select only
       setSelectedNodes(new Set());
-      if (node.data?.directChildCount > 0) {
-        toggleNodeCollapse(node.id);
-      }
       setSelectedNode(node);
     },
     [definingWorkflow, session, toggleNodeCollapse, editMode, selectedNode]
