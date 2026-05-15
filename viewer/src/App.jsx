@@ -225,6 +225,7 @@ export default function App() {
   // Collapse state
   const [collapsedDomains, setCollapsedDomains] = useState(new Set());
   const [collapsedNodes, setCollapsedNodes] = useState(new Set());
+  const [hiddenDomains, setHiddenDomains] = useState(new Set());
 
   // -----------------------------------------------------------------------
   // Derived data
@@ -261,9 +262,19 @@ export default function App() {
     setCollapsedNodes(new Set());
   }, []);
 
-  // Toggle domain collapse
+  // Toggle domain collapse (group box pill)
   const toggleDomain = useCallback((domain) => {
     setCollapsedDomains((prev) => {
+      const next = new Set(prev);
+      if (next.has(domain)) next.delete(domain);
+      else next.add(domain);
+      return next;
+    });
+  }, []);
+
+  // Toggle domain visibility (filter tray pills — fully hide/show)
+  const toggleHiddenDomain = useCallback((domain) => {
+    setHiddenDomains((prev) => {
       const next = new Set(prev);
       if (next.has(domain)) next.delete(domain);
       else next.add(domain);
@@ -285,7 +296,7 @@ export default function App() {
   }, []);
 
   const buildGraph = useCallback(
-    (sessionData, mode, flags, stubs, modals, workflow, platFilter, collapsed, collapsedN) => {
+    (sessionData, mode, flags, stubs, modals, workflow, platFilter, collapsed, collapsedN, hiddenD) => {
       const { nodes: rfNodes, edges: rfEdges, domainCounts } = sessionToGraph(sessionData, {
         viewMode: mode,
         flagFilter: flags,
@@ -295,9 +306,10 @@ export default function App() {
         platformFilter: platFilter,
         collapsedDomains: collapsed,
         collapsedNodes: collapsedN,
+        hiddenDomains: hiddenD,
       });
 
-      // Keep domain list in sync (all domains, regardless of collapsed state)
+      // Keep domain list in sync (all domains, regardless of hidden/collapsed state)
       const allDomains = sessionToGraph(sessionData, {
         viewMode: mode,
         flagFilter: [],
@@ -305,6 +317,7 @@ export default function App() {
         showModals: false,
         collapsedDomains: new Set(),
         collapsedNodes: new Set(),
+        hiddenDomains: new Set(),
       }).domainCounts;
       setDomainList(
         [...(allDomains?.keys() || [])]
@@ -345,18 +358,23 @@ export default function App() {
       }
 
       // Inject onToggle callbacks and counts into group data
-      const enrichedGroups = groups.map((g) => ({
-        ...g,
-        data: {
-          ...g.data,
-          nodeCount: domainCounts?.get(g.data.domain) || 0,
-          collapsed: collapsed.has(g.data.domain),
-          onToggle: () => toggleDomain(g.data.domain),
-        },
-      }));
+      // Skip groups for fully hidden domains
+      const enrichedGroups = groups
+        .filter((g) => !hiddenD.has(g.data.domain))
+        .map((g) => ({
+          ...g,
+          data: {
+            ...g.data,
+            nodeCount: domainCounts?.get(g.data.domain) || 0,
+            collapsed: collapsed.has(g.data.domain),
+            onToggle: () => toggleDomain(g.data.domain),
+          },
+        }));
 
       // Add collapsed domain placeholders (they won't have layout groups)
+      // Skip placeholders for fully hidden domains
       for (const domain of collapsed) {
+        if (hiddenD.has(domain)) continue;
         const count = domainCounts?.get(domain) || 0;
         if (count === 0) continue;
         // Check if this domain already has a group
@@ -395,9 +413,9 @@ export default function App() {
   // Rebuild when any filter/state changes
   useEffect(() => {
     if (session) {
-      buildGraph(session, viewMode, flagFilter, showStubs, showModals, activeWorkflow, platformFilter, collapsedDomains, collapsedNodes);
+      buildGraph(session, viewMode, flagFilter, showStubs, showModals, activeWorkflow, platformFilter, collapsedDomains, collapsedNodes, hiddenDomains);
     }
-  }, [session, viewMode, flagFilter, showStubs, showModals, activeWorkflow, platformFilter, collapsedDomains, collapsedNodes, buildGraph]);
+  }, [session, viewMode, flagFilter, showStubs, showModals, activeWorkflow, platformFilter, collapsedDomains, collapsedNodes, hiddenDomains, buildGraph]);
 
   // Inject dropTarget flag into node data during drag-to-reparent
   useEffect(() => {
@@ -1144,7 +1162,7 @@ export default function App() {
                 <div className="filter-tray-divider" />
                 <div className="filter-tray-section filter-tray-domains">
                   {domainList.map((domain) => {
-                    const hidden = collapsedDomains.has(domain);
+                    const hidden = hiddenDomains.has(domain);
                     const label = domain
                       .replace(/\.docker\.com$/, '')
                       .replace(/^www$/, 'www');
@@ -1152,7 +1170,7 @@ export default function App() {
                       <button
                         key={domain}
                         className={`tray-pill ${hidden ? '' : 'active'}`}
-                        onClick={() => toggleDomain(domain)}
+                        onClick={() => toggleHiddenDomain(domain)}
                         title={domain}
                       >
                         {label}

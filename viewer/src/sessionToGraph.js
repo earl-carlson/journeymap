@@ -86,6 +86,7 @@ export function sessionToGraph(session, options = {}) {
     platformFilter = null,
     collapsedDomains = new Set(),
     collapsedNodes = new Set(),
+    hiddenDomains = new Set(),
   } = options;
 
   if (!session || !session.nodes) return { nodes: [], edges: [] };
@@ -130,6 +131,9 @@ export function sessionToGraph(session, options = {}) {
   // Build nodes
   for (const [id, node] of Object.entries(session.nodes)) {
     const domain = getDomain(node.url);
+
+    // Skip if this domain is fully hidden (filter tray)
+    if (hiddenDomains.has(domain)) continue;
 
     // Skip if this domain is collapsed
     if (collapsedDomains.has(domain)) continue;
