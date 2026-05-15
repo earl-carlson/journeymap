@@ -1088,6 +1088,18 @@ export default function App() {
   const handleSelectWorkflow = useCallback((wf) => {
     setActiveWorkflow(wf);
     setSelectedNode(null);
+    // Fit view to workflow nodes after graph rebuilds
+    if (wf && wf.path && wf.path.length > 0) {
+      setTimeout(() => {
+        const rf = reactFlowRef.current;
+        if (!rf) return;
+        rf.fitView({
+          nodes: wf.path.map((id) => ({ id })),
+          padding: 0.25,
+          duration: 400,
+        });
+      }, 120);
+    }
   }, []);
 
   const handleDeselectWorkflow = useCallback(() => {

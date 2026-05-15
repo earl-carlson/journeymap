@@ -91,10 +91,14 @@ export function sessionToGraph(session, options = {}) {
 
   if (!session || !session.nodes) return { nodes: [], edges: [] };
 
-  // Build the set of node IDs on the active workflow path
+  // Build the set of node IDs on the active workflow path + step index map
   const workflowPathIds = activeWorkflow
     ? new Set(activeWorkflow.path || [])
     : null;
+  const workflowStepIndex = new Map(); // nodeId -> 1-based step number
+  if (activeWorkflow) {
+    (activeWorkflow.path || []).forEach((id, i) => workflowStepIndex.set(id, i + 1));
+  }
 
   // Pre-compute: which nodes are hidden because a parent is collapsed
   const hiddenByCollapse = new Set();
@@ -188,6 +192,7 @@ export function sessionToGraph(session, options = {}) {
     const isModal = node.isModal || id.includes(':modal:');
     const dimmed = workflowPathIds ? !workflowPathIds.has(id) : false;
     const hiddenChildren = hiddenChildCounts.get(id) || 0;
+    const workflowStep = workflowStepIndex.get(id) || null;
 
     rfNodes.push({
       id,
@@ -201,6 +206,7 @@ export function sessionToGraph(session, options = {}) {
         isStub: !!node.stub,
         platform: node.platform || 'web',
         dimmed,
+        workflowStep,
         hiddenChildren,
         isCollapsed: collapsedNodes.has(id),
         directChildCount: directChildCounts.get(id) || 0,
@@ -252,6 +258,40 @@ export function sessionToGraph(session, options = {}) {
       labelStyle: { fill: '#777799', fontSize: 10 },
       labelBgStyle: { fill: '#1a1a2e', fillOpacity: 0.8 },
     });
+  }
+
+  // Add sequential workflow step edges (numbered arrows on top of existing edges)
+  if (activeWorkflow) {
+    const path = activeWorkflow.path || [];
+    for (let i = 0; i < path.length - 1; i++) {
+      const from = path[i];
+      const to   = path[i + 1];
+      if (!visibleNodeIds.has(from) || !visibleNodeIds.has(to)) continue;
+      if (from === to) continue;
+      rfEdges.push({
+        id: `wf-step-${i}-${from}-${to}`,
+        source: from,
+        target: to,
+        type: 'smoothstep',
+        animated: false,
+        style: {
+          stroke: '#22c55e',
+          strokeWidth: 2.5,
+          opacity: 1,
+        },
+        label: `${i + 1} → ${i + 2}`,
+        labelStyle: { fill: '#22c55e', fontSize: 10, fontWeight: 700 },
+        labelBgStyle: { fill: '#0d1a0d', fillOpacity: 0.9, borderRadius: 4 },
+        zIndex: 10,
+        data: { isWorkflowStep: true },
+        markerEnd: {
+          type: 'arrowclosed',
+          color: '#22c55e',
+          width: 16,
+          height: 16,
+        },
+      });
+    }
   }
 
   return { nodes: rfNodes, edges: rfEdges, domainCounts };

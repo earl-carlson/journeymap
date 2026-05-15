@@ -1,0 +1,193 @@
+{
+  "meta": {
+    "contributor": "Earl",
+    "date": "2026-05-15",
+    "mode": "map"
+  },
+  "nodes": {
+    "158d28a4": {
+      "url": "https://app.docker.com/accounts/earlstestorg12",
+      "title": "Test org for fun yeah? if this goes too far what happens? | Docker Home",
+      "screenshot": "screenshots/158d28a4.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "3e3df913"
+    },
+    "3e3df913": {
+      "url": "https://app.docker.com/accounts",
+      "title": "Accounts (app.docker.com)",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": "135dd7a4"
+    },
+    "135dd7a4": {
+      "url": "https://app.docker.com",
+      "title": "app.docker.com",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": null
+    },
+    "dd2bff43": {
+      "url": "https://app.docker.com/accounts/earlstestorg12/admin/unassociated-machines",
+      "title": "Test org for fun yeah? if this goes too far what happens? | Docker Home",
+      "screenshot": "screenshots/dd2bff43.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "29d0859c"
+    },
+    "29d0859c": {
+      "url": "https://app.docker.com/accounts/earlstestorg12/admin",
+      "title": "Admin (app.docker.com)",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": "158d28a4"
+    },
+    "bfb03cd3": {
+      "url": "https://app.docker.com/accounts/earlstestorg12/admin/organization-information",
+      "title": "Test org for fun yeah? if this goes too far what happens? unassociated machines | Docker Admin",
+      "screenshot": "screenshots/bfb03cd3.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "29d0859c"
+    },
+    "7e14707e": {
+      "url": "https://app.docker.com/accounts/earlstestorg12/members",
+      "title": "Test org for fun yeah? if this goes too far what happens? information | Docker Admin",
+      "screenshot": "screenshots/7e14707e.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "158d28a4"
+    },
+    "2b28b10d": {
+      "url": "https://app.docker.com/accounts/earlstestorg12/teams",
+      "title": "Test org for fun yeah? if this goes too far what happens? members | Docker",
+      "screenshot": "screenshots/2b28b10d.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "158d28a4"
+    },
+    "ec5927cc": {
+      "url": "https://app.docker.com/accounts/earlstestorg12/teams/funteam",
+      "title": "funteam | Docker",
+      "screenshot": "screenshots/ec5927cc.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "2b28b10d"
+    }
+  },
+  "edges": [
+    {
+      "from": "3e3df913",
+      "to": "158d28a4",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "135dd7a4",
+      "to": "3e3df913",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "158d28a4",
+      "to": "dd2bff43",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "29d0859c",
+      "to": "dd2bff43",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "158d28a4",
+      "to": "29d0859c",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "dd2bff43",
+      "to": "bfb03cd3",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-sibling"
+    },
+    {
+      "from": "29d0859c",
+      "to": "bfb03cd3",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "bfb03cd3",
+      "to": "7e14707e",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "158d28a4",
+      "to": "7e14707e",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "7e14707e",
+      "to": "2b28b10d",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-sibling"
+    },
+    {
+      "from": "158d28a4",
+      "to": "2b28b10d",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "2b28b10d",
+      "to": "ec5927cc",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-parent-child"
+    },
+    {
+      "from": "2b28b10d",
+      "to": "ec5927cc",
+      "type": "child-of",
+      "count": 1
+    }
+  ],
+  "workflows": [
+    {
+      "name": "admin messabout",
+      "path": [
+        "158d28a4",
+        "dd2bff43",
+        "bfb03cd3",
+        "7e14707e",
+        "2b28b10d",
+        "ec5927cc",
+        "ec5927cc",
+        "ec5927cc",
+        "ec5927cc"
+      ],
+      "contributor": "Earl",
+      "persona": "Admin"
+    }
+  ]
+}
