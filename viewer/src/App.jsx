@@ -622,6 +622,18 @@ export default function App() {
     }
   }, [loadFromDirectory]);
 
+  // Add a folder without replacing the primary directory handle
+  const addFolder = useCallback(async () => {
+    try {
+      const handle = await window.showDirectoryPicker({ mode: 'read' });
+      await loadFromDirectory(handle);
+    } catch (err) {
+      if (err.name !== 'AbortError') {
+        console.error('Add folder error:', err);
+      }
+    }
+  }, [loadFromDirectory]);
+
   const refreshDirectory = useCallback(async () => {
     if (!dirHandle) return;
 
@@ -1420,6 +1432,12 @@ export default function App() {
             onClick={() => fileInputRef.current?.click()}
           >
             + Add Files
+          </button>
+          <button
+            className="toolbar-btn"
+            onClick={addFolder}
+          >
+            + Add Folder
           </button>
           {canRevert && (
             <button
