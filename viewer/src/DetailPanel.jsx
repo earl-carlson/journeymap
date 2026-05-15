@@ -121,6 +121,7 @@ export default function DetailPanel({
   const [titleDraft, setTitleDraft] = useState('');
   const [showParentPicker, setShowParentPicker] = useState(false);
   const [showMergePicker, setShowMergePicker] = useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState(null);
   const titleInputRef = useRef(null);
 
   const data = node.data;
@@ -305,17 +306,57 @@ export default function DetailPanel({
               width: '100%',
               borderRadius: 6,
               border: '1px solid var(--border)',
-              cursor: 'pointer',
+              cursor: 'zoom-in',
             }}
-            onClick={() => {
-              const w = window.open();
-              if (w) {
-                const src = data.screenshotDataUrl || data.screenshot;
-                w.document.write(`<img src="${src}" style="max-width:100%">`);
-                w.document.title = data.title;
-              }
+            onClick={() => setLightboxSrc(data.screenshotDataUrl || data.screenshot)}
+          />
+        </div>
+      )}
+
+      {/* Lightbox */}
+      {lightboxSrc && (
+        <div
+          onClick={() => setLightboxSrc(null)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 9999,
+            background: 'rgba(0,0,0,0.85)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'zoom-out',
+          }}
+        >
+          <img
+            src={lightboxSrc}
+            alt={data.title}
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              borderRadius: 8,
+              boxShadow: '0 8px 48px rgba(0,0,0,0.8)',
+              cursor: 'default',
             }}
           />
+          <button
+            onClick={() => setLightboxSrc(null)}
+            style={{
+              position: 'fixed',
+              top: 20,
+              right: 24,
+              background: 'none',
+              border: 'none',
+              color: '#fff',
+              fontSize: 28,
+              cursor: 'pointer',
+              lineHeight: 1,
+              opacity: 0.7,
+            }}
+          >
+            &times;
+          </button>
         </div>
       )}
 
