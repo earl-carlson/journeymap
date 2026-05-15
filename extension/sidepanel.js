@@ -33,8 +33,7 @@ const screenshotIndicator = document.getElementById('screenshot-indicator');
 const btnRetrigger        = document.getElementById('btn-retrigger');
 const recentList          = document.getElementById('recent-list');
 const flagButtons         = document.querySelectorAll('.btn-flag');
-const btnExport           = document.getElementById('btn-export');
-const btnExportZip        = document.getElementById('btn-export-zip');
+const actionsRecording    = document.getElementById('actions-recording');
 const btnStop             = document.getElementById('btn-stop');
 
 // Workflow editor
@@ -44,12 +43,7 @@ const wfEditSteps   = document.getElementById('wf-edit-steps');
 const btnWfSave     = document.getElementById('btn-wf-save');
 const btnWfDiscard  = document.getElementById('btn-wf-discard');
 
-// Audio
-const btnRecord          = document.getElementById('btn-record');
-const recordLabel        = document.getElementById('record-label');
-const waveformCanvas     = document.getElementById('waveform');
-const audioStatus        = document.getElementById('audio-status');
-const transcriptionResult = document.getElementById('transcription-result');
+// (Audio removed)
 
 // ---------------------------------------------------------------------------
 // State
@@ -347,6 +341,7 @@ function showWorkflowEditor() {
     editingWorkflowPath = (resp.path || []).map((s) => ({ ...s }));
     wfEditName.value    = resp.name || '';
     renderWorkflowSteps();
+    actionsRecording.classList.add('hidden');
     workflowEdit.classList.remove('hidden');
     workflowEdit.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
@@ -413,40 +408,12 @@ btnWfSave.addEventListener('click', () => {
 });
 
 btnWfDiscard.addEventListener('click', () => {
-  chrome.runtime.sendMessage({ type: 'UPDATE_WORKFLOW_PATH', name: null, path: [] }, () => {
-    chrome.runtime.sendMessage({ type: 'SET_MODE', mode: 'map' }, () => {
-      chrome.runtime.sendMessage({ type: 'EXPORT_SESSION' }, async (response) => {
-        if (chrome.runtime.lastError || !response?.ok || !response.session) return;
-        await saveToDirectory(response.session);
-        chrome.runtime.sendMessage({ type: 'STOP_SESSION' }, () => {
-          showIdleView();
-        });
-      });
-    });
-  });
+  workflowEdit.classList.add('hidden');
+  actionsRecording.classList.remove('hidden');
+  editingWorkflowPath = [];
 });
 
-// ---------------------------------------------------------------------------
-// Save snapshot (without stopping)
-// ---------------------------------------------------------------------------
 
-btnExport.addEventListener('click', () => {
-  chrome.runtime.sendMessage({ type: 'EXPORT_SESSION' }, async (response) => {
-    if (chrome.runtime.lastError || !response?.ok || !response.session) return;
-    await saveToDirectory(response.session);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// Export as zip
-// ---------------------------------------------------------------------------
-
-btnExportZip.addEventListener('click', () => {
-  chrome.runtime.sendMessage({ type: 'EXPORT_SESSION' }, async (response) => {
-    if (chrome.runtime.lastError || !response?.ok || !response.session) return;
-    await exportAsZip(response.session);
-  });
-});
 
 async function exportAsZip(sessionData) {
   const contributor = sessionData.meta.contributor || 'anonymous';
@@ -786,147 +753,7 @@ function refreshStatus() {
 
 setInterval(refreshStatus, 1500);
 
-// ---------------------------------------------------------------------------
-// Audio recording + Whisper transcription (unchanged)
-// ---------------------------------------------------------------------------
 
-let isRecording    = false;
-let mediaRecorder  = null;
-let audioChunks    = [];
-let audioContext   = null;
-let analyser       = null;
-let animFrameId    = null;
-let recordingNodeId = null;
-
-btnRecord.addEventListener('click', async () => {
-  if (isRecording) stopRecording();
-  else await startRecording();
-});
-
-async function startRecording() {
-  try {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      openMicPermissionPage(); return;
-    }
-    let stream;
-    try {
-      stream = await navigator.mediaDevices.getUserMedia({
-        audio: { channelCount: 1, sampleRate: 16000, echoCancellation: true, noiseSuppression: true },
-      });
-    } catch (micErr) {
-      if (micErr.name === 'NotAllowedError' || micErr.name === 'NotFoundError') { openMicPermissionPage(); return; }
-      throw micErr;
-    }
-
-    chrome.runtime.sendMessage({ type: 'AUDIO_RECORDING_STARTED' }, (resp) => {
-      if (resp?.nodeId) recordingNodeId = resp.nodeId;
-    });
-
-    audioContext = new AudioContext({ sampleRate: 16000 });
-    const source = audioContext.createMediaStreamSource(stream);
-    analyser     = audioContext.createAnalyser();
-    analyser.fftSize = 256;
-    source.connect(analyser);
-
-    mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
-    audioChunks   = [];
-    mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunks.push(e.data); };
-    mediaRecorder.onstop = async () => {
-      stream.getTracks().forEach((t) => t.stop());
-      cancelAnimationFrame(animFrameId);
-      if (audioChunks.length === 0) { showAudioStatus('No audio recorded'); return; }
-      showAudioStatus('Transcribing...');
-      try {
-        const blob        = new Blob(audioChunks, { type: 'audio/webm' });
-        const arrayBuffer = await blob.arrayBuffer();
-        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-        const float32Data = audioBuffer.getChannelData(0);
-        chrome.runtime.sendMessage(
-          { type: 'AUDIO_TRANSCRIBE', audioData: Array.from(float32Data), nodeId: recordingNodeId },
-          (response) => {
-            if (chrome.runtime.lastError) { showAudioStatus('Error: ' + chrome.runtime.lastError.message); return; }
-            if (response?.ok) { showTranscription(response.text, response.nodeId); showAudioStatus(''); }
-            else showAudioStatus('Transcription failed: ' + (response?.error || 'unknown'));
-          }
-        );
-      } catch (err) { showAudioStatus('Error processing audio: ' + err.message); }
-    };
-
-    mediaRecorder.start(250);
-    isRecording = true;
-    btnRecord.classList.add('recording');
-    recordLabel.textContent = 'Stop';
-    transcriptionResult.classList.add('hidden');
-    showAudioStatus('Recording...');
-    drawWaveform();
-  } catch (err) { showAudioStatus('Error: ' + err.message); }
-}
-
-function openMicPermissionPage() {
-  showAudioStatus('Opening microphone permission page...');
-  chrome.tabs.create({ url: chrome.runtime.getURL('mic-permission.html'), active: true });
-}
-
-function stopRecording() {
-  if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
-  isRecording = false;
-  btnRecord.classList.remove('recording');
-  recordLabel.textContent = 'Record';
-}
-
-function drawWaveform() {
-  if (!analyser || !isRecording) return;
-  const canvas = waveformCanvas;
-  const ctx    = canvas.getContext('2d');
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray    = new Uint8Array(bufferLength);
-  function draw() {
-    if (!isRecording) return;
-    animFrameId = requestAnimationFrame(draw);
-    analyser.getByteTimeDomainData(dataArray);
-    ctx.fillStyle = '#222240';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.lineWidth   = 1.5;
-    ctx.strokeStyle = '#4B7BE5';
-    ctx.beginPath();
-    const sliceWidth = canvas.width / bufferLength;
-    let x = 0;
-    for (let i = 0; i < bufferLength; i++) {
-      const v = dataArray[i] / 128.0;
-      const y = (v * canvas.height) / 2;
-      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
-      x += sliceWidth;
-    }
-    ctx.lineTo(canvas.width, canvas.height / 2);
-    ctx.stroke();
-  }
-  draw();
-}
-
-function showAudioStatus(text) {
-  if (text) { audioStatus.textContent = text; audioStatus.classList.remove('hidden'); }
-  else audioStatus.classList.add('hidden');
-}
-
-function showTranscription(text, nodeId) {
-  if (!text || !text.trim()) {
-    transcriptionResult.innerHTML = '<em style="color: var(--text-muted)">No speech detected</em>';
-    transcriptionResult.classList.remove('hidden');
-    return;
-  }
-  transcriptionResult.innerHTML = `
-    <div style="margin-bottom: 4px">${escapeHtml(text)}</div>
-    <div style="font-size: 10px; color: var(--text-muted)">Attached to node ${nodeId || 'current'}</div>
-  `;
-  transcriptionResult.classList.remove('hidden');
-}
-
-chrome.runtime.onMessage.addListener((message) => {
-  if (message.type === 'WHISPER_PROGRESS') {
-    const pct = Math.round(message.progress || 0);
-    showAudioStatus(`Loading model: ${pct}% (${message.file || ''})`);
-  }
-});
 
 // ---------------------------------------------------------------------------
 // Go

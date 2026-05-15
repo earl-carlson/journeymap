@@ -264,6 +264,10 @@ export default function App() {
   // Filter tray
   const [showFilterTray, setShowFilterTray] = useState(false);
 
+  // Pre-import snapshot — lets you revert after merging a new session
+  const preImportSnapshot = useRef(null);
+  const [canRevert, setCanRevert] = useState(false);
+
   // Edit mode
   const [editMode, setEditMode] = useState(false);
   const undoStack = useRef([]); // array of session snapshots (most recent last)
@@ -553,6 +557,17 @@ export default function App() {
     }
   }, [dirHandle]);
 
+  const revertImport = useCallback(() => {
+    const snap = preImportSnapshot.current;
+    if (!snap) return;
+    preImportSnapshot.current = null;
+    setCanRevert(false);
+    setSession(snap);
+    setCollapsedNodes(getAllParentIds(snap));
+    setSelectedNode(null);
+    setSelectedNodes(new Set());
+  }, [getAllParentIds]);
+
   const saveNow = useCallback(async () => {
     if (!dirHandle || !session) return;
     try {
@@ -577,6 +592,8 @@ export default function App() {
           return;
         }
 
+        preImportSnapshot.current = session ? structuredClone(session) : null;
+        setCanRevert(!!session);
         const merged = mergeSessions(null, ...sessions);
         setCollapsedNodes(getAllParentIds(merged));
         setSession(merged);
@@ -719,6 +736,10 @@ export default function App() {
 
       const sessions = [...jsonSessions, ...zipSessions];
       if (sessions.length === 0) return;
+
+      // Snapshot current state before merging so user can revert
+      preImportSnapshot.current = session ? structuredClone(session) : null;
+      setCanRevert(!!session);
 
       const merged = mergeSessions(session, ...sessions);
       setCollapsedNodes(getAllParentIds(merged));
@@ -1362,6 +1383,16 @@ export default function App() {
           >
             + Add Files
           </button>
+          {canRevert && (
+            <button
+              className="toolbar-btn"
+              onClick={revertImport}
+              style={{ borderColor: '#f59e0b', color: '#f59e0b' }}
+              title="Undo last import"
+            >
+              ↩ Revert Import
+            </button>
+          )}
           <button className="toolbar-btn" onClick={handleReset}>
             Reset
           </button>

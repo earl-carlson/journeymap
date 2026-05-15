@@ -1,0 +1,189 @@
+{
+  "meta": {
+    "contributor": "Earl",
+    "date": "2026-05-15",
+    "mode": "map"
+  },
+  "nodes": {
+    "ad239ba8": {
+      "url": "https://www.docker.com",
+      "title": "Docker: Accelerated Container Application Development",
+      "screenshot": "screenshots/ad239ba8.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": null
+    },
+    "d173546c": {
+      "url": "https://docs.docker.com",
+      "title": "Docker Docs",
+      "screenshot": "screenshots/d173546c.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": null
+    },
+    "7860c4ff": {
+      "url": "https://docs.docker.com/get-started",
+      "title": "Get started | Docker Docs",
+      "screenshot": "screenshots/7860c4ff.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "d173546c"
+    },
+    "f26128ca": {
+      "url": "https://docs.docker.com/get-started/docker-overview",
+      "title": "What is Docker? | Docker Docs",
+      "screenshot": "screenshots/f26128ca.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "7860c4ff"
+    },
+    "2acc4913": {
+      "url": "https://docs.docker.com/get-started/get-docker",
+      "title": "Get Docker | Docker Docs",
+      "screenshot": "screenshots/2acc4913.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "7860c4ff"
+    },
+    "22c380ff": {
+      "url": "https://docs.docker.com/desktop/setup/install/mac-install",
+      "title": "Install Docker Desktop on Mac | Docker Docs",
+      "screenshot": "screenshots/22c380ff.png",
+      "notes": [],
+      "flags": [],
+      "stub": false,
+      "inferredParent": "7e6e895b"
+    },
+    "7e6e895b": {
+      "url": "https://docs.docker.com/desktop/setup/install",
+      "title": "Install (docs.docker.com)",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": "583cc5d5"
+    },
+    "583cc5d5": {
+      "url": "https://docs.docker.com/desktop/setup",
+      "title": "Setup (docs.docker.com)",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": "f3d38355"
+    },
+    "f3d38355": {
+      "url": "https://docs.docker.com/desktop",
+      "title": "Desktop (docs.docker.com)",
+      "screenshot": null,
+      "notes": [],
+      "flags": [],
+      "stub": true,
+      "inferredParent": "d173546c"
+    }
+  },
+  "edges": [
+    {
+      "from": "ad239ba8",
+      "to": "d173546c",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "cross-domain"
+    },
+    {
+      "from": "d173546c",
+      "to": "7860c4ff",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "d173546c",
+      "to": "7860c4ff",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "7860c4ff",
+      "to": "f26128ca",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-parent-child"
+    },
+    {
+      "from": "7860c4ff",
+      "to": "f26128ca",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "f26128ca",
+      "to": "2acc4913",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-sibling"
+    },
+    {
+      "from": "7860c4ff",
+      "to": "2acc4913",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "2acc4913",
+      "to": "22c380ff",
+      "type": "navigate",
+      "count": 1,
+      "navClass": "same-domain-other"
+    },
+    {
+      "from": "7e6e895b",
+      "to": "22c380ff",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "583cc5d5",
+      "to": "7e6e895b",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "f3d38355",
+      "to": "583cc5d5",
+      "type": "child-of",
+      "count": 1
+    },
+    {
+      "from": "d173546c",
+      "to": "f3d38355",
+      "type": "child-of",
+      "count": 1
+    }
+  ],
+  "workflows": [
+    {
+      "name": "Test workflow",
+      "path": [
+        "ad239ba8",
+        "d173546c",
+        "d173546c",
+        "7860c4ff",
+        "7860c4ff",
+        "f26128ca",
+        "f26128ca",
+        "2acc4913",
+        "2acc4913",
+        "22c380ff",
+        "22c380ff"
+      ],
+      "contributor": "Earl",
+      "persona": "Developer"
+    }
+  ]
+}
