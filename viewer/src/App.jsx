@@ -202,6 +202,7 @@ export default function App() {
   const reactFlowRef = useRef(null);
   const shouldFitView = useRef(false);
   const anchorPositions = useRef(null); // snapshot of node positions before a collapse/expand
+  const lastSessionId = useRef(null); // tracks session identity to avoid fitView on mutations
 
   // Filter tray
   const [showFilterTray, setShowFilterTray] = useState(false);
@@ -427,9 +428,13 @@ export default function App() {
     );
   }, [dragOverNodeId, setNodes]);
 
-  // Fit view when session loads
+  // Fit view only when a genuinely new session is loaded (not on mutations).
+  // Use meta.date + node count as a cheap identity signal.
   useEffect(() => {
-    if (session) {
+    if (!session) return;
+    const id = `${session.meta?.date}-${Object.keys(session.nodes || {}).length}-${session.meta?.contributor}`;
+    if (id !== lastSessionId.current) {
+      lastSessionId.current = id;
       shouldFitView.current = true;
     }
   }, [session]);
