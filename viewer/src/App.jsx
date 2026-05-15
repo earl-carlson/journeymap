@@ -203,6 +203,9 @@ export default function App() {
   const shouldFitView = useRef(false);
   const anchorPositions = useRef(null); // snapshot of node positions before a collapse/expand
 
+  // Filter tray
+  const [showFilterTray, setShowFilterTray] = useState(false);
+
   // Edit mode
   const [editMode, setEditMode] = useState(false);
   const undoStack = useRef([]); // array of session snapshots (most recent last)
@@ -1044,26 +1047,21 @@ export default function App() {
         <div className="toolbar">
           <span className="toolbar-title">IA Mapper</span>
 
+          {/* View / filter tray toggle */}
+          <button
+            className={`toolbar-btn ${showFilterTray ? 'active' : ''}`}
+            onClick={() => setShowFilterTray((v) => !v)}
+          >
+            ⚙ View
+          </button>
+
           <button
             className={`toolbar-btn ${showWorkflows ? 'active' : ''}`}
             onClick={() => setShowWorkflows(!showWorkflows)}
           >
             Workflows{workflows.length > 0 ? ` (${workflows.length})` : ''}
           </button>
-          <button
-            className={`toolbar-btn ${showStubs ? 'active' : ''}`}
-            onClick={() => setShowStubs(!showStubs)}
-          >
-            {showStubs ? 'Hide' : 'Show'} Stubs
-          </button>
-          <button
-            className={`toolbar-btn ${showModals ? 'active' : ''}`}
-            onClick={() => setShowModals(!showModals)}
-          >
-            {showModals ? 'Hide' : 'Show'} Modals
-          </button>
-          <button className="toolbar-btn" onClick={collapseAll}>Collapse All</button>
-          <button className="toolbar-btn" onClick={expandAll}>Expand All</button>
+
           {dirHandle && (
             <>
               <button className="toolbar-btn" onClick={refreshDirectory}>
@@ -1093,6 +1091,7 @@ export default function App() {
               )}
             </>
           )}
+
           <button
             className="toolbar-btn"
             onClick={() => fileInputRef.current?.click()}
@@ -1112,26 +1111,57 @@ export default function App() {
           />
         </div>
 
-        {/* Domain filters */}
-        {domainList.length > 0 && (
-          <div className="filter-bar">
-            {domainList.map((domain) => {
-              const hidden = collapsedDomains.has(domain);
-              // Shorten label: strip .docker.com, keep subdomain
-              const label = domain
-                .replace(/\.docker\.com$/, '')
-                .replace(/^www$/, 'www');
-              return (
-                <button
-                  key={domain}
-                  className={`filter-btn domain-filter ${hidden ? '' : 'active'}`}
-                  onClick={() => toggleDomain(domain)}
-                  title={domain}
-                >
-                  {label}
-                </button>
-              );
-            })}
+        {/* Filter tray */}
+        {showFilterTray && (
+          <div className="filter-tray">
+            {/* Collapse / expand */}
+            <div className="filter-tray-section">
+              <button className="tray-btn" onClick={collapseAll}>Collapse All</button>
+              <button className="tray-btn" onClick={expandAll}>Expand All</button>
+            </div>
+
+            <div className="filter-tray-divider" />
+
+            {/* Toggles */}
+            <div className="filter-tray-section">
+              <button
+                className={`tray-btn ${showStubs ? 'active' : ''}`}
+                onClick={() => setShowStubs((v) => !v)}
+              >
+                {showStubs ? 'Hide' : 'Show'} Stubs
+              </button>
+              <button
+                className={`tray-btn ${showModals ? 'active' : ''}`}
+                onClick={() => setShowModals((v) => !v)}
+              >
+                {showModals ? 'Hide' : 'Show'} Modals
+              </button>
+            </div>
+
+            {/* Domain pills */}
+            {domainList.length > 0 && (
+              <>
+                <div className="filter-tray-divider" />
+                <div className="filter-tray-section filter-tray-domains">
+                  {domainList.map((domain) => {
+                    const hidden = collapsedDomains.has(domain);
+                    const label = domain
+                      .replace(/\.docker\.com$/, '')
+                      .replace(/^www$/, 'www');
+                    return (
+                      <button
+                        key={domain}
+                        className={`tray-pill ${hidden ? '' : 'active'}`}
+                        onClick={() => toggleDomain(domain)}
+                        title={domain}
+                      >
+                        {label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
           </div>
         )}
 
