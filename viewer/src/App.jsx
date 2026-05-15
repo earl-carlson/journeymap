@@ -142,6 +142,61 @@ function blobToDataUrl(blob) {
 }
 
 // ---------------------------------------------------------------------------
+// ZIP parser — reads PKZIP stored (method 0) and deflate (method 8) entries.
+// Used for importing session zips exported from the Chrome extension.
+// ---------------------------------------------------------------------------
+
+async function parseZip(bytes) {
+  const view    = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+  const entries = [];
+  let i = 0;
+
+  while (i < bytes.length - 4) {
+    const sig = view.getUint32(i, true);
+    if (sig !== 0x04034b50) { i++; continue; } // local file header signature
+
+    const method    = view.getUint16(i + 8,  true);
+    const compSize  = view.getUint32(i + 18, true);
+    const uncompSize = view.getUint32(i + 22, true);
+    const nameLen   = view.getUint16(i + 26, true);
+    const extraLen  = view.getUint16(i + 28, true);
+    const name      = new TextDecoder().decode(bytes.slice(i + 30, i + 30 + nameLen));
+    const dataStart = i + 30 + nameLen + extraLen;
+    const compData  = bytes.slice(dataStart, dataStart + compSize);
+
+    if (method === 0) {
+      // Stored — no compression
+      entries.push({ name, data: compData });
+    } else if (method === 8 && typeof DecompressionStream !== 'undefined') {
+      // Deflate-raw — decompress using DecompressionStream
+      try {
+        const ds     = new DecompressionStream('deflate-raw');
+        const writer = ds.writable.getWriter();
+        const reader = ds.readable.getReader();
+        writer.write(compData);
+        writer.close();
+        const chunks = [];
+        let totalLen = 0;
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          totalLen += value.length;
+        }
+        const out = new Uint8Array(totalLen);
+        let pos = 0;
+        for (const chunk of chunks) { out.set(chunk, pos); pos += chunk.length; }
+        entries.push({ name, data: out });
+      } catch { /* skip undecompressable entry */ }
+    }
+
+    i = dataStart + compSize;
+  }
+
+  return entries;
+}
+
+// ---------------------------------------------------------------------------
 // Write-back: save session.json to the directory
 // ---------------------------------------------------------------------------
 
@@ -609,15 +664,60 @@ export default function App() {
     }
   }, []);
 
+  // Parse a ZIP file, extract session.json + screenshots, return a session object
+  const loadZipFile = useCallback(async (file) => {
+    try {
+      const buf   = await file.arrayBuffer();
+      const bytes = new Uint8Array(buf);
+      const entries = await parseZip(bytes);
+
+      // Find session.json (may be inside a subfolder)
+      const sessionEntry = entries.find((e) => e.name.endsWith('session.json'));
+      if (!sessionEntry) return null;
+
+      const jsonText = new TextDecoder().decode(sessionEntry.data);
+      const data     = JSON.parse(jsonText);
+      if (!data.nodes || data.edges === undefined) return null;
+
+      // Find the folder prefix (e.g. "session-Earl-2026-05-15-120000/")
+      const prefix = sessionEntry.name.includes('/')
+        ? sessionEntry.name.slice(0, sessionEntry.name.lastIndexOf('/') + 1)
+        : '';
+
+      // Inject screenshot data URLs from zip into nodes
+      for (const [id, node] of Object.entries(data.nodes)) {
+        if (!node.screenshot) continue;
+        const screenshotName = `${prefix}screenshots/${id}.png`;
+        const screenshotEntry = entries.find((e) => e.name === screenshotName);
+        if (screenshotEntry) {
+          // Convert PNG bytes to data URL
+          const b64 = btoa(String.fromCharCode(...screenshotEntry.data));
+          node.screenshotDataUrl = `data:image/png;base64,${b64}`;
+        }
+      }
+
+      if (!data.name) data.name = file.name.replace(/\.zip$/i, '');
+      return data;
+    } catch (err) {
+      console.error('[zip] Failed to load zip:', err);
+      return null;
+    }
+  }, []);
+
   const handleFiles = useCallback(
     async (files) => {
       const jsonFiles = files.filter((f) => f.name.endsWith('.json'));
-      if (jsonFiles.length === 0) return;
+      const zipFiles  = files.filter((f) => f.name.endsWith('.zip'));
 
-      const sessions = (
+      const jsonSessions = (
         await Promise.all(jsonFiles.map(loadSessionFile))
       ).filter(Boolean);
 
+      const zipSessions = (
+        await Promise.all(zipFiles.map(loadZipFile))
+      ).filter(Boolean);
+
+      const sessions = [...jsonSessions, ...zipSessions];
       if (sessions.length === 0) return;
 
       const merged = mergeSessions(session, ...sessions);
@@ -626,7 +726,7 @@ export default function App() {
       setSessionCount((c) => c + sessions.length);
       setSelectedNode(null);
     },
-    [session, loadSessionFile]
+    [session, loadSessionFile, loadZipFile]
   );
 
   const handleDrop = useCallback(
@@ -1271,7 +1371,7 @@ export default function App() {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".json"
+            accept=".json,.zip"
             multiple
             style={{ display: 'none' }}
             onChange={handleFileInput}

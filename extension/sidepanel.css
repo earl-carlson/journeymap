@@ -783,3 +783,86 @@ h1 {
   color: var(--danger);
   background: rgba(239, 68, 68, 0.1);
 }
+
+/* ---- Workflow-first idle view ---- */
+
+.workflow-setup {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 14px 10px;
+  margin-bottom: 14px;
+}
+
+.workflow-setup .field {
+  margin-bottom: 12px;
+}
+
+.workflow-setup .field:last-of-type {
+  margin-bottom: 14px;
+}
+
+.workflow-setup input,
+.workflow-setup select {
+  width: 100%;
+  padding: 8px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text);
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.workflow-setup input:focus,
+.workflow-setup select:focus {
+  border-color: var(--accent);
+}
+
+.workflow-setup input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+.workflow-setup select option {
+  background: var(--bg-surface);
+  color: var(--text);
+}
+
+/* ---- Active view: workflow identity block ---- */
+
+.workflow-identity {
+  background: rgba(75, 123, 229, 0.07);
+  border: 1px solid rgba(75, 123, 229, 0.2);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  margin-bottom: 12px;
+}
+
+.workflow-identity-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  word-break: break-word;
+}
+
+.workflow-identity-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.persona-badge {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background: rgba(139, 92, 246, 0.12);
+  color: #a78bfa;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

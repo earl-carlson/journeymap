@@ -12,10 +12,10 @@
     <div class="header">
       <h1>IA Mapper</h1>
     </div>
-    <p class="description">Set your name and choose where session files are saved. Both are remembered permanently.</p>
+    <p class="description">Set your name and choose where session files are saved.</p>
     <div class="field">
       <label for="contributor">Your name</label>
-      <input type="text" id="contributor" placeholder="e.g. earl" autocomplete="off" spellcheck="false">
+      <input type="text" id="contributor" placeholder="e.g. Sarah" autocomplete="off" spellcheck="false">
     </div>
     <div class="field">
       <label>Export directory</label>
@@ -25,82 +25,35 @@
     <button id="btn-save-setup" class="btn btn-primary">Save &amp; Continue</button>
   </div>
 
-  <!-- Idle: name is set, no session active -->
+  <!-- Idle: ready to record a workflow -->
   <div id="view-idle" class="view hidden">
     <div class="header">
       <h1>IA Mapper</h1>
-      <span class="badge badge-idle">Idle</span>
+      <span class="badge badge-idle">Ready</span>
     </div>
-    <p class="description">Navigate to any Docker page and start a session to begin mapping.</p>
+
     <div class="meta">
       <span class="meta-item">
-        <span class="meta-label">Contributor:</span>
+        <span class="meta-label">Recorder:</span>
         <span id="idle-contributor">—</span>
         <button id="btn-change-name" class="btn-inline" title="Change settings">edit</button>
       </span>
       <span class="meta-item">
-        <span class="meta-label">Export to:</span>
+        <span class="meta-label">Saving to:</span>
         <span id="idle-dir" class="dir-display">—</span>
         <button id="btn-change-dir" class="btn-inline" title="Change directory">change</button>
       </span>
     </div>
-    <button id="btn-start" class="btn btn-primary">Start Session</button>
-  </div>
 
-  <!-- Active: session running -->
-  <div id="view-active" class="view hidden">
-    <div class="header">
-      <h1>IA Mapper</h1>
-      <span class="badge badge-active">Recording</span>
-    </div>
-
-    <div class="stats">
-      <div class="stat">
-        <span class="stat-value" id="stat-nodes">0</span>
-        <span class="stat-label">Nodes</span>
+    <div class="workflow-setup">
+      <div class="field">
+        <label for="idle-workflow-name">Workflow name</label>
+        <input type="text" id="idle-workflow-name" placeholder="e.g. Upgrade to Team plan" autocomplete="off" spellcheck="false">
       </div>
-      <div class="stat">
-        <span class="stat-value" id="stat-edges">0</span>
-        <span class="stat-label">Edges</span>
-      </div>
-    </div>
-
-    <div class="meta">
-      <span class="meta-item">
-        <span class="meta-label">Contributor:</span>
-        <span id="meta-contributor">—</span>
-      </span>
-      <span class="meta-item">
-        <span class="meta-label">Saving to:</span>
-        <span id="active-dir" class="dir-display">—</span>
-      </span>
-    </div>
-
-    <!-- Mode toggle -->
-    <div class="mode-section">
-      <div class="mode-toggle">
-        <button id="btn-mode-map" class="mode-btn active" title="Map mode">Map</button>
-        <button id="btn-mode-workflow" class="mode-btn" title="Workflow mode">Workflow</button>
-      </div>
-      <div id="workflow-info" class="workflow-info hidden">
-        <span class="workflow-name-label">Recording:</span>
-        <span id="workflow-name-display" class="workflow-name-display">—</span>
-        <span id="workflow-persona-display" class="workflow-persona-badge hidden"></span>
-        <span id="workflow-step-count" class="workflow-step-count">0 steps</span>
-      </div>
-    </div>
-
-    <!-- Workflow name prompt (shown when switching to workflow mode) -->
-    <div id="workflow-prompt" class="workflow-prompt hidden">
-      <div class="section-label">New Workflow</div>
-      <div class="field" style="margin-bottom:8px">
-        <label for="workflow-name-input">Name</label>
-        <input type="text" id="workflow-name-input" placeholder="e.g. Create new project" autocomplete="off" spellcheck="false">
-      </div>
-      <div class="field" style="margin-bottom:10px">
-        <label for="workflow-persona-select">Persona</label>
-        <select id="workflow-persona-select">
-          <option value="">— none —</option>
+      <div class="field">
+        <label for="idle-persona">Persona</label>
+        <select id="idle-persona">
+          <option value="">— select persona —</option>
           <option value="Admin">Admin</option>
           <option value="Docker Employee">Docker Employee</option>
           <option value="Purchaser">Purchaser</option>
@@ -108,22 +61,37 @@
           <option value="VP of Engineering">VP of Engineering</option>
         </select>
       </div>
-      <div class="workflow-prompt-actions">
-        <button id="btn-wf-start" class="btn btn-primary btn-small">Start Recording</button>
-        <button id="btn-wf-cancel" class="btn btn-secondary btn-small">Cancel</button>
+      <button id="btn-start" class="btn btn-primary">Start Recording</button>
+    </div>
+  </div>
+
+  <!-- Active: workflow recording in progress -->
+  <div id="view-active" class="view hidden">
+    <div class="header">
+      <h1>IA Mapper</h1>
+      <span class="badge badge-active">Recording</span>
+    </div>
+
+    <!-- Workflow identity -->
+    <div class="workflow-identity">
+      <div class="workflow-identity-name" id="active-workflow-name">—</div>
+      <div class="workflow-identity-meta">
+        <span id="active-persona-badge" class="persona-badge hidden"></span>
+        <span id="stat-nodes">0</span> pages
+        &middot;
+        <span id="stat-steps">0</span> steps
       </div>
     </div>
 
-    <!-- Capture queue chip -->
-    <div id="capture-queue-chip" class="capture-queue-chip hidden">
-      <div class="queue-chip-header">
-        <span class="section-label">Next Target</span>
-        <button id="btn-queue-dismiss" class="btn-inline" title="Skip this target">skip</button>
-        <button id="btn-queue-clear" class="btn-inline" title="Clear queue">clear</button>
-      </div>
-      <div id="queue-target-title" class="queue-target-title">—</div>
-      <div id="queue-target-url" class="queue-target-url">—</div>
-      <div id="queue-progress" class="queue-progress">0 / 0</div>
+    <div class="meta">
+      <span class="meta-item">
+        <span class="meta-label">Recorder:</span>
+        <span id="meta-contributor">—</span>
+      </span>
+      <span class="meta-item">
+        <span class="meta-label">Saving to:</span>
+        <span id="active-dir" class="dir-display">—</span>
+      </span>
     </div>
 
     <!-- Current page info -->
@@ -154,38 +122,37 @@
     <div class="flags">
       <div class="section-label">Flag current page</div>
       <div class="flag-buttons">
-        <button class="btn-flag" data-flag="broken" title="Broken">broken</button>
-        <button class="btn-flag" data-flag="confusing" title="Confusing">confusing</button>
-        <button class="btn-flag" data-flag="missing" title="Missing">missing</button>
-        <button class="btn-flag" data-flag="good" title="Good">good</button>
+        <button class="btn-flag" data-flag="broken">broken</button>
+        <button class="btn-flag" data-flag="confusing">confusing</button>
+        <button class="btn-flag" data-flag="missing">missing</button>
+        <button class="btn-flag" data-flag="good">good</button>
       </div>
     </div>
 
-    <!-- Recent nodes -->
+    <!-- Recent pages -->
     <div id="recent-nodes" class="recent-nodes">
       <div class="section-label">Recent Pages</div>
       <div id="recent-list" class="recent-list"></div>
     </div>
 
-    <!-- Workflow edit (shown after ending workflow recording) -->
+    <!-- Workflow step editor (shown after Stop) -->
     <div id="workflow-edit" class="workflow-edit hidden">
-      <div class="section-label">Edit Workflow</div>
+      <div class="section-label">Review &amp; Edit Steps</div>
       <div class="field">
-        <label for="wf-edit-name">Name</label>
+        <label for="wf-edit-name">Workflow name</label>
         <input type="text" id="wf-edit-name" autocomplete="off" spellcheck="false">
       </div>
       <div id="wf-edit-steps" class="wf-edit-steps"></div>
       <div class="workflow-prompt-actions">
-        <button id="btn-wf-save" class="btn btn-primary btn-small">Save Workflow</button>
+        <button id="btn-wf-save" class="btn btn-primary btn-small">Save &amp; Export</button>
         <button id="btn-wf-discard" class="btn btn-secondary btn-small">Discard</button>
       </div>
     </div>
 
     <div class="actions">
-      <button id="btn-load-queue" class="btn btn-secondary btn-small" title="Load capture queue from viewer">Load Capture Queue</button>
-      <input type="file" id="queue-file-input" accept=".json" style="display:none">
       <button id="btn-export" class="btn btn-secondary">Save Snapshot</button>
-      <button id="btn-stop" class="btn btn-danger">End Session</button>
+      <button id="btn-export-zip" class="btn btn-secondary">Export Zip</button>
+      <button id="btn-stop" class="btn btn-danger">Stop &amp; Review</button>
     </div>
   </div>
 
