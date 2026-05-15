@@ -17,6 +17,7 @@ const btnChangeName      = document.getElementById('btn-change-name');
 const btnChangeDir       = document.getElementById('btn-change-dir');
 const idleWorkflowName   = document.getElementById('idle-workflow-name');
 const idlePersona        = document.getElementById('idle-persona');
+const idlePersonaCustom  = document.getElementById('idle-persona-custom');
 const btnStart           = document.getElementById('btn-start');
 
 // Active view
@@ -210,6 +211,8 @@ function showIdleView() {
   idleDir.textContent         = dirName || '—';
   idleWorkflowName.value      = '';
   idlePersona.value           = '';
+  idlePersonaCustom.style.display = 'none';
+  idlePersonaCustom.value     = '';
   workflowEdit.classList.add('hidden');
   editingWorkflowPath = [];
   setTimeout(() => idleWorkflowName.focus(), 50);
@@ -284,7 +287,9 @@ btnChangeDir.addEventListener('click', async () => {
 
 btnStart.addEventListener('click', () => {
   const name    = idleWorkflowName.value.trim();
-  const persona = idlePersona.value || null;
+  const persona = idlePersona.value === '__custom__'
+    ? (idlePersonaCustom.value.trim() || null)
+    : (idlePersona.value || null);
 
   if (!name) {
     idleWorkflowName.focus();
@@ -319,6 +324,20 @@ btnStart.addEventListener('click', () => {
 });
 
 idleWorkflowName.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') btnStart.click();
+});
+
+idlePersona.addEventListener('change', () => {
+  if (idlePersona.value === '__custom__') {
+    idlePersonaCustom.style.display = 'block';
+    idlePersonaCustom.focus();
+  } else {
+    idlePersonaCustom.style.display = 'none';
+    idlePersonaCustom.value = '';
+  }
+});
+
+idlePersonaCustom.addEventListener('keydown', (e) => {
   if (e.key === 'Enter') btnStart.click();
 });
 
