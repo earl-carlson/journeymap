@@ -73,9 +73,25 @@ async function loadDirHandle() {
 
 async function scanDirectory(dirHandle) {
   const sessions = [];
+  let viewerSession = null; // session-viewer/ is loaded last so its edits win
 
   for await (const entry of dirHandle.values()) {
     if (entry.kind === 'directory') {
+      // session-viewer/ is the viewer's edit layer — handle separately
+      if (entry.name === 'session-viewer') {
+        try {
+          const sessionFile = await entry.getFileHandle('session.json');
+          const file = await sessionFile.getFile();
+          const text = await file.text();
+          const data = JSON.parse(text);
+          if (data.nodes && data.edges !== undefined) {
+            data._isViewerSession = true;
+            viewerSession = data;
+          }
+        } catch { /* no viewer session yet */ }
+        continue;
+      }
+
       // Check if this subdirectory contains a session.json
       try {
         const sessionFile = await entry.getFileHandle('session.json');
@@ -84,38 +100,33 @@ async function scanDirectory(dirHandle) {
         const data = JSON.parse(text);
 
         if (data.nodes && data.edges !== undefined) {
-          // Remember the directory handle for write-back
           data._dirHandle = entry;
 
           // Load screenshots from screenshots/ subfolder
           try {
             const screenshotDir = await entry.getDirectoryHandle('screenshots');
-            for (const [nodeId, node] of Object.entries(data.nodes)) {
+            for (const [, node] of Object.entries(data.nodes)) {
               if (node.screenshot) {
                 try {
                   const filename = node.screenshot.split('/').pop();
                   const imgFile = await screenshotDir.getFileHandle(filename);
-                  const imgBlob = await (await imgFile.getFile());
+                  const imgBlob = await imgFile.getFile();
                   const dataUrl = await blobToDataUrl(imgBlob);
                   node.screenshotDataUrl = dataUrl;
-                } catch {
-                  // Screenshot file not found, skip
-                }
+                } catch { /* screenshot not found */ }
               }
             }
-          } catch {
-            // No screenshots directory, that's fine
-          }
+          } catch { /* no screenshots dir */ }
 
           sessions.push(data);
         }
       } catch {
-        // No session.json in this directory, recurse deeper
-        const nested = await scanDirectory(entry);
+        // No session.json — recurse deeper
+        const { sessions: nested, viewerSession: nestedViewer } = await scanDirectory(entry);
         sessions.push(...nested);
+        if (nestedViewer && !viewerSession) viewerSession = nestedViewer;
       }
     } else if (entry.kind === 'file' && entry.name.endsWith('.json')) {
-      // Also handle loose JSON files at the top level (legacy format)
       try {
         const file = await entry.getFile();
         const text = await file.text();
@@ -123,13 +134,11 @@ async function scanDirectory(dirHandle) {
         if (data.nodes && data.edges !== undefined) {
           sessions.push(data);
         }
-      } catch {
-        // Not a valid session JSON
-      }
+      } catch { /* not a valid session JSON */ }
     }
   }
 
-  return sessions;
+  return { sessions, viewerSession };
 }
 
 function blobToDataUrl(blob) {
@@ -139,6 +148,73 @@ function blobToDataUrl(blob) {
     reader.onerror = reject;
     reader.readAsDataURL(blob);
   });
+}
+
+// ---------------------------------------------------------------------------
+// Apply viewer edits on top of merged capture sessions.
+// The viewer session (session-viewer/session.json) is the authoritative
+// edit layer — its titles, flags, notes, inferredParent, and deleted nodes
+// win over whatever the raw capture sessions say.
+// ---------------------------------------------------------------------------
+
+function applyViewerEdits(merged, viewerSession) {
+  const result = structuredClone(merged);
+
+  // Remove nodes the viewer deleted (present in merged but not in viewer session)
+  // Only do this if the viewer session has nodes (not empty)
+  if (Object.keys(viewerSession.nodes).length > 0) {
+    // Find nodes that exist in merged but were deleted in the viewer session
+    // We detect deletions by checking if a node that was in a prior viewer save
+    // is now absent. We use a marker: viewer session has _isViewerSession = true.
+    // Strategy: for every node in the viewer session, apply its edits to merged.
+    for (const [id, viewerNode] of Object.entries(viewerSession.nodes)) {
+      if (result.nodes[id]) {
+        // Apply viewer's title (always wins)
+        if (viewerNode.title) result.nodes[id].title = viewerNode.title;
+        // Apply viewer's flags (replace, not union — viewer is authoritative)
+        if (viewerNode.flags) result.nodes[id].flags = viewerNode.flags;
+        // Apply viewer's notes
+        if (viewerNode.notes) result.nodes[id].notes = viewerNode.notes;
+        // Apply viewer's inferredParent
+        if (viewerNode.inferredParent !== undefined) {
+          result.nodes[id].inferredParent = viewerNode.inferredParent;
+        }
+      } else {
+        // Node exists in viewer but not in merged — viewer added it
+        result.nodes[id] = structuredClone(viewerNode);
+      }
+    }
+
+    // Apply viewer's workflows (replace any with same name)
+    if (viewerSession.workflows && viewerSession.workflows.length > 0) {
+      for (const wf of viewerSession.workflows) {
+        const idx = result.workflows.findIndex((w) => w.name === wf.name);
+        if (idx >= 0) result.workflows[idx] = wf;
+        else result.workflows.push(wf);
+      }
+    }
+
+    // Apply viewer's edges (replace child-of edges that were changed)
+    // Simple approach: remove all child-of edges for nodes the viewer touched,
+    // then add the viewer's edges back
+    const viewerNodeIds = new Set(Object.keys(viewerSession.nodes));
+    result.edges = result.edges.filter((e) => {
+      // Keep edges not involving viewer-touched nodes
+      if (!viewerNodeIds.has(e.from) && !viewerNodeIds.has(e.to)) return true;
+      // Keep navigate edges (viewer doesn't edit those)
+      if (e.type !== 'child-of') return true;
+      // Drop child-of edges involving viewer nodes — viewer session has the correct ones
+      return false;
+    });
+    // Add viewer's child-of edges back
+    for (const edge of viewerSession.edges) {
+      if (edge.type === 'child-of') {
+        result.edges.push(structuredClone(edge));
+      }
+    }
+  }
+
+  return result;
 }
 
 // ---------------------------------------------------------------------------
@@ -613,15 +689,21 @@ export default function App() {
     async (handle) => {
       setLoading(true);
       try {
-        const sessions = await scanDirectory(handle);
-        if (sessions.length === 0) {
+        const { sessions, viewerSession } = await scanDirectory(handle);
+        if (sessions.length === 0 && !viewerSession) {
           setLoading(false);
           return;
         }
 
         preImportSnapshot.current = session ? structuredClone(session) : null;
         setCanRevert(!!session);
-        const merged = mergeSessions(null, ...sessions);
+
+        // Merge capture sessions first, then apply viewer edits on top
+        let merged = mergeSessions(null, ...sessions);
+        if (viewerSession) {
+          merged = applyViewerEdits(merged, viewerSession);
+        }
+
         setCollapsedNodes(getAllParentIds(merged));
         setSession(merged);
         setSessionCount(sessions.length);
