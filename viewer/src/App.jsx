@@ -273,6 +273,7 @@ export default function App() {
   const undoStack = useRef([]); // array of session snapshots (most recent last)
   const [dragOverNodeId, setDragOverNodeId] = useState(null); // node being hovered during drag-to-reparent
   const [unsavedChanges, setUnsavedChanges] = useState(0);
+  const [saveStatus, setSaveStatus] = useState(null); // null | 'saved' | 'error'
 
   // Workflow state
   const [showWorkflows, setShowWorkflows] = useState(false);
@@ -569,12 +570,38 @@ export default function App() {
   }, [getAllParentIds]);
 
   const saveNow = useCallback(async () => {
-    if (!dirHandle || !session) return;
+    if (!session) return;
+
+    let handle = dirHandle;
+
+    // No directory set — prompt to pick one
+    if (!handle) {
+      try {
+        handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        setDirHandle(handle);
+        setDirName(handle.name);
+        await saveDirHandle(handle);
+      } catch (err) {
+        if (err.name !== 'AbortError') console.error('[save] Directory picker failed:', err);
+        return;
+      }
+    }
+
     try {
-      await writeBackSession(dirHandle, session);
-      setUnsavedChanges(0);
+      const ok = await writeBackSession(handle, session);
+      if (ok) {
+        setUnsavedChanges(0);
+        // Brief visual confirmation on the save button
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus(null), 2000);
+      } else {
+        setSaveStatus('error');
+        setTimeout(() => setSaveStatus(null), 3000);
+      }
     } catch (err) {
       console.error('[save] Failed:', err);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus(null), 3000);
     }
   }, [dirHandle, session]);
 
@@ -1414,14 +1441,19 @@ export default function App() {
                   ↩ Undo
                 </button>
               )}
-              {unsavedChanges > 0 && (
+              {(unsavedChanges > 0 || saveStatus) && (
                 <button
                   className="toolbar-btn"
                   onClick={saveNow}
-                  style={{ borderColor: '#22c55e', color: '#22c55e' }}
+                  style={{
+                    borderColor: saveStatus === 'error' ? '#ef4444' : '#22c55e',
+                    color: saveStatus === 'error' ? '#ef4444' : '#22c55e',
+                  }}
                   title="Save changes to disk"
                 >
-                  ↓ Save{unsavedChanges > 1 ? ` (${unsavedChanges})` : ''}
+                  {saveStatus === 'saved' ? '✓ Saved' :
+                   saveStatus === 'error' ? '✕ Save failed' :
+                   `↓ Save${unsavedChanges > 1 ? ` (${unsavedChanges})` : ''}`}
                 </button>
               )}
             </>
