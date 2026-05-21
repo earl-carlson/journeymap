@@ -5,46 +5,68 @@
 
 ## Principles
 
-**Clear spaces.** Every feature, setting, and workflow has one primary home. Secondary surfaces are lightweight windows into that home — not copies of it.
+**Everything has a home.** Every feature, setting, and workflow has one primary home. If you're building something new and asking "where does this go," there is a clear answer. No squatting in the wrong space because it's convenient.
 
-**Settings live where the work lives.** User settings for container work → Docker Desktop. User settings for agentic work → Agentic Platform. Org-level settings for anything → Admin. If you're building a new feature and asking "where does the settings page go," the answer is: follow the work, not the tool.
+**Each space is made for someone.** A developer working only on agentic tools only needs the Agentic Platform. An IT admin only needs Admin. The spaces are distinct enough that you know which one is yours without having to search. If someone has to look in three places to find their thing, the IA is wrong.
 
-**Billing is contextual, not duplicated.** The billing team owns and maintains billing widgets. Those widgets can appear anywhere it makes sense (Build Cloud, Agentic Platform, Desktop). The full billing experience — plan management, invoices, seat counts, PAYG controls — lives in Admin only.
-
-**Docs are a peek, not a portal.** A platform team owns the doc panel component. The Docs team owns the content inside it. Any surface can embed a contextual doc panel. The full docs site is its own destination.
-
-**Notifications: burn them down.** No notification system until there's a clear answer to "what action does this notification enable that the user couldn't take without it." Default is no notification.
-
-**The CLI is shared infrastructure.** It lives under Container Platform and Agentic Platform as a secondary surface in both. It is not a product area with its own home.
+**The system is modular, not duplicated.** Any surface can expose a contextual window into another — a billing widget, a doc panel, a usage summary. That window is a peek, not a copy. The full experience lives in one place. The widget is a convenience, not a second home.
 
 ---
 
-## The Four Areas
+## Kill list
+
+Things that should not exist or should be radically cut before being rebuilt:
+
+- Notification systems as currently implemented. No new notification surface gets built until there is a clear answer to: what action does this enable that the user couldn't take without it?
+
+---
+
+## The Six Areas
 
 | Area | Who it's for | What it owns |
 |---|---|---|
-| **Marketing & Docs** | Everyone, pre-login | Discovery, education, conversion |
-| **Hub** | Developers pulling and publishing images | Image registry, search, org namespaces |
+| **www** | Execs, senior leaders evaluating Docker | Marketing, product pages, pricing, conversion |
+| **Docs** | Anyone using the tools | Full documentation, guides, reference |
+| **Hub** | Developers publishing and pulling images | Image registry, search, org namespaces |
 | **Container Platform** | Developers working with containers | Docker Desktop, Build, Compose, CLI (secondary) |
 | **Admin** | IT admins, security leads, procurement | Org management, billing, governance, provisioning |
 | **Agentic Platform** | Developers working with AI agents | Agent sessions, MCP, Gordon, CLI (secondary) |
 
 ---
 
-## Marketing & Docs
+## www
 
-**Primary users:** Everyone. Pre-login, pre-purchase, early evaluation.
+**Primary users:** Execs and senior leaders evaluating whether Docker is worth it for their org.
 
 **What lives here:**
-- Marketing website (product pages, pricing, use cases)
-- Full documentation site
-- Blog, changelog, release notes
-- Conversion flows (sign up, start trial)
+- Product pages, use cases, customer stories
+- Pricing and plan comparison
+- Conversion flows (sign up, start trial, talk to sales)
+- Blog, press, company
 
 **What does not live here:**
 - Any authenticated product experience
 - Settings of any kind
 - Billing (link to Admin)
+- Documentation (link to Docs)
+
+---
+
+## Docs
+
+**Primary users:** Anyone actively using Docker tools — developers, DevOps, admins.
+
+**What lives here:**
+- Full documentation site
+- Guides, tutorials, reference, API docs
+- Changelog and release notes
+
+**What does not live here:**
+- Marketing copy (www)
+- Product UI (each platform)
+- Settings of any kind
+
+**Note:** Any product surface can embed a contextual doc panel. That panel is a peek into Docs, not a copy of it. A platform team owns the panel component. The Docs team owns the content inside it.
 
 ---
 
@@ -159,7 +181,6 @@ Tech lead sets up a daily schedule: reviewer agent runs on all open PRs at 9am. 
 - API key management (BYOK)
 - GitHub and Slack integration credentials
 - Agent default behavior and instructions
-- Notification preferences (minimal — session failed, PR opened)
 
 **What does not live here:**
 - Org-level agent governance (Admin — what agents can access and execute)
@@ -224,10 +245,12 @@ Procurement subscribes to Team plan + Gordon add-on → enables PAYG for Build C
 
 1. **Gordon vs. Agentic Platform overlap.** Gordon (in Desktop) helps a developer in the moment — it has context about their local environment. The Agentic Platform runs agents autonomously on a codebase. The line: Gordon is synchronous and local. Agentic Platform is async and cloud. They share the AI-acts-on-your-behalf surface but serve different moments. Worth making this distinction explicit in product copy.
 
-2. **Admin: one workflow or three for AI governance?** Currently Admin serves Paola (billing), Alex (IT/provisioning), and Steph (security/governance) with pretty different goals. The settings are in the same place but the jobs-to-be-done are distinct enough that the navigation and IA inside Admin probably needs to reflect three different entry points, not one flat list.
+2. **Admin: one workflow or three for AI governance?** Admin serves procurement (billing), IT admins (provisioning), and security leads (governance) with pretty different goals. The settings are in the same place but the jobs-to-be-done are distinct enough that the navigation inside Admin probably needs to reflect three different entry points, not one flat list.
 
 3. **MCP Toolkit placement.** Currently under Container Platform / Desktop. If MCP becomes a first-class agentic primitive (agents consuming MCP servers), it may want a presence in Agentic Platform too. For now: primary home is Desktop, secondary surface in Agentic Platform.
 
-4. **Docs panels.** A platform team owns the component. Docs team owns the content. Which team decides where panels appear and what content they surface? Needs an owner before this scales.
+4. **Docs panels ownership.** A platform team owns the component. Docs team owns the content. Which team decides where panels appear and what content they surface? Needs an owner before this scales.
 
 5. **DHI: Hub or Admin?** The catalog and pull experience lives in Hub. The org-level mirroring configuration and customizations feel more like Admin (IT admin sets it up, not the developer). Currently listed under Hub — worth a conversation.
+
+6. **CLI placement.** Currently listed as a secondary surface under both Container Platform and Agentic Platform. Is that the right model or does it need a clearer primary home?
