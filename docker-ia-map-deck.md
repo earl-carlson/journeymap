@@ -9,7 +9,7 @@ size: 1920x1080
 <!-- _class: accent-wave -->
 <!-- _paginate: false -->
 
-<img src="/Users/earl/Documents/GitHub/loupe/themes/logos/brand/docker-mark.png" style="height: 24px; margin-bottom: 48px;">
+<img src="assets/docker-mark.png" style="height: 24px; margin-bottom: 48px;">
 
 # Docker IA Map
 
@@ -173,13 +173,26 @@ Hub is kept standalone for now even though Container Platform org owns it. Worth
 
 ---
 
-<!-- _class: table-slide -->
+<!-- _class: full -->
 
 ## www — journeys
 
-| Journey | Role | Key stages |
-|---|---|---|
-| **Evaluation & purchase** | Exec · Procurement | Land on docker.com → read product pages → compare plans → convert (sign up / talk to sales) |
+<style scoped>
+.jt { width: 100%; margin-top: 24px; }
+.jt-head { display: grid; grid-template-columns: 200px 260px 1fr; gap: 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 4px; }
+.jt-head-cell { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #9ca3af; }
+.jt-row { display: grid; grid-template-columns: 200px 260px 1fr; gap: 0; border-bottom: 1px solid #f3f4f6; padding: 12px 0; align-items: center; }
+.jt-row:last-child { border-bottom: none; }
+.jt-name { font-size: 14px; font-weight: 600; color: #111827; padding-right: 16px; }
+.jt-roles { padding-right: 16px; display: flex; flex-wrap: wrap; gap: 4px; }
+.jt-stages { font-size: 13.5px; color: #374151; line-height: 1.4; }
+.chip { display: inline-block; font-size: 10px; font-weight: 500; color: #0091E2; background: rgba(0,145,226,0.07); border: 1px solid rgba(0,145,226,0.18); border-radius: 3px; padding: 2px 7px; white-space: nowrap; }
+</style>
+
+<div class="jt">
+<div class="jt-head"><div class="jt-head-cell">Journey</div><div class="jt-head-cell">Role</div><div class="jt-head-cell">Key stages</div></div>
+<div class="jt-row"><div class="jt-name">Evaluation &amp; purchase</div><div class="jt-roles"><span class="chip">Exec</span><span class="chip">Procurement</span></div><div class="jt-stages">Land on docker.com → read product pages → compare plans → convert (sign up / talk to sales)</div></div>
+</div>
 
 ---
 
@@ -234,13 +247,26 @@ Hub is kept standalone for now even though Container Platform org owns it. Worth
 
 ---
 
-<!-- _class: table-slide -->
+<!-- _class: full -->
 
 ## Docs — journeys
 
-| Journey | Role | Key stages |
-|---|---|---|
-| **Self-serve documentation** | Any role | Hit an error or knowledge gap → search Docs → find the guide → apply it → unblocked |
+<style scoped>
+.jt { width: 100%; margin-top: 24px; }
+.jt-head { display: grid; grid-template-columns: 200px 260px 1fr; gap: 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 4px; }
+.jt-head-cell { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #9ca3af; }
+.jt-row { display: grid; grid-template-columns: 200px 260px 1fr; gap: 0; border-bottom: 1px solid #f3f4f6; padding: 12px 0; align-items: center; }
+.jt-row:last-child { border-bottom: none; }
+.jt-name { font-size: 14px; font-weight: 600; color: #111827; padding-right: 16px; }
+.jt-roles { padding-right: 16px; display: flex; flex-wrap: wrap; gap: 4px; }
+.jt-stages { font-size: 13.5px; color: #374151; line-height: 1.4; }
+.chip { display: inline-block; font-size: 10px; font-weight: 500; color: #0091E2; background: rgba(0,145,226,0.07); border: 1px solid rgba(0,145,226,0.18); border-radius: 3px; padding: 2px 7px; white-space: nowrap; }
+</style>
+
+<div class="jt">
+<div class="jt-head"><div class="jt-head-cell">Journey</div><div class="jt-head-cell">Role</div><div class="jt-head-cell">Key stages</div></div>
+<div class="jt-row"><div class="jt-name">Self-serve documentation</div><div class="jt-roles"><span class="chip">Any role</span></div><div class="jt-stages">Hit an error or knowledge gap → search Docs → find the guide → apply it → unblocked</div></div>
+</div>
 
 ---
 
@@ -307,18 +333,31 @@ Hub is kept standalone for now even though Container Platform org owns it. Worth
 
 ---
 
-<!-- _class: table-slide -->
+<!-- _class: full -->
 
 ## Hub — journeys
 
-| Journey | Role | Key stages |
-|---|---|---|
-| **Image discovery** | Developer | Search Hub → filter by category / trusted content → browse result → read repo overview → pull image |
-| **Private repo management** | Developer · Platform Engineer | Create private repo → push images → manage tags and visibility → monitor pull and storage usage |
-| **Hub Publisher** | Developer · Platform Engineer | Build image locally → tag → push to Hub → set visibility → write repo overview → team pulls |
-| **DVP insights** | Platform Engineer | Access DVP dashboard → view pull data by image → analyze distribution → export for reporting |
-| **MCP Hub discovery** | Developer | Browse MCP catalog on Hub → read server overview → connect to Docker Desktop to use |
-| **DHI on Hub** | Developer · Security Lead | Log in → browse DHI catalog → find hardened image → get pull command → enterprise: manage entitlements |
+<style scoped>
+.jt { width: 100%; margin-top: 20px; }
+.jt-head { display: grid; grid-template-columns: 200px 260px 1fr; gap: 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 4px; }
+.jt-head-cell { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #9ca3af; }
+.jt-row { display: grid; grid-template-columns: 200px 260px 1fr; gap: 0; border-bottom: 1px solid #f3f4f6; padding: 10px 0; align-items: center; }
+.jt-row:last-child { border-bottom: none; }
+.jt-name { font-size: 13px; font-weight: 600; color: #111827; padding-right: 16px; }
+.jt-roles { padding-right: 16px; display: flex; flex-wrap: wrap; gap: 4px; }
+.jt-stages { font-size: 13px; color: #374151; line-height: 1.4; }
+.chip { display: inline-block; font-size: 10px; font-weight: 500; color: #0091E2; background: rgba(0,145,226,0.07); border: 1px solid rgba(0,145,226,0.18); border-radius: 3px; padding: 2px 7px; white-space: nowrap; }
+</style>
+
+<div class="jt">
+<div class="jt-head"><div class="jt-head-cell">Journey</div><div class="jt-head-cell">Role</div><div class="jt-head-cell">Key stages</div></div>
+<div class="jt-row"><div class="jt-name">Image discovery</div><div class="jt-roles"><span class="chip">Developer</span></div><div class="jt-stages">Search Hub → filter by category / trusted content → browse result → read repo overview → pull image</div></div>
+<div class="jt-row"><div class="jt-name">Private repo management</div><div class="jt-roles"><span class="chip">Developer</span><span class="chip">Platform Engineer</span></div><div class="jt-stages">Create private repo → push images → manage tags and visibility → monitor pull and storage usage</div></div>
+<div class="jt-row"><div class="jt-name">Hub Publisher</div><div class="jt-roles"><span class="chip">Developer</span><span class="chip">Platform Engineer</span></div><div class="jt-stages">Build image locally → tag → push to Hub → set visibility → write repo overview → team pulls</div></div>
+<div class="jt-row"><div class="jt-name">DVP insights</div><div class="jt-roles"><span class="chip">Platform Engineer</span></div><div class="jt-stages">Access DVP dashboard → view pull data by image → analyze distribution → export for reporting</div></div>
+<div class="jt-row"><div class="jt-name">MCP Hub discovery</div><div class="jt-roles"><span class="chip">Developer</span></div><div class="jt-stages">Browse MCP catalog on Hub → read server overview → connect to Docker Desktop to use</div></div>
+<div class="jt-row"><div class="jt-name">DHI on Hub</div><div class="jt-roles"><span class="chip">Developer</span><span class="chip">Security Lead</span></div><div class="jt-stages">Log in → browse DHI catalog → find hardened image → get pull command → enterprise: manage entitlements</div></div>
+</div>
 
 <!--
 Hub now has 6 journeys. DVP insights was previously flagged as a gap (Q09). MCP Hub and DHI on Hub are disconnected from the main Hub search — that disconnection is itself a known issue.
@@ -398,23 +437,36 @@ Hub now has 6 journeys. DVP insights was previously flagged as a gap (Q09). MCP 
 
 ---
 
-<!-- _class: table-slide -->
+<!-- _class: full -->
 
 ## Container Platform — journeys
 
-| Journey | Role | Key stages |
-|---|---|---|
-| **First-time setup** | Developer | Install Desktop → open Learning center → complete walkthrough → run first container |
-| **Desktop & CLI** | Developer | Start work → run in container → iterate with logs, exec, container state |
-| **Model Runner** | Developer | Enable → pull model → hit local API → integrate → share with team |
-| **Gordon** | Developer | Hit an error → ask Gordon → get a specific fix → use daily |
-| **Docker Scout** | Developer · Security Lead | View image vulnerabilities → understand policy violation → remediate → recheck |
-| **Compose GUI** | Developer · DevOps | Inspect running stack → convert and deploy to Kubernetes |
-| **Build UI** | Developer · DevOps | Build fails → trace → fix → compare performance |
-| **Build Cloud** | DevOps Engineer | Connect to CI → shared cache → analytics → pipeline debug |
-| **Offload** | Developer · DevOps | Select cloud engine → workloads run remotely → team rollout |
-| **Sandboxes** | Developer · DevOps · IT Admin | Isolate agent → parallel threads → cloud sandboxes → org governance |
-| **Hardened Images** | Platform Engineer · Security Lead | Browse catalog → mirror to internal registry → apply customizations |
+<style scoped>
+.jt { width: 100%; margin-top: 16px; }
+.jt-head { display: grid; grid-template-columns: 180px 280px 1fr; gap: 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 7px; margin-bottom: 2px; }
+.jt-head-cell { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #9ca3af; }
+.jt-row { display: grid; grid-template-columns: 180px 280px 1fr; gap: 0; border-bottom: 1px solid #f3f4f6; padding: 7px 0; align-items: center; }
+.jt-row:last-child { border-bottom: none; }
+.jt-name { font-size: 12.5px; font-weight: 600; color: #111827; padding-right: 12px; }
+.jt-roles { padding-right: 12px; display: flex; flex-wrap: wrap; gap: 3px; }
+.jt-stages { font-size: 12px; color: #374151; line-height: 1.4; }
+.chip { display: inline-block; font-size: 9.5px; font-weight: 500; color: #0091E2; background: rgba(0,145,226,0.07); border: 1px solid rgba(0,145,226,0.18); border-radius: 3px; padding: 1px 6px; white-space: nowrap; }
+</style>
+
+<div class="jt">
+<div class="jt-head"><div class="jt-head-cell">Journey</div><div class="jt-head-cell">Role</div><div class="jt-head-cell">Key stages</div></div>
+<div class="jt-row"><div class="jt-name">First-time setup</div><div class="jt-roles"><span class="chip">Developer</span></div><div class="jt-stages">Install Desktop → open Learning center → complete walkthrough → run first container</div></div>
+<div class="jt-row"><div class="jt-name">Desktop &amp; CLI</div><div class="jt-roles"><span class="chip">Developer</span></div><div class="jt-stages">Start work → run in container → iterate with logs, exec, container state</div></div>
+<div class="jt-row"><div class="jt-name">Model Runner</div><div class="jt-roles"><span class="chip">Developer</span></div><div class="jt-stages">Enable → pull model → hit local API → integrate → share with team</div></div>
+<div class="jt-row"><div class="jt-name">Gordon</div><div class="jt-roles"><span class="chip">Developer</span></div><div class="jt-stages">Hit an error → ask Gordon → get a specific fix → use daily</div></div>
+<div class="jt-row"><div class="jt-name">Docker Scout</div><div class="jt-roles"><span class="chip">Developer</span><span class="chip">Security Lead</span></div><div class="jt-stages">View image vulnerabilities → understand policy violation → remediate → recheck</div></div>
+<div class="jt-row"><div class="jt-name">Compose GUI</div><div class="jt-roles"><span class="chip">Developer</span><span class="chip">DevOps Engineer</span></div><div class="jt-stages">Inspect running stack → convert and deploy to Kubernetes</div></div>
+<div class="jt-row"><div class="jt-name">Build UI</div><div class="jt-roles"><span class="chip">Developer</span><span class="chip">DevOps Engineer</span></div><div class="jt-stages">Build fails → trace in Build UI → fix Dockerfile → compare performance</div></div>
+<div class="jt-row"><div class="jt-name">Build Cloud</div><div class="jt-roles"><span class="chip">DevOps Engineer</span></div><div class="jt-stages">Connect to CI → shared cache kicks in → analytics → pipeline debug</div></div>
+<div class="jt-row"><div class="jt-name">Offload</div><div class="jt-roles"><span class="chip">Developer</span><span class="chip">DevOps Engineer</span></div><div class="jt-stages">Select cloud engine → workloads run remotely → team rollout</div></div>
+<div class="jt-row"><div class="jt-name">Sandboxes</div><div class="jt-roles"><span class="chip">Developer</span><span class="chip">DevOps Engineer</span><span class="chip">IT Admin</span></div><div class="jt-stages">Isolate agent → parallel threads → cloud sandboxes → org governance</div></div>
+<div class="jt-row"><div class="jt-name">Hardened Images</div><div class="jt-roles"><span class="chip">Platform Engineer</span><span class="chip">Security Lead</span></div><div class="jt-stages">Browse catalog → mirror to internal registry → apply customizations</div></div>
+</div>
 
 ---
 
@@ -486,14 +538,27 @@ Hub now has 6 journeys. DVP insights was previously flagged as a gap (Q09). MCP 
 
 ---
 
-<!-- _class: table-slide -->
+<!-- _class: full -->
 
 ## Agentic Platform — journeys
 
-| Journey | Role | Key stages |
-|---|---|---|
-| **Agentic Platform** | Tech Lead | Connect repo → first agent run → customize agents → schedule → team rollout |
-| **MCP Toolkit** | Developer | Browse catalog → connect server → connect AI client → share profile |
+<style scoped>
+.jt { width: 100%; margin-top: 24px; }
+.jt-head { display: grid; grid-template-columns: 200px 260px 1fr; gap: 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 4px; }
+.jt-head-cell { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #9ca3af; }
+.jt-row { display: grid; grid-template-columns: 200px 260px 1fr; gap: 0; border-bottom: 1px solid #f3f4f6; padding: 13px 0; align-items: center; }
+.jt-row:last-child { border-bottom: none; }
+.jt-name { font-size: 14px; font-weight: 600; color: #111827; padding-right: 16px; }
+.jt-roles { padding-right: 16px; display: flex; flex-wrap: wrap; gap: 4px; }
+.jt-stages { font-size: 13.5px; color: #374151; line-height: 1.4; }
+.chip { display: inline-block; font-size: 10px; font-weight: 500; color: #0091E2; background: rgba(0,145,226,0.07); border: 1px solid rgba(0,145,226,0.18); border-radius: 3px; padding: 2px 7px; white-space: nowrap; }
+</style>
+
+<div class="jt">
+<div class="jt-head"><div class="jt-head-cell">Journey</div><div class="jt-head-cell">Role</div><div class="jt-head-cell">Key stages</div></div>
+<div class="jt-row"><div class="jt-name">Agentic Platform</div><div class="jt-roles"><span class="chip">Tech Lead</span></div><div class="jt-stages">Connect repo → first agent run → customize agents → schedule → team rollout</div></div>
+<div class="jt-row"><div class="jt-name">MCP Toolkit</div><div class="jt-roles"><span class="chip">Developer</span></div><div class="jt-stages">Browse catalog → connect server → connect AI client → share profile with team</div></div>
+</div>
 
 ---
 
@@ -568,15 +633,28 @@ Hub now has 6 journeys. DVP insights was previously flagged as a gap (Q09). MCP 
 
 ---
 
-<!-- _class: table-slide -->
+<!-- _class: full -->
 
 ## Admin — journeys
 
-| Journey | Role | Key stages |
-|---|---|---|
-| **Billing** | Procurement · IT Admin | Subscribe → enable PAYG → manage seats → review usage |
-| **Admin & org provisioning** | IT Admin · Procurement · Security Lead | Set up org → configure SSO + SCIM → assign licenses → verify compliance |
-| **DD deployment & policy management** | IT Admin · Platform Engineer | Deploy Desktop to org machines → define settings policies → view compliance reporting |
+<style scoped>
+.jt { width: 100%; margin-top: 24px; }
+.jt-head { display: grid; grid-template-columns: 240px 320px 1fr; gap: 0; border-bottom: 1px solid #e5e7eb; padding-bottom: 8px; margin-bottom: 4px; }
+.jt-head-cell { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #9ca3af; }
+.jt-row { display: grid; grid-template-columns: 240px 320px 1fr; gap: 0; border-bottom: 1px solid #f3f4f6; padding: 13px 0; align-items: center; }
+.jt-row:last-child { border-bottom: none; }
+.jt-name { font-size: 14px; font-weight: 600; color: #111827; padding-right: 16px; }
+.jt-roles { padding-right: 16px; display: flex; flex-wrap: wrap; gap: 4px; }
+.jt-stages { font-size: 13.5px; color: #374151; line-height: 1.4; }
+.chip { display: inline-block; font-size: 10px; font-weight: 500; color: #0091E2; background: rgba(0,145,226,0.07); border: 1px solid rgba(0,145,226,0.18); border-radius: 3px; padding: 2px 7px; white-space: nowrap; }
+</style>
+
+<div class="jt">
+<div class="jt-head"><div class="jt-head-cell">Journey</div><div class="jt-head-cell">Role</div><div class="jt-head-cell">Key stages</div></div>
+<div class="jt-row"><div class="jt-name">Billing</div><div class="jt-roles"><span class="chip">Procurement</span><span class="chip">IT Admin</span></div><div class="jt-stages">Subscribe → enable PAYG → manage seats → review usage at end of period</div></div>
+<div class="jt-row"><div class="jt-name">Admin &amp; org provisioning</div><div class="jt-roles"><span class="chip">IT Admin</span><span class="chip">Procurement</span><span class="chip">Security Lead</span></div><div class="jt-stages">Set up org → configure SSO + SCIM → assign licenses → verify compliance</div></div>
+<div class="jt-row"><div class="jt-name">DD deployment &amp; policy management</div><div class="jt-roles"><span class="chip">IT Admin</span><span class="chip">Platform Engineer</span></div><div class="jt-stages">Deploy Desktop to org machines → define settings policies → view compliance reporting</div></div>
+</div>
 
 ---
 
@@ -710,7 +788,7 @@ Eight questions — four active, one blocked, three parked. The active ones need
 <!-- _class: accent-wave -->
 <!-- _paginate: false -->
 
-<img src="/Users/earl/Documents/GitHub/loupe/themes/logos/brand/docker-mark.png" style="height: 24px; margin-bottom: 48px;">
+<img src="assets/docker-mark.png" style="height: 24px; margin-bottom: 48px;">
 
 # 
 

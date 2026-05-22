@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Journey Layout Options</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #0f0f0f;
+  color: #e2e8f0;
+  padding: 48px 32px;
+  min-height: 100vh;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 72px;
+}
+
+.page-header h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.page-header p {
+  font-size: 15px;
+  color: #64748b;
+}
+
+/* SLIDE WRAPPER — 16:9 at 1200px wide */
+.option {
+  margin-bottom: 80px;
+}
+
+.option-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0091E2;
+  margin-bottom: 12px;
+}
+
+.option-desc {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 20px;
+  max-width: 700px;
+}
+
+.slide {
+  width: 1200px;
+  aspect-ratio: 16/9;
+  background: #f4f4f6;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 40px rgba(0,0,0,0.4);
+}
+
+/* ─── SHARED SLIDE CHROME ─── */
+.slide-header {
+  padding: 36px 56px 0;
+  flex-shrink: 0;
+}
+
+.slide-eyebrow {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #0091E2;
+  margin-bottom: 6px;
+}
+
+.slide-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.slide-body {
+  flex: 1;
+  padding: 24px 56px 36px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─────────────────────────────────────────
+   OPTION A — Multi-slide table split
+   ───────────────────────────────────────── */
+.opt-a .slide-body {
+  justify-content: center;
+}
+
+.table-clean {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.table-clean thead tr {
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.table-clean th {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  text-align: left;
+  padding: 0 16px 10px 0;
+}
+
+.table-clean td {
+  padding: 11px 16px 11px 0;
+  vertical-align: top;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+  line-height: 1.4;
+}
+
+.table-clean tr:last-child td { border-bottom: none; }
+
+.table-clean td:first-child {
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.role-chip {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 500;
+  color: #0091E2;
+  background: rgba(0,145,226,0.08);
+  border: 1px solid rgba(0,145,226,0.2);
+  border-radius: 3px;
+  padding: 2px 7px;
+  white-space: nowrap;
+}
+
+.role-chip + .role-chip { margin-left: 4px; }
+
+.slide-count {
+  position: absolute;
+  bottom: 20px;
+  right: 40px;
+  font-size: 11px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+/* ─────────────────────────────────────────
+   OPTION B — Journey cards 2×3 grid
+   ───────────────────────────────────────── */
+.opt-b .slide-body {
+  justify-content: flex-start;
+}
+
+.cards-grid {
+  display: grid;
+  gap: 10px;
+  flex: 1;
+}
+
+.cards-grid-2x3 { grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; }
+.cards-grid-2x2 { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; }
+
+.journey-card-b {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.jcard-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.jcard-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.jcard-role {
+  font-size: 10px;
+  font-weight: 500;
+  color: #0091E2;
+  background: rgba(0,145,226,0.07);
+  border-radius: 3px;
+  padding: 1px 6px;
+}
+
+.jcard-stages {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.jcard-stage {
+  font-size: 10.5px;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.jcard-arrow {
+  font-size: 9px;
+  color: #d1d5db;
+  flex-shrink: 0;
+}
+
+/* ─────────────────────────────────────────
+   OPTION C — Swimlane / stage map
+   ───────────────────────────────────────── */
+.opt-c .slide-body {
+  justify-content: flex-start;
+  padding-top: 20px;
+}
+
+.swimlanes {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  flex: 1;
+}
+
+.swimlane {
+  display: grid;
+  grid-template-columns: 180px 1fr 1fr 1fr 1fr;
+  gap: 6px;
+  align-items: stretch;
+  min-height: 0;
+  flex: 1;
+}
+
+.swimlane-label {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  padding-right: 12px;
+  border-right: 2px solid #e5e7eb;
+}
+
+.swimlane-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+}
+
+.swimlane-role {
+  font-size: 9.5px;
+  color: #0091E2;
+  font-weight: 500;
+}
+
+.swimlane-stage {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 10px;
+  color: #374151;
+  line-height: 1.4;
+  display: flex;
+  align-items: center;
+}
+
+.swimlane-stage.empty {
+  background: transparent;
+  border-color: transparent;
+}
+
+.stage-col-header {
+  grid-column: 2 / -1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.stage-col-label {
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #9ca3af;
+  text-align: center;
+}
+
+/* ─────────────────────────────────────────
+   OPTION D — One journey per slide, full detail
+   ───────────────────────────────────────── */
+.opt-d .slide-body {
+  justify-content: center;
+}
+
+.journey-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.jd-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.jd-role-chip {
+  font-size: 11px;
+  font-weight: 500;
+  color: #0091E2;
+  background: rgba(0,145,226,0.08);
+  border: 1px solid rgba(0,145,226,0.2);
+  border-radius: 4px;
+  padding: 3px 10px;
+}
+
+.jd-stages {
+  display: grid;
+  gap: 10px;
+}
+
+.jd-stages-4 { grid-template-columns: repeat(4, 1fr); }
+.jd-stages-5 { grid-template-columns: repeat(5, 1fr); }
+.jd-stages-6 { grid-template-columns: repeat(6, 1fr); }
+
+.jd-stage {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 18px 16px;
+  position: relative;
+}
+
+.jd-stage-num {
+  font-size: 10px;
+  font-weight: 700;
+  color: #d1d5db;
+  margin-bottom: 8px;
+}
+
+.jd-stage-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 6px;
+  line-height: 1.3;
+}
+
+.jd-stage-desc {
+  font-size: 11.5px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+.jd-connector {
+  position: absolute;
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 14px;
+  background: #0091E2;
+  border-radius: 50%;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jd-connector svg {
+  width: 8px;
+  height: 8px;
+}
+
+.jd-stage:last-child .jd-connector { display: none; }
+
+/* progress bar variant */
+.jd-progress {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 8px;
+}
+
+.jd-prog-step {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.jd-prog-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #0091E2;
+  flex-shrink: 0;
+}
+
+.jd-prog-line {
+  flex: 1;
+  height: 2px;
+  background: #e5e7eb;
+}
+
+.jd-prog-step:last-child .jd-prog-line { display: none; }
+
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>Journey Layout Options</h1>
+  <p>All four approaches using Hub journeys as the test case (6 journeys). Evaluate at 1200×675px — actual slide scale.</p>
+</div>
+
+<!-- ════════════════════════════════════════
+     OPTION A — Multi-slide table split
+     ════════════════════════════════════════ -->
+<div class="option opt-a">
+  <div class="option-label">Option A — Multi-slide table split</div>
+  <div class="option-desc">Keep the table format. Split any area with more than 4 journeys across multiple slides. Simple, no redesign, fast to apply everywhere. The table stays readable but the format doesn't do much for the content.</div>
+
+  <!-- Slide A1 -->
+  <div class="slide" style="margin-bottom: 12px;">
+    <div class="slide-header">
+      <div class="slide-eyebrow">Hub · Journeys 1 of 2</div>
+      <div class="slide-title">Hub — journeys</div>
+    </div>
+    <div class="slide-body">
+      <table class="table-clean">
+        <thead>
+          <tr>
+            <th style="width:200px">Journey</th>
+            <th style="width:240px">Role</th>
+            <th>Key stages</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Image discovery</td>
+            <td><span class="role-chip">Developer</span></td>
+            <td>Search Hub → filter by category / trusted content → browse result → read repo overview → pull image</td>
+          </tr>
+          <tr>
+            <td>Private repo management</td>
+            <td><span class="role-chip">Developer</span> <span class="role-chip">Platform Engineer</span></td>
+            <td>Create private repo → push images → manage tags and visibility → monitor pull and storage usage</td>
+          </tr>
+          <tr>
+            <td>Hub Publisher</td>
+            <td><span class="role-chip">Developer</span> <span class="role-chip">Platform Engineer</span></td>
+            <td>Build image locally → tag → push → set visibility → write repo overview → team pulls</td>
+          </tr>
+          <tr>
+            <td>DVP insights</td>
+            <td><span class="role-chip">Platform Engineer</span></td>
+            <td>Access DVP dashboard → view pull data by image → analyze distribution → export for reporting</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="slide-count">1 / 2</div>
+  </div>
+
+  <!-- Slide A2 -->
+  <div class="slide">
+    <div class="slide-header">
+      <div class="slide-eyebrow">Hub · Journeys 2 of 2</div>
+      <div class="slide-title">Hub — journeys (cont.)</div>
+    </div>
+    <div class="slide-body">
+      <table class="table-clean">
+        <thead>
+          <tr>
+            <th style="width:200px">Journey</th>
+            <th style="width:240px">Role</th>
+            <th>Key stages</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>MCP Hub discovery</td>
+            <td><span class="role-chip">Developer</span></td>
+            <td>Browse MCP catalog on Hub → read server overview → connect to Docker Desktop to use</td>
+          </tr>
+          <tr>
+            <td>DHI on Hub</td>
+            <td><span class="role-chip">Developer</span> <span class="role-chip">Security Lead</span></td>
+            <td>Log in → browse DHI catalog → find hardened image → get pull command → enterprise: manage entitlements</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="slide-count">2 / 2</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     OPTION B — Journey cards 2×3 grid
+     ════════════════════════════════════════ -->
+<div class="option opt-b">
+  <div class="option-label">Option B — Journey cards, 2×3 grid</div>
+  <div class="option-desc">Each journey gets a card: title, role pill(s), and key stages as an inline flow. 6 per slide in a 3-column grid. One slide per area regardless of journey count. More visual, handles density better than a table.</div>
+
+  <div class="slide">
+    <div class="slide-header">
+      <div class="slide-eyebrow">Hub</div>
+      <div class="slide-title">Hub — journeys</div>
+    </div>
+    <div class="slide-body">
+      <div class="cards-grid cards-grid-2x3">
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Image discovery</div>
+          <div class="jcard-roles">
+            <span class="jcard-role">Developer</span>
+          </div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Search Hub</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Filter by trusted content</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Browse result</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Pull image</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Private repo management</div>
+          <div class="jcard-roles">
+            <span class="jcard-role">Developer</span>
+            <span class="jcard-role">Platform Engineer</span>
+          </div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Create repo</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Push images</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Manage tags</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Monitor usage</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Hub Publisher</div>
+          <div class="jcard-roles">
+            <span class="jcard-role">Developer</span>
+            <span class="jcard-role">Platform Engineer</span>
+          </div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Build locally</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Tag + push</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Set visibility</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Write overview</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">DVP insights</div>
+          <div class="jcard-roles">
+            <span class="jcard-role">Platform Engineer</span>
+          </div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Access dashboard</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">View pull data</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Analyze distribution</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Export</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">MCP Hub discovery</div>
+          <div class="jcard-roles">
+            <span class="jcard-role">Developer</span>
+          </div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Browse MCP catalog</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Read server overview</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Connect to Desktop</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">DHI on Hub</div>
+          <div class="jcard-roles">
+            <span class="jcard-role">Developer</span>
+            <span class="jcard-role">Security Lead</span>
+          </div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Browse DHI catalog</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Find image</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Get pull command</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Manage entitlements</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     OPTION C — Swimlane / stage map
+     ════════════════════════════════════════ -->
+<div class="option opt-c">
+  <div class="option-label">Option C — Swimlane / stage map</div>
+  <div class="option-desc">Each journey is a horizontal row. Columns map to journey stages. Shows the flow and lets you compare stages across journeys at a glance. Dense at 6 rows but readable. Best for areas where stages align (like Admin). Tightest at scale.</div>
+
+  <div class="slide">
+    <div class="slide-header">
+      <div class="slide-eyebrow">Hub</div>
+      <div class="slide-title">Hub — journeys</div>
+    </div>
+    <div class="slide-body" style="padding-top: 16px;">
+
+      <div class="swimlanes">
+
+        <!-- header row -->
+        <div class="swimlane" style="min-height: unset; flex: 0;">
+          <div></div>
+          <div style="font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;padding-left:2px;">Stage 1</div>
+          <div style="font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;padding-left:2px;">Stage 2</div>
+          <div style="font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;padding-left:2px;">Stage 3</div>
+          <div style="font-size:9px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#9ca3af;padding-left:2px;">Stage 4</div>
+        </div>
+
+        <div class="swimlane">
+          <div class="swimlane-label">
+            <div class="swimlane-name">Image discovery</div>
+            <div class="swimlane-role">Developer</div>
+          </div>
+          <div class="swimlane-stage">Search Hub, filter by category or trusted content</div>
+          <div class="swimlane-stage">Browse results and read repo overview</div>
+          <div class="swimlane-stage">Pull image</div>
+          <div class="swimlane-stage empty"></div>
+        </div>
+
+        <div class="swimlane">
+          <div class="swimlane-label">
+            <div class="swimlane-name">Private repo management</div>
+            <div class="swimlane-role">Developer · Platform Engineer</div>
+          </div>
+          <div class="swimlane-stage">Create private repo, push first image</div>
+          <div class="swimlane-stage">Manage tags and visibility settings</div>
+          <div class="swimlane-stage">Monitor pull counts and storage usage</div>
+          <div class="swimlane-stage empty"></div>
+        </div>
+
+        <div class="swimlane">
+          <div class="swimlane-label">
+            <div class="swimlane-name">Hub Publisher</div>
+            <div class="swimlane-role">Developer · Platform Engineer</div>
+          </div>
+          <div class="swimlane-stage">Build image locally, tag it</div>
+          <div class="swimlane-stage">Push to Hub, set visibility</div>
+          <div class="swimlane-stage">Write repo overview and README</div>
+          <div class="swimlane-stage">Set up webhooks and access controls</div>
+        </div>
+
+        <div class="swimlane">
+          <div class="swimlane-label">
+            <div class="swimlane-name">DVP insights</div>
+            <div class="swimlane-role">Platform Engineer</div>
+          </div>
+          <div class="swimlane-stage">Access DVP dashboard</div>
+          <div class="swimlane-stage">View pull data by image</div>
+          <div class="swimlane-stage">Analyze distribution patterns</div>
+          <div class="swimlane-stage">Export data for reporting</div>
+        </div>
+
+        <div class="swimlane">
+          <div class="swimlane-label">
+            <div class="swimlane-name">MCP Hub discovery</div>
+            <div class="swimlane-role">Developer</div>
+          </div>
+          <div class="swimlane-stage">Browse MCP catalog on Hub</div>
+          <div class="swimlane-stage">Read server overview and use cases</div>
+          <div class="swimlane-stage">Connect to Docker Desktop</div>
+          <div class="swimlane-stage empty"></div>
+        </div>
+
+        <div class="swimlane">
+          <div class="swimlane-label">
+            <div class="swimlane-name">DHI on Hub</div>
+            <div class="swimlane-role">Developer · Security Lead</div>
+          </div>
+          <div class="swimlane-stage">Log in, browse DHI catalog</div>
+          <div class="swimlane-stage">Find hardened image, get pull command</div>
+          <div class="swimlane-stage">Enterprise: manage entitlements</div>
+          <div class="swimlane-stage empty"></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     OPTION D — One journey per slide, full detail
+     ════════════════════════════════════════ -->
+<div class="option opt-d">
+  <div class="option-label">Option D — One journey per slide, full detail</div>
+  <div class="option-desc">Each journey gets its own slide. Stage columns show label + description. The most useful for stakeholders who want to actually understand what a journey involves. Adds ~20 slides but each one is self-contained and presentation-ready. Showing two examples.</div>
+
+  <!-- Example 1: Image discovery -->
+  <div class="slide" style="margin-bottom: 12px;">
+    <div class="slide-header" style="padding-bottom: 4px;">
+      <div class="slide-eyebrow">Hub · Journey</div>
+      <div style="display:flex; align-items:baseline; gap:16px;">
+        <div class="slide-title">Image discovery</div>
+        <span style="font-size:12px;font-weight:500;color:#0091E2;background:rgba(0,145,226,0.08);border:1px solid rgba(0,145,226,0.2);border-radius:4px;padding:3px 10px;">Developer</span>
+      </div>
+    </div>
+    <div class="slide-body" style="justify-content:center;">
+      <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px;">
+        <div class="jd-stage">
+          <div class="jd-stage-num">01</div>
+          <div class="jd-stage-title">Search Hub</div>
+          <div class="jd-stage-desc">Developer searches for a base image or tool using keywords, categories, or use-case filters.</div>
+        </div>
+        <div class="jd-stage">
+          <div class="jd-stage-num">02</div>
+          <div class="jd-stage-title">Filter by trusted content</div>
+          <div class="jd-stage-desc">Filters by Docker Official Images, Verified Publisher, or Sponsored OSS to narrow to trustworthy results.</div>
+        </div>
+        <div class="jd-stage">
+          <div class="jd-stage-num">03</div>
+          <div class="jd-stage-title">Browse and evaluate</div>
+          <div class="jd-stage-desc">Opens a repository, reads the overview, checks tags, reviews vulnerability and health status.</div>
+        </div>
+        <div class="jd-stage">
+          <div class="jd-stage-num">04</div>
+          <div class="jd-stage-title">Pull image</div>
+          <div class="jd-stage-desc">Copies the pull command and runs it locally. Image is now available in Docker Desktop or via CLI.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example 2: Hub Publisher — more stages -->
+  <div class="slide">
+    <div class="slide-header" style="padding-bottom: 4px;">
+      <div class="slide-eyebrow">Hub · Journey</div>
+      <div style="display:flex; align-items:baseline; gap:12px;">
+        <div class="slide-title">Hub Publisher</div>
+        <span style="font-size:12px;font-weight:500;color:#0091E2;background:rgba(0,145,226,0.08);border:1px solid rgba(0,145,226,0.2);border-radius:4px;padding:3px 10px;">Developer</span>
+        <span style="font-size:12px;font-weight:500;color:#0091E2;background:rgba(0,145,226,0.08);border:1px solid rgba(0,145,226,0.2);border-radius:4px;padding:3px 10px;">Platform Engineer</span>
+      </div>
+    </div>
+    <div class="slide-body" style="justify-content:center;">
+      <div style="display:grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">
+        <div class="jd-stage">
+          <div class="jd-stage-num">01</div>
+          <div class="jd-stage-title">Build locally</div>
+          <div class="jd-stage-desc">Builds the image locally with Docker CLI. Tags it with the correct namespace and version.</div>
+        </div>
+        <div class="jd-stage">
+          <div class="jd-stage-num">02</div>
+          <div class="jd-stage-title">Push to Hub</div>
+          <div class="jd-stage-desc">Authenticates and pushes the image to the Docker Hub repository. Sets visibility — public or private.</div>
+        </div>
+        <div class="jd-stage">
+          <div class="jd-stage-num">03</div>
+          <div class="jd-stage-title">Write repo overview</div>
+          <div class="jd-stage-desc">Adds a README so others know how to use the image. No enforced structure — consistency varies.</div>
+        </div>
+        <div class="jd-stage">
+          <div class="jd-stage-num">04</div>
+          <div class="jd-stage-title">Set up automation</div>
+          <div class="jd-stage-desc">Configures webhooks for downstream CI triggers. Sets repository access for the org namespace.</div>
+        </div>
+        <div class="jd-stage">
+          <div class="jd-stage-num">05</div>
+          <div class="jd-stage-title">Monitor usage</div>
+          <div class="jd-stage-desc">Checks pull counts, storage usage, and tag activity via Hub insights over time.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ════════════════════════════════════════
+     BONUS: Option B applied to Container Platform
+     (11 journeys — shows how it handles large sets)
+     ════════════════════════════════════════ -->
+<div class="option opt-b">
+  <div class="option-label">Option B applied to Container Platform (11 journeys — 2 slides)</div>
+  <div class="option-desc">Shows how Option B handles a large area. 6 cards on slide 1, 5 on slide 2. Still one clear story per card.</div>
+
+  <div class="slide" style="margin-bottom:12px;">
+    <div class="slide-header">
+      <div class="slide-eyebrow">Container Platform · Journeys 1 of 2</div>
+      <div class="slide-title">Container Platform — journeys</div>
+    </div>
+    <div class="slide-body">
+      <div class="cards-grid cards-grid-2x3">
+
+        <div class="journey-card-b">
+          <div class="jcard-title">First-time setup</div>
+          <div class="jcard-roles"><span class="jcard-role">Developer</span></div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Install Desktop</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Open Learning center</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Complete walkthrough</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Run first container</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Desktop & CLI</div>
+          <div class="jcard-roles"><span class="jcard-role">Developer</span></div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Start work</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Run in container</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Iterate with logs + exec</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Model Runner</div>
+          <div class="jcard-roles"><span class="jcard-role">Developer</span></div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Enable in Desktop</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Pull model</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Hit local API</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Integrate</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Gordon</div>
+          <div class="jcard-roles"><span class="jcard-role">Developer</span></div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Hit an error</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Ask Gordon</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Get specific fix</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Use daily</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Docker Scout</div>
+          <div class="jcard-roles">
+            <span class="jcard-role">Developer</span>
+            <span class="jcard-role">Security Lead</span>
+          </div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">View vulnerabilities</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Understand policy</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Remediate</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Recheck</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Compose GUI</div>
+          <div class="jcard-roles">
+            <span class="jcard-role">Developer</span>
+            <span class="jcard-role">DevOps Engineer</span>
+          </div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Run compose up</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Inspect stack</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Convert to Kubernetes</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="slide-count">1 / 2</div>
+  </div>
+
+  <div class="slide">
+    <div class="slide-header">
+      <div class="slide-eyebrow">Container Platform · Journeys 2 of 2</div>
+      <div class="slide-title">Container Platform — journeys (cont.)</div>
+    </div>
+    <div class="slide-body">
+      <div class="cards-grid" style="grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr;">
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Build UI</div>
+          <div class="jcard-roles">
+            <span class="jcard-role">Developer</span>
+            <span class="jcard-role">DevOps Engineer</span>
+          </div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Build fails</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Trace in Build UI</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Fix Dockerfile</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Compare perf</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Build Cloud</div>
+          <div class="jcard-roles"><span class="jcard-role">DevOps Engineer</span></div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Connect to CI</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Shared cache</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Analytics</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Pipeline debug</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Offload</div>
+          <div class="jcard-roles">
+            <span class="jcard-role">Developer</span>
+            <span class="jcard-role">DevOps Engineer</span>
+          </div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Select cloud engine</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Workloads run remotely</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Team rollout</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Sandboxes</div>
+          <div class="jcard-roles">
+            <span class="jcard-role">Developer</span>
+            <span class="jcard-role">DevOps Engineer</span>
+            <span class="jcard-role">IT Admin</span>
+          </div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Isolate agent</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Parallel threads</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Cloud sandboxes</span>
+          </div>
+        </div>
+
+        <div class="journey-card-b">
+          <div class="jcard-title">Hardened Images</div>
+          <div class="jcard-roles">
+            <span class="jcard-role">Platform Engineer</span>
+            <span class="jcard-role">Security Lead</span>
+          </div>
+          <div class="jcard-stages">
+            <span class="jcard-stage">Browse DHI catalog</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Mirror to registry</span>
+            <span class="jcard-arrow">›</span>
+            <span class="jcard-stage">Apply customizations</span>
+          </div>
+        </div>
+
+        <!-- empty slot — intentionally blank -->
+        <div style="background: transparent;"></div>
+
+      </div>
+    </div>
+    <div class="slide-count">2 / 2</div>
+  </div>
+
+</div>
+
+</body>
+</html>

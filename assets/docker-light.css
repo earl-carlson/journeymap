@@ -1,0 +1,776 @@
+/* @theme docker-light */
+
+/*
+ * Docker Design System (DDS) — Light Mode Marp Theme
+ *
+ * Built entirely from DDS tokens. Every value traces to a named token.
+ * For internal all-hands, team presentations, design reviews, and
+ * anything shown in a well-lit room.
+ *
+ * Token map:
+ *   bg:           #f4f4f6  (dds-gray-10 light)
+ *   bg-elevated:  #ffffff  (white — elevated surfaces only, not slide bg)
+ *   bg-surface:   #f9fafb  (dds-gray-5 light)
+ *   fg:           #17191e  (dds-gray-80 light, near-black)
+ *   fg-secondary: #505968  (dds-gray-60 light)
+ *   fg-muted:     #677285  (dds-gray-50 light)
+ *   fg-subtle:    #8993a5  (dds-gray-40 light)
+ *   primary:      #1d63ed  (light blue-50)
+ *   primary-dark: #0c49c2  (light blue-60, hover/active)
+ *   border:       #e1e2e6  (dds-gray-20 light)
+ *   success:      #2e7f74  (light green-50)
+ *   warning:      #b85504  (light amber-50)
+ *   error:        #d52536  (light red-50)
+ *   premium:      #7d2eff  (light violet-50)
+ *
+ * Depth hierarchy: gray bg (#f4f4f6) > white card (#ffffff) > content
+ * This is the same pattern Docker's CDO uses. White is reserved for
+ * elevated surfaces. The warm gray is the canvas.
+ */
+
+@import "default";
+
+/* ===== Inter Variable — latin-ext subset ===== */
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('inter-variable-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1E9F, U+1EF2-1EFF,
+    U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+/* ===== Inter Variable — latin subset ===== */
+
+@font-face {
+  font-family: 'Inter Variable';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('inter-variable-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191,
+    U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ===== Design tokens ===== */
+
+:root {
+  /* Backgrounds */
+  --dds-bg:           #f4f4f6; /* dds-gray-10 light — slide canvas */
+  --dds-bg-elevated:  #ffffff; /* white — cards, code blocks, elevated surfaces */
+  --dds-bg-surface:   #f9fafb; /* dds-gray-5 light — subtle surface variant */
+
+  /* Foregrounds */
+  --dds-fg:           #17191e; /* dds-gray-80 light — primary text */
+  --dds-fg-secondary: #505968; /* dds-gray-60 light — body text, secondary labels */
+  --dds-fg-muted:     #677285; /* dds-gray-50 light — descriptions, metadata */
+  --dds-fg-subtle:    #8993a5; /* dds-gray-40 light — footer, pagination, placeholders */
+
+  /* Brand */
+  --dds-primary:      #1d63ed; /* light blue-50 — accent, links, markers */
+  --dds-primary-dark: #0c49c2; /* light blue-60 — hover/active states */
+
+  /* Semantic */
+  --dds-success:      #2e7f74; /* light green-50 */
+  --dds-warning:      #b85504; /* light amber-50 */
+  --dds-error:        #d52536; /* light red-50 */
+  --dds-premium:      #7d2eff; /* light violet-50 */
+
+  /* Structure */
+  --dds-border:       #e1e2e6; /* dds-gray-20 light */
+
+  /* Typography */
+  --dds-sans: 'Inter Variable', system-ui, -apple-system, sans-serif;
+  --dds-mono: ui-monospace, 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', monospace;
+}
+
+/* ===== Base slide ===== */
+
+section {
+  background: var(--dds-bg);           /* dds-gray-10 light — warm gray canvas, not white */
+  color: var(--dds-fg);                /* dds-gray-80 light */
+  font-family: var(--dds-sans);
+  font-size: 28px;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+  padding: 64px;
+}
+
+/* ===== Headings ===== */
+
+section h1 {
+  color: var(--dds-fg);                /* dds-gray-80 light */
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+  margin-bottom: 24px;
+}
+
+section h2 {
+  color: var(--dds-fg);                /* dds-gray-80 light */
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+
+section h3 {
+  color: var(--dds-fg-secondary);      /* dds-gray-60 light */
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.3;
+  margin-bottom: 12px;
+}
+
+/* ===== Body ===== */
+
+section p {
+  color: var(--dds-fg-secondary);      /* dds-gray-60 light */
+  margin-bottom: 16px;
+}
+
+section strong {
+  color: var(--dds-fg);                /* dds-gray-80 light — full weight for emphasis */
+  font-weight: 600;
+}
+
+section em {
+  color: var(--dds-primary);           /* light blue-50 — accent, not italic */
+  font-style: normal;
+}
+
+section a {
+  color: var(--dds-primary);           /* light blue-50 */
+  text-decoration: none;
+}
+
+/* ===== Lists ===== */
+
+section ul,
+section ol {
+  color: var(--dds-fg-secondary);      /* dds-gray-60 light */
+  margin-bottom: 16px;
+}
+
+section li {
+  margin-bottom: 8px;
+}
+
+section li::marker {
+  color: var(--dds-primary);           /* light blue-50 */
+}
+
+/* ===== Code ===== */
+
+/* Inline code: white elevated bg, border, primary color */
+section code {
+  background: var(--dds-bg-elevated);  /* white — elevated above gray canvas */
+  border: 1px solid var(--dds-border); /* dds-gray-20 light */
+  border-radius: 6px;
+  color: var(--dds-primary);           /* light blue-50 */
+  font-family: var(--dds-mono);
+  font-size: 0.82em;
+  padding: 2px 8px;
+}
+
+/* Code blocks: white card on gray canvas — depth through lightness */
+section pre {
+  background: var(--dds-bg-elevated);  /* white — elevated surface */
+  border: 1px solid var(--dds-border); /* dds-gray-20 light */
+  border-radius: 12px;
+  box-shadow: 0 1px 2px rgba(23, 25, 30, 0.06); /* shadow-xs only — light mode only */
+  padding: 28px 32px;
+  margin-bottom: 16px;
+}
+
+section pre code {
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: var(--dds-fg);                /* dds-gray-80 light */
+  font-size: 24px;
+  padding: 0;
+}
+
+/* ===== Tables ===== */
+
+section table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+/* Kill Marp's default alternating row backgrounds */
+section table,
+section table thead,
+section table tbody,
+section table tr,
+section table tr:nth-child(even),
+section table tr:nth-child(odd),
+section table tr:nth-child(even) td,
+section table tr:nth-child(odd) td,
+section table tr:nth-child(even) th,
+section table tr:nth-child(odd) th,
+section table thead tr,
+section table thead tr th {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+section table th {
+  background: transparent;
+  border-bottom: 2px solid var(--dds-primary); /* light blue-50 */
+  color: var(--dds-fg-muted);          /* dds-gray-50 light */
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  padding: 12px 20px;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+section table td {
+  background: transparent;
+  border-bottom: 1px solid var(--dds-border); /* dds-gray-20 light */
+  color: var(--dds-fg-secondary);      /* dds-gray-60 light */
+  font-size: 24px;
+  padding: 14px 20px;
+}
+
+/* First column: primary text, medium weight — the row's identity */
+section table td:first-child {
+  color: var(--dds-fg);                /* dds-gray-80 light */
+  font-weight: 500;
+}
+
+section table tr:last-child td {
+  border-bottom: none;
+}
+
+/* ===== Blockquotes ===== */
+
+section blockquote {
+  border-left: 4px solid var(--dds-primary); /* light blue-50 */
+  color: var(--dds-fg-muted);          /* dds-gray-50 light */
+  margin: 16px 0;
+  padding: 8px 24px;
+}
+
+/* ===== HR ===== */
+
+section hr {
+  border: none;
+  border-top: 1px solid var(--dds-border); /* dds-gray-20 light */
+  margin: 32px 0;
+}
+
+/* ===== Footer & pagination ===== */
+
+section::after {
+  color: var(--dds-fg-subtle);         /* dds-gray-40 light */
+  font-size: 14px;
+}
+
+footer {
+  color: var(--dds-fg-subtle) !important; /* dds-gray-40 light */
+  font-size: 14px !important;
+}
+
+/* ===== Layout: lead ===== */
+/*
+ * Left-aligned, vertically centered. For title slides and section openers.
+ * h1 at 60px — large enough to read from the back of the room.
+ */
+
+section.lead {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+section.lead h1 {
+  font-size: 60px;
+}
+
+section.lead p {
+  font-size: 28px;
+}
+
+/* ===== Layout: centered ===== */
+/*
+ * Centered content with max-width constraint.
+ * For statements, key messages, and single-idea slides.
+ */
+
+section.centered {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 64px 96px;
+}
+
+section.centered h2 {
+  font-size: 42px;
+  max-width: 960px;
+  margin-bottom: 32px;
+}
+
+section.centered p {
+  font-size: 26px;
+  max-width: 800px;
+}
+
+/* ===== Layout: table-slide ===== */
+/*
+ * Vertical flex with larger cell padding.
+ * For comparison tables and structured data.
+ */
+
+section.table-slide {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 48px 64px;
+}
+
+section.table-slide h2 {
+  margin-bottom: 32px;
+}
+
+section.table-slide table td {
+  font-size: 24px;
+  padding: 16px 24px;
+}
+
+section.table-slide table th {
+  padding: 12px 24px;
+}
+
+/* ===== Layout: full ===== */
+/*
+ * Full-width with reduced padding.
+ * For dense content, code walkthroughs, and screenshots.
+ */
+
+section.full {
+  padding: 48px 64px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+section.full h2 {
+  margin-bottom: 32px;
+}
+
+/* ===== Layout: split ===== */
+/*
+ * Two-column CSS grid. h2 spans full width.
+ * For before/after, problem/solution, and side-by-side comparisons.
+ */
+
+section.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  gap: 0 48px;
+  align-items: start;
+  padding: 48px 64px;
+}
+
+section.split h2 {
+  grid-column: 1 / -1;
+  margin-bottom: 24px;
+}
+
+/* ===== Layout: accent ===== */
+/*
+ * Full-bleed primary background. White text.
+ * For bookend slides, section transitions, and key callouts.
+ * Uses light blue-50 (#1d63ed) — the DDS primary.
+ */
+
+section.accent {
+  background: var(--dds-primary);      /* light blue-50 */
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+section.accent h1,
+section.accent h2,
+section.accent h3 {
+  color: #ffffff;
+}
+
+section.accent p {
+  color: rgba(255, 255, 255, 0.80);
+}
+
+section.accent em {
+  color: #ffffff;
+  font-style: normal;
+  opacity: 0.70;
+}
+
+section.accent strong {
+  color: #ffffff;
+}
+
+section.accent li::marker {
+  color: rgba(255, 255, 255, 0.60);
+}
+
+section.accent blockquote {
+  border-left-color: rgba(255, 255, 255, 0.40);
+  color: rgba(255, 255, 255, 0.80);
+}
+
+section.accent::after,
+section.accent footer {
+  color: rgba(255, 255, 255, 0.50) !important;
+}
+
+/* ===== Layout: dark-accent ===== */
+/*
+ * Near-black background. White text.
+ * For dramatic contrast slides, closing statements, and data reveals.
+ * Uses dds-gray-80 (#17191e) — the DDS near-black.
+ */
+
+section.dark-accent {
+  background: var(--dds-fg);           /* dds-gray-80 light — near-black */
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+section.dark-accent h1,
+section.dark-accent h2,
+section.dark-accent h3 {
+  color: #ffffff;
+}
+
+section.dark-accent p {
+  color: rgba(255, 255, 255, 0.70);
+}
+
+section.dark-accent em {
+  color: #6fa8ff;                      /* blue-40 light — readable on dark bg */
+  font-style: normal;
+}
+
+section.dark-accent strong {
+  color: #ffffff;
+}
+
+section.dark-accent li::marker {
+  color: #6fa8ff;                      /* blue-40 light */
+}
+
+section.dark-accent code {
+  background: rgba(255, 255, 255, 0.10);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #6fa8ff;                      /* blue-40 light */
+}
+
+section.dark-accent pre {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: none;
+}
+
+section.dark-accent pre code {
+  color: rgba(255, 255, 255, 0.90);
+}
+
+section.dark-accent table th {
+  border-bottom-color: #6fa8ff;        /* blue-40 light */
+  color: rgba(255, 255, 255, 0.50);
+}
+
+section.dark-accent table td {
+  border-bottom-color: rgba(255, 255, 255, 0.10);
+  color: rgba(255, 255, 255, 0.70);
+}
+
+section.dark-accent table td:first-child {
+  color: #ffffff;
+}
+
+section.dark-accent blockquote {
+  border-left-color: #6fa8ff;          /* blue-40 light */
+  color: rgba(255, 255, 255, 0.70);
+}
+
+section.dark-accent::after,
+section.dark-accent footer {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+/* ===== Component: .metric ===== */
+/*
+ * Big number slides. 72px number, centered.
+ * Use for KPIs, stats, and single-number reveals.
+ *
+ * Usage:
+ *   <!-- _class: metric -->
+ *   ## 94%
+ *   Customer satisfaction
+ */
+
+section.metric {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+section.metric h1,
+section.metric h2 {
+  color: var(--dds-fg);                /* dds-gray-80 light */
+  font-size: 72px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin-bottom: 16px;
+}
+
+section.metric p {
+  color: var(--dds-fg-muted);          /* dds-gray-50 light */
+  font-size: 24px;
+  font-weight: 400;
+  max-width: 640px;
+}
+
+section.metric em {
+  color: var(--dds-primary);           /* light blue-50 */
+  font-style: normal;
+}
+
+/* ===== Component: .quote ===== */
+/*
+ * Quote slides. Large centered blockquote with attribution.
+ * The 4px primary left border is the only decoration.
+ *
+ * Usage:
+ *   <!-- _class: quote -->
+ *   > The detail is the product.
+ *   > — Someone who was right
+ */
+
+section.quote {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 64px 96px;
+}
+
+section.quote blockquote {
+  border-left: 4px solid var(--dds-primary); /* light blue-50 */
+  color: var(--dds-fg);                /* dds-gray-80 light — quotes deserve full weight */
+  font-size: 32px;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.4;
+  margin: 0;
+  padding: 8px 32px;
+}
+
+section.quote blockquote p {
+  color: var(--dds-fg);                /* dds-gray-80 light */
+  font-size: 32px;
+  margin-bottom: 0;
+}
+
+section.quote blockquote p:last-child {
+  color: var(--dds-fg-muted);          /* dds-gray-50 light — attribution */
+  font-size: 20px;
+  font-weight: 400;
+  margin-top: 24px;
+}
+
+/* ===== Corporate background slides ===== */
+/*
+ * Background images from Docker's corporate template (July 2025).
+ * Organic flowing wave/arc patterns in tone-on-tone blue and navy.
+ * Use on bookend slides only: title, section dividers, closers.
+ * Content slides stay clean with the warm gray background.
+ *
+ * Files live in themes/backgrounds/ alongside the CSS.
+ */
+
+/* --- Blue wave: organic swirls in Docker blue --- */
+/* Use for: title slides, opening slides, the ask */
+section.accent-wave {
+  background: url('backgrounds/blue-wave.png') center / cover no-repeat;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+section.accent-wave h1 {
+  color: #ffffff;
+  font-size: 60px;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.15);
+}
+
+section.accent-wave h2 {
+  color: #ffffff;
+  font-size: 36px;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.12);
+}
+
+section.accent-wave p {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+section.accent-wave em {
+  color: #ffffff;
+  font-style: normal;
+}
+
+section.accent-wave strong {
+  color: #ffffff;
+}
+
+/* --- Navy wave: organic swirls in deep navy --- */
+/* Use for: section dividers, dramatic contrast in light decks */
+section.dark-wave {
+  background: url('backgrounds/navy-wave.png') center / cover no-repeat;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+section.dark-wave h1 {
+  color: #ffffff;
+  font-size: 60px;
+}
+
+section.dark-wave h2 {
+  color: #ffffff;
+  font-size: 36px;
+}
+
+section.dark-wave p {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+section.dark-wave em {
+  color: #4da6ff;                      /* lighter blue for legibility on navy */
+  font-style: normal;
+}
+
+/* --- Blue arc: large sweeping arcs, more formal --- */
+/* Use for: keynote title slides, external presentations */
+section.accent-arc {
+  background: url('backgrounds/blue-arc.png') center / cover no-repeat;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+section.accent-arc h1 {
+  color: #ffffff;
+  font-size: 60px;
+  text-shadow: 0 2px 16px rgba(0, 0, 0, 0.15);
+}
+
+section.accent-arc h2 {
+  color: #ffffff;
+  font-size: 36px;
+}
+
+section.accent-arc p {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+section.accent-arc em {
+  color: #ffffff;
+  font-style: normal;
+}
+
+/* --- Navy arc: large sweeping arcs in deep navy --- */
+/* Use for: closing slides, paired with accent-arc for bookends */
+section.dark-arc {
+  background: url('backgrounds/navy-arc.png') center / cover no-repeat;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+section.dark-arc h1 {
+  color: #ffffff;
+  font-size: 60px;
+}
+
+section.dark-arc h2 {
+  color: #ffffff;
+  font-size: 36px;
+}
+
+section.dark-arc p {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+section.dark-arc em {
+  color: #4da6ff;                      /* lighter blue on navy */
+  font-style: normal;
+}
+
+/* --- Shared rules for all background slides --- */
+
+/* Hide pagination */
+section.accent-wave::after,
+section.dark-wave::after,
+section.accent-arc::after,
+section.dark-arc::after {
+  display: none;
+}
+
+/* Constrain inline images (logos) on background slides */
+section.accent-wave img,
+section.dark-wave img,
+section.accent-arc img,
+section.dark-arc img {
+  height: 36px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Generous padding on background slides for breathing room */
+section.accent-wave,
+section.dark-wave,
+section.accent-arc,
+section.dark-arc {
+  padding: 80px 80px;
+}
+
+/* Subtitle text on background slides: lighter, more space from heading */
+section.accent-wave h1 + p,
+section.dark-wave h1 + p,
+section.accent-arc h1 + p,
+section.dark-arc h1 + p {
+  font-size: 24px;
+  margin-top: 8px;
+}

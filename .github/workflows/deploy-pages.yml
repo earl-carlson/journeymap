@@ -34,6 +34,20 @@ jobs:
         run: BUNDLE_EXPORTS=1 npm run build
         working-directory: viewer
 
+      - name: Install Marp CLI
+        run: npm install -g @marp-team/marp-cli
+
+      - name: Copy assets into dist
+        run: cp -r assets dist/assets
+
+      - name: Build deck (HTML)
+        run: |
+          marp docker-ia-map-deck.md \
+            --html \
+            --allow-local-files \
+            --theme-set assets/docker-light.css \
+            --output dist/docker-ia-map-deck.html
+
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
