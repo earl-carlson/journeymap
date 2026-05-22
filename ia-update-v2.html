@@ -1,0 +1,2427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Docker IA Map — Working Draft</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8f9fa;
+      --surface: #ffffff;
+      --border: #e5e7eb;
+      --border-strong: #d1d5db;
+      --text-primary: #111827;
+      --text-secondary: #6b7280;
+      --text-tertiary: #9ca3af;
+      --accent: #0091E2;
+      --accent-light: rgba(0, 145, 226, 0.08);
+      --warn-bg: rgba(245, 158, 11, 0.08);
+      --warn-text: #92400e;
+      --danger-bg: rgba(239, 68, 68, 0.06);
+      --danger-text: #991b1b;
+      --sidebar-width: 240px;
+      --content-max: 800px;
+    }
+
+    html { font-size: 14px; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: var(--bg);
+    }
+
+    /* ─── SIDEBAR ─────────────────────────────────────────────── */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: var(--sidebar-width);
+      height: 100vh;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #sidebar::-webkit-scrollbar { width: 4px; }
+    #sidebar::-webkit-scrollbar-track { background: transparent; }
+    #sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .sidebar-wordmark {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .sidebar-wordmark span {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    .sidebar-wordmark span em {
+      font-style: normal;
+      color: var(--text-tertiary);
+      font-weight: 400;
+    }
+
+    .nav-section {
+      padding: 16px 0 4px;
+    }
+
+    .nav-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      padding: 0 16px 6px;
+    }
+
+    .nav-link {
+      display: block;
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-secondary);
+      text-decoration: none;
+      padding: 5px 16px;
+      border-left: 2px solid transparent;
+      transition: color 0.12s, background 0.12s, border-color 0.12s;
+      cursor: pointer;
+    }
+
+    .nav-link:hover {
+      color: var(--text-primary);
+      background: var(--bg);
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      background: var(--accent-light);
+      border-left-color: var(--accent);
+      font-weight: 500;
+    }
+
+    .nav-sub-group {
+      padding: 2px 0;
+    }
+
+    .nav-sub-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      padding: 6px 16px 3px;
+    }
+
+    .nav-sub-link {
+      display: block;
+      font-size: 12px;
+      color: var(--text-tertiary);
+      text-decoration: none;
+      padding: 4px 16px 4px 24px;
+      border-left: 2px solid transparent;
+      transition: color 0.12s, background 0.12s;
+      cursor: pointer;
+    }
+
+    .nav-sub-link::before {
+      content: '—';
+      margin-right: 6px;
+      opacity: 0.5;
+      font-size: 10px;
+    }
+
+    .nav-sub-link:hover {
+      color: var(--text-primary);
+      background: var(--bg);
+    }
+
+    /* ─── MAIN ────────────────────────────────────────────────── */
+    main {
+      margin-left: var(--sidebar-width);
+      min-height: 100vh;
+      padding: 48px 48px 96px;
+    }
+
+    .content-inner {
+      max-width: var(--content-max);
+    }
+
+    /* ─── PAGE HEADER ─────────────────────────────────────────── */
+    .page-header {
+      margin-bottom: 48px;
+      padding-bottom: 32px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .page-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+
+    .page-title {
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 8px;
+    }
+
+    .page-meta {
+      font-size: 13px;
+      color: var(--text-tertiary);
+    }
+
+    /* ─── SECTION DIVIDERS ────────────────────────────────────── */
+    .section-divider {
+      margin: 48px 0 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-divider-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      white-space: nowrap;
+    }
+
+    .section-divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ─── CONTENT SECTIONS ────────────────────────────────────── */
+    .content-section {
+      margin-bottom: 40px;
+      scroll-margin-top: 24px;
+    }
+
+    .section-heading {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    .section-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      font-style: italic;
+    }
+
+    /* ─── CARDS ───────────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .card-body {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ─── PRINCIPLE CARDS ─────────────────────────────────────── */
+    .principle-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-bottom: 8px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .principle-number {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 0.04em;
+      min-width: 20px;
+      padding-top: 2px;
+    }
+
+    .principle-content {}
+
+    .principle-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+
+    .principle-body {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ─── KILL LIST / GAPS ────────────────────────────────────── */
+    .list-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 8px;
+    }
+
+    .list-item-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+
+    .list-item-body {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    .placeholder-dashed {
+      border: 1px dashed var(--border-strong);
+      border-radius: 8px;
+      padding: 16px 20px;
+      font-size: 13px;
+      color: var(--text-tertiary);
+      font-style: italic;
+    }
+
+    /* ─── TABLE ───────────────────────────────────────────────── */
+    .ia-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 12px;
+    }
+
+    .ia-table thead th {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      padding: 10px 16px;
+      text-align: left;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ia-table tbody tr {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ia-table tbody tr:last-child {
+      border-bottom: none;
+    }
+
+    .ia-table tbody td {
+      padding: 11px 16px;
+      color: var(--text-secondary);
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    .ia-table tbody td:first-child {
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .table-note {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      font-style: italic;
+      margin-top: 8px;
+    }
+
+    /* ─── AREA CARDS ──────────────────────────────────────────── */
+    .area-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+
+    .area-card.clickable {
+      cursor: pointer;
+    }
+
+    .area-card.clickable:hover {
+      border-color: var(--accent);
+    }
+
+    .area-card.clickable:hover .area-card-journeys-hint {
+      opacity: 1;
+    }
+
+    .area-card-header {
+      padding: 16px 20px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .area-card-header-left {}
+
+    .area-card-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+    }
+
+    .area-card-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .area-card-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      max-width: 520px;
+    }
+
+    .area-card-header-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .area-card-owner {
+      font-size: 11px;
+      color: var(--text-tertiary);
+      text-align: right;
+      max-width: 160px;
+      line-height: 1.4;
+    }
+
+    .area-card-journeys-hint {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent);
+      opacity: 0;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+
+    .area-card-body {
+      padding: 16px 20px;
+    }
+
+    .area-card-cols {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .area-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 8px;
+    }
+
+    .area-section-body {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    .area-section-body ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .area-section-body ul li {
+      padding: 2px 0;
+      padding-left: 12px;
+      position: relative;
+    }
+
+    .area-section-body ul li::before {
+      content: '·';
+      position: absolute;
+      left: 0;
+      color: var(--text-tertiary);
+    }
+
+    .area-section {
+      margin-bottom: 16px;
+    }
+
+    .area-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .area-note {
+      font-size: 12px;
+      color: var(--text-tertiary);
+      font-style: italic;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .warning-banner {
+      background: var(--warn-bg);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--warn-text);
+      line-height: 1.55;
+      margin-top: 12px;
+    }
+
+    .warning-banner strong {
+      font-weight: 600;
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 8px;
+    }
+
+    /* ─── OPEN QUESTIONS ──────────────────────────────────────── */
+    .question-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px 18px;
+      margin-bottom: 8px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .question-num {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      min-width: 24px;
+      padding-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .question-content {
+      flex: 1;
+    }
+
+    .question-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+
+    .question-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .status-tag {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      padding: 2px 7px;
+      border-radius: 3px;
+    }
+
+    .status-active {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    .status-blocked {
+      background: var(--warn-bg);
+      color: var(--warn-text);
+    }
+
+    .status-parked {
+      background: var(--bg);
+      color: var(--text-tertiary);
+      border: 1px solid var(--border);
+    }
+
+    .question-body {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ─── MODAL ───────────────────────────────────────────────── */
+    #modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      background: rgba(17, 24, 39, 0.5);
+      backdrop-filter: blur(2px);
+      -webkit-backdrop-filter: blur(2px);
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+
+    #modal.open {
+      display: flex;
+    }
+
+    #modal-panel {
+      width: min(720px, calc(100vw - 48px));
+      height: 100vh;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: slideIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(32px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    #modal-header {
+      padding: 20px 28px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      background: var(--surface);
+    }
+
+    #modal-area-name {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.01em;
+    }
+
+    #modal-area-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 2px;
+    }
+
+    #modal-close {
+      width: 32px;
+      height: 32px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-size: 16px;
+      transition: background 0.1s, color 0.1s;
+      flex-shrink: 0;
+    }
+
+    #modal-close:hover {
+      background: var(--bg);
+      color: var(--text-primary);
+    }
+
+    #modal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px;
+    }
+
+    #modal-body::-webkit-scrollbar { width: 6px; }
+    #modal-body::-webkit-scrollbar-track { background: transparent; }
+    #modal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ─── JOURNEY SECTIONS (in modal) ────────────────────────── */
+    .journey-section {
+      margin-bottom: 40px;
+      scroll-margin-top: 20px;
+    }
+
+    .journey-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .journey-num-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 10px;
+    }
+
+    .journey-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .journey-card-header {
+      padding: 16px 20px 14px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg);
+    }
+
+    .journey-tag {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .journey-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text-primary);
+      letter-spacing: -0.015em;
+      margin-bottom: 4px;
+    }
+
+    .journey-persona-role {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .journey-card-body {
+      padding: 20px;
+    }
+
+    .persona-block {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+    }
+
+    .persona-block-title {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 10px;
+    }
+
+    .persona-field {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 6px;
+      font-size: 13px;
+    }
+
+    .persona-field:last-child {
+      margin-bottom: 0;
+    }
+
+    .persona-field-label {
+      font-weight: 600;
+      color: var(--text-secondary);
+      min-width: 90px;
+      flex-shrink: 0;
+    }
+
+    .persona-field-value {
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .persona-cols {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .persona-col-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 5px;
+    }
+
+    .persona-col-body {
+      font-size: 12px;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .journey-stages {}
+
+    .stage {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stage:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .stage-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
+      margin-bottom: 4px;
+    }
+
+    .stage-heading {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .stage-body {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.65;
+    }
+
+    /* ─── INLINE CODE ─────────────────────────────────────────── */
+    code {
+      font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+      font-size: 12px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      color: var(--text-primary);
+    }
+
+    /* ─── SCROLLBAR GLOBAL ────────────────────────────────────── */
+    main::-webkit-scrollbar { display: none; }
+
+  </style>
+</head>
+<body>
+
+<!-- ─── SIDEBAR ─────────────────────────────────────────────────── -->
+<nav id="sidebar">
+  <div class="sidebar-wordmark">
+    <span>Docker <em>/ IA Map</em></span>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Foundation</div>
+    <a class="nav-link" href="#principles">Principles</a>
+    <a class="nav-link" href="#kill-list">Kill list</a>
+    <a class="nav-link" href="#known-gaps">Known gaps</a>
+    <a class="nav-link" href="#glossary">Glossary</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Map</div>
+    <a class="nav-link" href="#overview">Six areas</a>
+    <a class="nav-link" href="#area-www">www</a>
+    <a class="nav-link" href="#area-docs">Docs</a>
+    <a class="nav-link" href="#area-hub">Hub</a>
+    <a class="nav-link" href="#area-container-platform">Container Platform</a>
+    <a class="nav-link" href="#area-agentic-platform">Agentic Platform</a>
+    <a class="nav-link" href="#area-admin">Admin</a>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Journeys</div>
+
+    <div class="nav-sub-group">
+      <div class="nav-sub-label">Hub</div>
+      <a class="nav-sub-link" data-area="hub" data-src-id="journey-hub-publisher">Hub Publisher</a>
+    </div>
+
+    <div class="nav-sub-group">
+      <div class="nav-sub-label">Container Platform</div>
+      <a class="nav-sub-link" data-area="container-platform" data-src-id="journey-desktop-cli">Desktop &amp; CLI</a>
+      <a class="nav-sub-link" data-area="container-platform" data-src-id="journey-model-runner">Model Runner</a>
+      <a class="nav-sub-link" data-area="container-platform" data-src-id="journey-gordon">Gordon</a>
+      <a class="nav-sub-link" data-area="container-platform" data-src-id="journey-compose">Compose GUI</a>
+      <a class="nav-sub-link" data-area="container-platform" data-src-id="journey-build-ui">Build UI</a>
+      <a class="nav-sub-link" data-area="container-platform" data-src-id="journey-build-cloud">Build Cloud</a>
+      <a class="nav-sub-link" data-area="container-platform" data-src-id="journey-offload">Offload</a>
+      <a class="nav-sub-link" data-area="container-platform" data-src-id="journey-sandboxes">Sandboxes</a>
+      <a class="nav-sub-link" data-area="container-platform" data-src-id="journey-dhi">Hardened Images</a>
+    </div>
+
+    <div class="nav-sub-group">
+      <div class="nav-sub-label">Agentic Platform</div>
+      <a class="nav-sub-link" data-area="agentic-platform" data-src-id="journey-agentic">Agentic Platform</a>
+      <a class="nav-sub-link" data-area="agentic-platform" data-src-id="journey-mcp">MCP Toolkit</a>
+    </div>
+
+    <div class="nav-sub-group">
+      <div class="nav-sub-label">Admin</div>
+      <a class="nav-sub-link" data-area="admin" data-src-id="journey-billing">Billing</a>
+      <a class="nav-sub-link" data-area="admin" data-src-id="journey-admin">Admin &amp; provisioning</a>
+    </div>
+  </div>
+
+  <div class="nav-section">
+    <div class="nav-section-label">Status</div>
+    <a class="nav-link" href="#open-questions">Open questions</a>
+  </div>
+</nav>
+
+<!-- ─── MAIN ─────────────────────────────────────────────────────── -->
+<main id="main-content">
+  <div class="content-inner">
+
+    <!-- PAGE HEADER -->
+    <header class="page-header">
+      <div class="page-eyebrow">Working draft</div>
+      <h1 class="page-title">Docker IA Map</h1>
+      <div class="page-meta">May 2026</div>
+    </header>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- FOUNDATION -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-divider">
+      <span class="section-divider-label">Foundation</span>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <!-- Principles -->
+    <section class="content-section" id="principles">
+      <h2 class="section-heading">Principles</h2>
+
+      <div class="principle-card">
+        <div class="principle-number">01</div>
+        <div class="principle-content">
+          <div class="principle-title">Everything has a home.</div>
+          <div class="principle-body">Every feature, setting, and workflow has one primary home. If you're building something new and asking "where does this go," there is a clear answer. No squatting in the wrong space because it's convenient.</div>
+        </div>
+      </div>
+
+      <div class="principle-card">
+        <div class="principle-number">02</div>
+        <div class="principle-content">
+          <div class="principle-title">Each space is made for someone.</div>
+          <div class="principle-body">A developer working only on agentic tools only needs the Agentic Platform. An IT admin only needs Admin. The spaces are distinct enough that you know which one is yours without having to search. If someone has to look in three places to find their thing, the IA is wrong.</div>
+        </div>
+      </div>
+
+      <div class="principle-card">
+        <div class="principle-number">03</div>
+        <div class="principle-content">
+          <div class="principle-title">The system is modular, not duplicated.</div>
+          <div class="principle-body">Any surface can expose a contextual window into another — a billing widget, a doc panel, a usage summary. That window is a peek, not a copy. The full experience lives in one place. The widget is a convenience, not a second home.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Kill list -->
+    <section class="content-section" id="kill-list">
+      <h2 class="section-heading">Kill list</h2>
+      <p class="section-label">Things that should not exist or should be radically cut before being rebuilt.</p>
+
+      <div class="list-item">
+        <div class="list-item-title">Notification systems as currently implemented.</div>
+        <div class="list-item-body">No new notification surface gets built until there is a clear answer to: what action does this enable that the user couldn't take without it?</div>
+      </div>
+    </section>
+
+    <!-- Known gaps -->
+    <section class="content-section" id="known-gaps">
+      <h2 class="section-heading">Known gaps</h2>
+      <p class="section-label">Specific product and UX problems that are known and need fixing. Not IA decisions — things to fix.</p>
+
+      <div class="list-item">
+        <div class="list-item-title">Profiles and accounts.</div>
+        <div class="list-item-body">Currently fragmented — profile settings are split across Hub, app.docker.com, and Admin with no single coherent home. A user managing their Docker identity visits multiple surfaces to do one job. Needs a defined primary home before any new profile features are built.</div>
+      </div>
+
+      <div class="placeholder-dashed">Add known UX and product gaps here as they're identified.</div>
+    </section>
+
+    <!-- Glossary -->
+    <section class="content-section" id="glossary">
+      <h2 class="section-heading">Glossary</h2>
+      <div class="placeholder-dashed">Definitions and terminology artifact from Roberta — in progress.</div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- MAP -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-divider">
+      <span class="section-divider-label">Map</span>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <!-- Six areas overview -->
+    <section class="content-section" id="overview">
+      <h2 class="section-heading">Six areas</h2>
+
+      <table class="ia-table">
+        <thead>
+          <tr>
+            <th>Area</th>
+            <th>Who it's for</th>
+            <th>What it owns</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>www</td>
+            <td>Execs, senior leaders evaluating Docker</td>
+            <td>Marketing, product pages, pricing, conversion</td>
+          </tr>
+          <tr>
+            <td>Docs</td>
+            <td>Anyone using the tools</td>
+            <td>Full documentation, guides, reference</td>
+          </tr>
+          <tr>
+            <td>Hub</td>
+            <td>Developers publishing and pulling images</td>
+            <td>Image registry, marketplace, search, org namespaces</td>
+          </tr>
+          <tr>
+            <td>Container Platform</td>
+            <td>Developers working with containers</td>
+            <td>Docker Desktop, Build, Compose, Secure Artifacts, CLI (secondary)</td>
+          </tr>
+          <tr>
+            <td>Admin</td>
+            <td>IT admins, security leads, procurement</td>
+            <td>Org management, billing, governance config, provisioning</td>
+          </tr>
+          <tr>
+            <td>Agentic Platform</td>
+            <td>Developers working with AI agents</td>
+            <td>Agent sessions, MCP, Gordon, Cloud Sandboxes, CLI (secondary)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-note">Hub is kept as a standalone area for now even though the Container Platform org owns it. Worth revisiting.</p>
+    </section>
+
+    <!-- ─── www ─────────────────────────────────────────────────── -->
+    <section class="content-section" id="area-www">
+      <div class="area-card">
+        <div class="area-card-header">
+          <div class="area-card-header-left">
+            <div class="area-card-eyebrow">Primary surface</div>
+            <div class="area-card-title">www</div>
+            <div class="area-card-desc">Marketing, product pages, pricing, and conversion. The pre-purchase surface for execs and senior leaders evaluating Docker.</div>
+          </div>
+          <div class="area-card-header-right">
+            <div class="area-card-owner">Execs &amp; senior leaders evaluating Docker</div>
+          </div>
+        </div>
+        <div class="area-card-body">
+          <div class="area-card-cols">
+            <div>
+              <div class="area-section">
+                <div class="area-section-label">What lives here</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li>Product pages, use cases, customer stories</li>
+                    <li>Pricing and plan comparison</li>
+                    <li>Conversion flows — sign up, start trial, talk to sales</li>
+                    <li>Blog, press, company</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="area-section">
+                <div class="area-section-label">What does not live here</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li>Any authenticated product experience</li>
+                    <li>Settings of any kind</li>
+                    <li>Billing — link to Admin</li>
+                    <li>Documentation — link to Docs</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="warning-banner">
+            <strong>Current state:</strong> Highest-debt surface area. Every page has diverged independently — inconsistent layout, visual language, and content standards throughout. No page should be used as a reference for what www should look like. Needs a full audit before any new content is added.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Docs ────────────────────────────────────────────────── -->
+    <section class="content-section" id="area-docs">
+      <div class="area-card">
+        <div class="area-card-header">
+          <div class="area-card-header-left">
+            <div class="area-card-eyebrow">Primary surface</div>
+            <div class="area-card-title">Docs</div>
+            <div class="area-card-desc">Full documentation, guides, tutorials, and API reference. The single source of truth for anyone actively using Docker tools.</div>
+          </div>
+          <div class="area-card-header-right">
+            <div class="area-card-owner">Anyone actively using Docker tools</div>
+          </div>
+        </div>
+        <div class="area-card-body">
+          <div class="area-card-cols">
+            <div>
+              <div class="area-section">
+                <div class="area-section-label">What lives here</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li>Full documentation site</li>
+                    <li>Guides, tutorials, reference, API docs</li>
+                    <li>Changelog and release notes</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="area-section">
+                <div class="area-section-label">What does not live here</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li>Marketing copy — www</li>
+                    <li>Product UI — each platform</li>
+                    <li>Settings of any kind</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p class="area-note">Any product surface can embed a contextual doc panel. That panel is a peek into Docs, not a copy of it. A platform team owns the panel component. The Docs team owns the content inside it.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Hub ─────────────────────────────────────────────────── -->
+    <section class="content-section" id="area-hub">
+      <div class="area-card clickable" data-area="hub" role="button" tabindex="0" aria-label="View Hub journeys">
+        <div class="area-card-header">
+          <div class="area-card-header-left">
+            <div class="area-card-eyebrow">Primary surface</div>
+            <div class="area-card-title">Hub</div>
+            <div class="area-card-desc">The world's largest container registry. Developers push, pull, search, and share images. Home to Docker Official Images, Verified Publishers, and the MCP catalog.</div>
+          </div>
+          <div class="area-card-header-right">
+            <div class="area-card-owner">Developers publishing and pulling images</div>
+            <div class="area-card-journeys-hint">View journeys →</div>
+          </div>
+        </div>
+        <div class="area-card-body">
+          <div class="area-card-cols">
+            <div>
+              <div class="area-section">
+                <div class="area-section-label">What lives here</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li>Image registry — push, pull, search, browse</li>
+                    <li>Org namespaces and repository management</li>
+                    <li>Marketplace</li>
+                    <li>Webhooks and access tokens for registry automation</li>
+                  </ul>
+                </div>
+              </div>
+              <div class="area-section">
+                <div class="area-section-label">Key workflows</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li><strong>Publishing:</strong> Developer builds an image locally → tags it → pushes to Hub → sets visibility → team pulls it as a dependency.</li>
+                    <li><strong>Discovery:</strong> Developer searches Hub for a base image → browses the Marketplace → pulls and integrates.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="area-section">
+                <div class="area-section-label">What does not live here</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li>Hardened Images catalog and mirroring — Container Platform, Secure Artifacts</li>
+                    <li>Full billing — billing widget yes; full plan management in Admin</li>
+                    <li>Org-level auth — Admin</li>
+                    <li>Container runtime — Desktop</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Container Platform ──────────────────────────────────── -->
+    <section class="content-section" id="area-container-platform">
+      <div class="area-card clickable" data-area="container-platform" role="button" tabindex="0" aria-label="View Container Platform journeys">
+        <div class="area-card-header">
+          <div class="area-card-header-left">
+            <div class="area-card-eyebrow">Primary surface</div>
+            <div class="area-card-title">Container Platform</div>
+            <div class="area-card-desc">Docker Desktop, Build Cloud, Offload, Hardened Images, Scout, and Testcontainers Cloud. The daily workspace for developers and DevOps engineers building and running containerized applications.</div>
+          </div>
+          <div class="area-card-header-right">
+            <div class="area-card-owner">Org: Container Platform group</div>
+            <div class="area-card-journeys-hint">View journeys →</div>
+          </div>
+        </div>
+        <div class="area-card-body">
+          <div class="area-section" style="margin-bottom:12px;">
+            <div class="area-section-label">Primary users</div>
+            <div class="area-section-body">Backend engineers, DevOps engineers, platform engineers working with containers day-to-day.</div>
+          </div>
+
+          <div class="area-card-cols">
+            <div>
+              <div class="area-section">
+                <div class="area-section-label">What lives here</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li>Docker Desktop: container and image management UI</li>
+                    <li>Compose File Viewer</li>
+                    <li>Compose Bridge — local to Kubernetes</li>
+                    <li>Build UI — build history, troubleshooting, performance comparison</li>
+                    <li>Gordon — AI assistant, context-aware to local environment</li>
+                    <li>Docker Offload — local/cloud engine switching</li>
+                    <li>Coding Agent Sandboxes — local isolation for agentic work</li>
+                    <li>User-level settings for all of the above</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="area-section">
+                <div class="area-section-label">&nbsp;</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li>Docker Build Cloud: shared cache, accelerated CI builds</li>
+                    <li>Build performance analytics — org, user, time period</li>
+                    <li>CI pipeline debugging and metadata</li>
+                    <li>Secure Artifacts: Docker Hardened Images catalog</li>
+                    <li>DHI mirroring and org-specific customizations</li>
+                    <li>Helm Charts, DOI (Docker Official Images)</li>
+                    <li>Docker Scout: vulnerability scanning and image policy</li>
+                    <li>Testcontainers Cloud: cloud-based runtime for integration tests</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="area-section" style="margin-top:12px;">
+            <div class="area-section-label">User settings</div>
+            <div class="chips">
+              <span class="chip">Model Runner config</span>
+              <span class="chip">Build Cloud preferences</span>
+              <span class="chip">Offload engine selection</span>
+              <span class="chip">Gordon access &amp; behavior (user level)</span>
+              <span class="chip">Desktop resource limits</span>
+            </div>
+          </div>
+
+          <div class="area-section" style="margin-top:12px;">
+            <div class="area-section-label">What does not live here</div>
+            <div class="area-section-body">
+              <ul>
+                <li>Org-level policy enforcement — Admin</li>
+                <li>Full billing — billing widget yes; plan management in Admin</li>
+                <li>Agent session history, scheduling, cloud sandboxes — Agentic Platform</li>
+                <li>MCP Toolkit — Agentic Platform, owned by AI Tools &amp; Security</li>
+              </ul>
+            </div>
+          </div>
+
+          <p class="area-note">CLI is a secondary surface. Commands map to Desktop and Build Cloud capabilities.</p>
+          <p class="area-note">Scout straddles Container Platform (developer-facing scanning) and Admin (org-level policy enforcement). Same open question as Gordon's placement — see Q01.</p>
+          <p class="area-note">Org-level Gordon governance is in Admin.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Agentic Platform ────────────────────────────────────── -->
+    <section class="content-section" id="area-agentic-platform">
+      <div class="area-card clickable" data-area="agentic-platform" role="button" tabindex="0" aria-label="View Agentic Platform journeys">
+        <div class="area-card-header">
+          <div class="area-card-header-left">
+            <div class="area-card-eyebrow">Primary surface</div>
+            <div class="area-card-title">Agentic Platform</div>
+            <div class="area-card-desc">Agent sessions, MCP Toolkit, Gordon, and Cloud Sandboxes. For tech leads and senior engineers who want to delegate well-defined coding work to autonomous agents.</div>
+          </div>
+          <div class="area-card-header-right">
+            <div class="area-card-owner">Org: Agents group</div>
+            <div class="area-card-journeys-hint">View journeys →</div>
+          </div>
+        </div>
+        <div class="area-card-body">
+          <div class="area-section" style="margin-bottom:12px;">
+            <div class="area-section-label">Primary users</div>
+            <div class="area-section-body">Senior engineers and tech leads who want to delegate well-defined coding work to autonomous agents.</div>
+          </div>
+
+          <div class="area-card-cols">
+            <div>
+              <div class="area-section">
+                <div class="area-section-label">What lives here</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li>Agent session management — create, run, monitor, review</li>
+                    <li>Agent team configuration — orchestrator, implementer, reviewer, documentalist, custom</li>
+                    <li>Project setup — repository connection, GitHub permissions, session history</li>
+                    <li>Scheduling — daily/weekly agent runs tied to GitHub events or cron</li>
+                    <li>BYOK — bring your own API key, Anthropic, OpenAI, etc.</li>
+                    <li>Slack and GitHub integrations</li>
+                    <li>Session artifacts — PRs opened, diffs, logs</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="area-section">
+                <div class="area-section-label">&nbsp;</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li>MCP Toolkit — browse, configure, share MCP server profiles</li>
+                    <li>Cloud Sandboxes — <code>sbx --cloud</code>, owned by Cloud Group</li>
+                    <li>User-level settings for all of the above</li>
+                    <li>CLI — secondary surface, <code>docker agent run</code>, session status, log tailing</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="area-section" style="margin-top:12px;">
+            <div class="area-section-label">User settings</div>
+            <div class="chips">
+              <span class="chip">API key management (BYOK)</span>
+              <span class="chip">GitHub integration credentials</span>
+              <span class="chip">Slack integration credentials</span>
+              <span class="chip">Agent default behavior &amp; instructions</span>
+              <span class="chip">MCP server profiles &amp; client connections</span>
+            </div>
+          </div>
+
+          <div class="area-section" style="margin-top:12px;">
+            <div class="area-section-label">What does not live here</div>
+            <div class="area-section-body">
+              <ul>
+                <li>Org-level agent governance — Admin</li>
+                <li>Container runtime — Desktop</li>
+                <li>Local coding agent sandboxes — Container Platform</li>
+                <li>Full billing — billing widget yes; plan management in Admin</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Admin ───────────────────────────────────────────────── -->
+    <section class="content-section" id="area-admin">
+      <div class="area-card clickable" data-area="admin" role="button" tabindex="0" aria-label="View Admin journeys">
+        <div class="area-card-header">
+          <div class="area-card-header-left">
+            <div class="area-card-eyebrow">Primary surface</div>
+            <div class="area-card-title">Admin</div>
+            <div class="area-card-desc">Billing, subscriptions, org onboarding, SSO, governance configuration, and compliance. For IT admins, security leads, and procurement at Business-tier orgs.</div>
+          </div>
+          <div class="area-card-header-right">
+            <div class="area-card-owner">Org: Bridge group</div>
+            <div class="area-card-journeys-hint">View journeys →</div>
+          </div>
+        </div>
+        <div class="area-card-body">
+          <div class="area-section" style="margin-bottom:12px;">
+            <div class="area-section-label">Primary users</div>
+            <div class="area-section-body">IT admins, security leads, procurement, engineering managers at Business-tier orgs.</div>
+          </div>
+
+          <div class="card" style="margin-bottom:14px; background: var(--bg);">
+            <div class="card-body" style="font-size:13px; color: var(--text-secondary);">
+              <strong style="color:var(--text-primary);">Note:</strong> Admin is the UI where org admins configure governance. The Governance Platform is the underlying substrate (owned by Bridge) that Container Platform, Agentic Platform, and other products plug into. Admin exposes the controls; the platform enforces them.
+            </div>
+          </div>
+
+          <div class="area-card-cols">
+            <div>
+              <div class="area-section">
+                <div class="area-section-label">What lives here</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li><strong>Billing &amp; subscriptions:</strong> Plan management, PAYG, license quantity, usage dashboards, invoices</li>
+                    <li><strong>Org onboarding &amp; management:</strong> Org creation, SSO, SCIM, license assignment</li>
+                    <li><strong>Authentication:</strong> SSO provider management, session and token policies</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div class="area-section">
+                <div class="area-section-label">&nbsp;</div>
+                <div class="area-section-body">
+                  <ul>
+                    <li><strong>Governance configuration:</strong> Registry access, network/filesystem policies, Gordon governance, Agentic Platform governance, cross-product policy</li>
+                    <li><strong>Compliance &amp; monitoring:</strong> Compliance reporting, adoption monitoring, audit logs</li>
+                    <li><strong>Inside sales &amp; provisioning</strong> (internal, not customer-facing): Org provisioning, license management</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="area-section" style="margin-top:12px;">
+            <div class="area-section-label">What does not live here</div>
+            <div class="area-section-body">
+              <ul>
+                <li>User-level settings for any product</li>
+                <li>The Governance Platform substrate itself</li>
+                <li>The actual product experiences (Gordon, agents, builds)</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <!-- STATUS -->
+    <!-- ═══════════════════════════════════════════════════════════ -->
+    <div class="section-divider">
+      <span class="section-divider-label">Status</span>
+      <div class="section-divider-line"></div>
+    </div>
+
+    <!-- Open questions -->
+    <section class="content-section" id="open-questions">
+      <h2 class="section-heading">Open questions</h2>
+
+      <div class="question-item">
+        <div class="question-num">01</div>
+        <div class="question-content">
+          <div class="question-header">
+            <span class="question-title">Gordon placement</span>
+            <span class="status-tag status-active">active</span>
+          </div>
+          <div class="question-body">Gordon is owned by the Agents group but lives in Docker Desktop (Container Platform). The ia-map has it under Container Platform. The org has it under Agents. This tension needs a resolution — does Gordon have a presence in both, or does it move fully to Agentic Platform?</div>
+        </div>
+      </div>
+
+      <div class="question-item">
+        <div class="question-num">02</div>
+        <div class="question-content">
+          <div class="question-header">
+            <span class="question-title">Coding Agent Sandboxes vs. Cloud Sandboxes</span>
+            <span class="status-tag status-active">active</span>
+          </div>
+          <div class="question-body">Coding Agent Sandboxes (local, Dash Runtime group) is under Container Platform here. Cloud Sandboxes (Cloud Group) is under Agentic Platform. This split maps to the org but may be confusing to users who just think of "sandboxes." Worth a shared entry point or at least consistent naming.</div>
+        </div>
+      </div>
+
+      <div class="question-item">
+        <div class="question-num">03</div>
+        <div class="question-content">
+          <div class="question-header">
+            <span class="question-title">Admin: one workflow or three?</span>
+            <span class="status-tag status-active">active</span>
+          </div>
+          <div class="question-body">Admin serves procurement (billing), IT admins (provisioning), and security leads (governance) with pretty different goals. The navigation inside Admin probably needs three distinct entry points, not one flat list.</div>
+        </div>
+      </div>
+
+      <div class="question-item">
+        <div class="question-num">04</div>
+        <div class="question-content">
+          <div class="question-header">
+            <span class="question-title">MCP placement</span>
+            <span class="status-tag status-active">active</span>
+          </div>
+          <div class="question-body">MCP is owned by AI Tools &amp; Security (Agents group) and listed under Agentic Platform here. But MCP Toolkit in Desktop has historically lived in Container Platform. Primary home: Agentic Platform. Secondary surface: Desktop. Needs to be explicit in both places.</div>
+        </div>
+      </div>
+
+      <div class="question-item">
+        <div class="question-num">05</div>
+        <div class="question-content">
+          <div class="question-header">
+            <span class="question-title">Docs panels ownership</span>
+            <span class="status-tag status-parked">parked</span>
+          </div>
+          <div class="question-body">A platform team owns the component. Docs team owns the content. Which team decides where panels appear and what content they surface? Needs an owner before this scales.</div>
+        </div>
+      </div>
+
+      <div class="question-item">
+        <div class="question-num">06</div>
+        <div class="question-content">
+          <div class="question-header">
+            <span class="question-title">Hub org ownership</span>
+            <span class="status-tag status-parked">parked</span>
+          </div>
+          <div class="question-body">Hub (Registry + Marketplace) is owned by the Container Platform group but kept as a standalone area in this map. Revisit once the product surface boundaries are clearer.</div>
+        </div>
+      </div>
+
+      <div class="question-item">
+        <div class="question-num">07</div>
+        <div class="question-content">
+          <div class="question-header">
+            <span class="question-title">CLI placement</span>
+            <span class="status-tag status-parked">parked</span>
+          </div>
+          <div class="question-body">Listed as secondary under both Container Platform and Agentic Platform. Is that the right model or does it need a clearer primary home?</div>
+        </div>
+      </div>
+
+      <div class="question-item">
+        <div class="question-num">08</div>
+        <div class="question-content">
+          <div class="question-header">
+            <span class="question-title">Governance Platform as infrastructure</span>
+            <span class="status-tag status-blocked">blocked</span>
+          </div>
+          <div class="question-body">The Code Red doc is explicit that Governance is the substrate, not a sibling product. The ia-map reflects this in the Admin section but the full implications — what "plugging in" means for each product, what's hosted on app.docker.com — are still being defined by Steven/Brian.</div>
+        </div>
+      </div>
+
+      <div class="question-item">
+        <div class="question-num">09</div>
+        <div class="question-content">
+          <div class="question-header">
+            <span class="question-title">DVP (Docker Verified Publisher) insights — missing journey</span>
+            <span class="status-tag status-parked">parked</span>
+          </div>
+          <div class="question-body">The product map PDF covers a distinct DVP surface: verified publishers get access to pull data on their images, separate from standard Hub repository management. This is a different role (ISV / commercial publisher) and a different job than the Hub Publisher journey here. Not yet represented in journeys.md or the IA map. Worth a dedicated journey if DVP is a meaningful segment.</div>
+        </div>
+      </div>
+
+      <div class="question-item">
+        <div class="question-num">10</div>
+        <div class="question-content">
+          <div class="question-header">
+            <span class="question-title">Churn &amp; contraction — missing from Billing journey</span>
+            <span class="status-tag status-parked">parked</span>
+          </div>
+          <div class="question-body">The PDF covers downgrade-to-free and seat removal as explicit flows (scheduled at end of billing cycle, no mid-tier downgrade supported). The Billing journey here covers subscribe, PAYG, seat addition, and usage review — but not the offboarding/contraction path. Low priority but worth adding when the Billing journey gets a deeper pass.</div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /content-inner -->
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- JOURNEY POOL (hidden) -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div id="journey-pool" hidden style="display:none">
+
+  <!-- Journey: Hub Publisher -->
+  <section id="journey-hub-publisher" class="journey-section">
+    <div class="journey-num-label">Journey 13</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Image distribution</div>
+        <div class="journey-title">Hub Publisher</div>
+        <div class="journey-persona-role">Persona: Developer · Platform Engineer</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">Developer or platform engineer sharing software or images for the community or team to use</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Make it easy for others to pull, set up, and run. Maintain a clear repository with good documentation and consistent tagging.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Stage 1</div>
+            <div class="stage-heading">Publishing: Build, tag, push</div>
+            <div class="stage-body">Builds an image locally → tags it → pushes to Hub → sets visibility (public or private) → writes a repository overview so others know how to use it. Team pulls it as a dependency.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 2</div>
+            <div class="stage-heading">Repository management: Manage tags, webhooks, and access</div>
+            <div class="stage-body">Manages tags across multiple image variants → sets up webhooks for downstream automation → controls repository access for the org namespace. Monitors pull counts and storage usage via Hub insights.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: Desktop & CLI -->
+  <section id="journey-desktop-cli" class="journey-section">
+    <div class="journey-num-label">Journey 06</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Local container development</div>
+        <div class="journey-title">Desktop &amp; CLI</div>
+        <div class="journey-persona-role">Persona: Developer</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">Developer building containerized applications day-to-day, using Desktop and CLI as their primary Docker interface</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Run and verify work in containers without managing dependencies locally. Get to a runnable setup quickly when starting something new.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Stage 1</div>
+            <div class="stage-heading">Typical workflow: Start work, run it in a container</div>
+            <div class="stage-body">Developer starts work on a feature → runs it in a container to verify behavior matches remote and avoid managing local dependencies → iterates using the CLI or Desktop UI for logs, exec, and container state.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 2</div>
+            <div class="stage-heading">New service setup: Pick a base image, wire up Compose, get running</div>
+            <div class="stage-body">Uses templates or Gordon to pick the right base image → wires up a Compose file → gets to a runnable and verifiable local setup. Desktop surfaces the running stack; CLI handles the commands.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: Model Runner -->
+  <section id="journey-model-runner" class="journey-section">
+    <div class="journey-num-label">Journey 01</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Local AI inference</div>
+        <div class="journey-title">Docker Model Runner</div>
+        <div class="journey-persona-role">Persona: Developer</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona — Alex</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">Developer building or integrating AI-powered features into their product</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Experience</span>
+            <span class="persona-field-value">Comfortable with Docker and CLI. Has used LLM APIs but hasn't run models locally before.</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Prototype AI features quickly, avoid cloud inference costs, keep data off third-party servers, avoid a new toolchain.</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Frustrations</span>
+            <span class="persona-field-value">Local model setup is fragmented — llama.cpp, Ollama, Hugging Face all separate from the container workflow. No standard way to version models alongside the stack.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Awareness</div>
+            <div class="stage-heading">"I need a better way to run models locally"</div>
+            <div class="stage-body">Cloud costs are adding up, setup is messy, every model has a different download process. A Docker blog post or colleague mention lands. The pitch — run models like containers — resonates immediately because Docker is already central to their workflow.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Consideration</div>
+            <div class="stage-heading">"Can this actually fit into how I work?"</div>
+            <div class="stage-body">Alex reads the docs and sees DMR uses the OpenAI-compatible API — no rewriting app code. Models are distributed as OCI artifacts on Docker Hub, the same registry they already use. The mental leap is small.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Activation</div>
+            <div class="stage-heading">"Let me try it"</div>
+            <div class="stage-body">Updates Docker Desktop, enables Model Runner in settings, runs a model with a single <code>docker model pull</code> command. Hits the local API endpoint and gets a response in seconds using GPU acceleration. The moment it just works without separate installs is the aha moment.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Engagement</div>
+            <div class="stage-heading">"I'm building with this"</div>
+            <div class="stage-body">Starts running models as part of the local dev loop, testing prompts, iterating on system instructions, integrating responses into the app. Uses Docker Compose to wire up the model alongside other services. Starts treating models like any other dependency.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Expansion</div>
+            <div class="stage-heading">"My team should use this too"</div>
+            <div class="stage-body">Shares the workflow with the team. Platform engineer sees the value of OCI-based model distribution for standardizing versions across environments. Team starts pulling models from Hub as part of CI, potentially publishing their own fine-tuned model as an OCI artifact.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: Gordon -->
+  <section id="journey-gordon" class="journey-section">
+    <div class="journey-num-label">Journey 02</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Contextual AI assistance</div>
+        <div class="journey-title">Gordon</div>
+        <div class="journey-persona-role">Persona: Developer</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">Developer using Docker Desktop daily across containerized apps, Dockerfiles, Compose, and CI pipelines</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Experience</span>
+            <span class="persona-field-value">Competent with Docker but not an expert. Frequently hits walls — cryptic build errors, containers that fail to start. Not enough time to optimize images.</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Unblock quickly without leaving the current workflow. Get better at Docker over time without reading the entire manual.</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Frustrations</span>
+            <span class="persona-field-value">Context switching is expensive. Generic AI chatbots give plausible but subtly wrong Docker answers because they lack context about the actual environment.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Awareness</div>
+            <div class="stage-heading">"Something broke and I need help"</div>
+            <div class="stage-body">Container fails to start. Notices Gordon right next to the container actions in Desktop, or a colleague mentions asking Gordon to optimize their Dockerfile. The entry point is frictionless — it's just there.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Consideration</div>
+            <div class="stage-heading">"Is this actually useful or just another chatbot?"</div>
+            <div class="stage-body">Skepticism is high after being burned by generic AI answers. Notices Gordon has access to their actual environment — running containers, logs, local files, Docker Scout findings. That context-awareness is the differentiator.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Activation</div>
+            <div class="stage-heading">"Let me try it on this error"</div>
+            <div class="stage-body">Opens the Ask Gordon panel on a failed container. Gordon reads the logs, identifies the issue, and suggests a fix with an explanation. No copy-pasting — the agent offers a solution and runs the commands. The answer is specific to their container. That first successful interaction is the aha moment.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Engagement</div>
+            <div class="stage-heading">"I use this daily now"</div>
+            <div class="stage-body">Starts asking Gordon proactively: "Rate my Dockerfile," "How do I run MongoDB?", "What does this Scout policy violation mean?" Uses it in both Desktop and the CLI depending on where they're working. Gordon becomes the first stop instead of the browser.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Expansion</div>
+            <div class="stage-heading">"The team should have this"</div>
+            <div class="stage-body">Team lead notices cleaner Dockerfiles and faster debugging. Enables Gordon for the team. As AI Governance is adopted, the platform engineer configures what Gordon can access and execute on behalf of developers, making it safe to roll out broadly.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: Compose GUI -->
+  <section id="journey-compose" class="journey-section">
+    <div class="journey-num-label">Journey 07</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Local to Kubernetes</div>
+        <div class="journey-title">Compose GUI</div>
+        <div class="journey-persona-role">Persona: Developer · DevOps Engineer</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">Developer moving from local Compose development toward Kubernetes, or DevOps engineer validating a deployment path</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Inspect a running Compose stack visually, then convert and deploy to Kubernetes without leaving Desktop.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Stage 1</div>
+            <div class="stage-heading">Compose File Viewer: Inspect the running stack</div>
+            <div class="stage-body">Runs a multi-container app locally with <code>docker compose up</code> → opens Desktop to inspect the running stack via the Compose File Viewer — config sections, service logs, lifecycle controls — without touching the CLI.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 2</div>
+            <div class="stage-heading">Compose Bridge: Convert and deploy to Kubernetes</div>
+            <div class="stage-body">Navigates to "Convert and Deploy to Kubernetes" → Compose Bridge generates Kubernetes manifests (Deployments, Services, ConfigMaps, Network Policies) → deploys to the local Desktop Kubernetes cluster → validates pod and service behavior.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: Build UI -->
+  <section id="journey-build-ui" class="journey-section">
+    <div class="journey-num-label">Journey 08</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Build troubleshooting &amp; optimization</div>
+        <div class="journey-title">Build UI in Desktop</div>
+        <div class="journey-persona-role">Persona: Developer · DevOps Engineer</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">Developer or DevOps engineer debugging a failing build or trying to understand performance regressions</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Understand what happened in a build, fix it fast, and make informed decisions about performance without reading raw logs.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Stage 1</div>
+            <div class="stage-heading">Debugging: Build fails — find out why</div>
+            <div class="stage-body">Triggers a build → it fails → opens Build UI → reads the build trace → identifies the failing layer → fixes the Dockerfile → rebuilds. Gordon is available inline to explain errors without leaving Desktop.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 2</div>
+            <div class="stage-heading">Performance: Compare builds to improve CI times</div>
+            <div class="stage-body">Focused on improving CI build times → uses Build UI to compare different builds side by side → understands performance impacts of Dockerfile changes → makes informed decisions before pushing to CI.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: Build Cloud -->
+  <section id="journey-build-cloud" class="journey-section">
+    <div class="journey-num-label">Journey 09</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Accelerated CI builds</div>
+        <div class="journey-title">Docker Build Cloud</div>
+        <div class="journey-persona-role">Persona: DevOps Engineer</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">DevOps engineer responsible for CI pipeline speed, reliability, and cost</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Radically reduce CI build times with shared cache. Understand build performance across the org. Debug complex pipelines without guessing.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Stage 1</div>
+            <div class="stage-heading">Speed up CI: Shared cache, faster builds</div>
+            <div class="stage-body">Connects Build Cloud to the CI pipeline → shared cache kicks in across builds → build times drop significantly. Team stops waiting on cold builds.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 2</div>
+            <div class="stage-heading">Analytics: Understand build performance across the org</div>
+            <div class="stage-body">Reviews build performance across a time period, user group, or organization → identifies slow repositories and cache miss patterns → makes informed decisions about Dockerfile structure and CI configuration.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 3</div>
+            <div class="stage-heading">Pipeline debugging: Debug a complex CI pipeline</div>
+            <div class="stage-body">A multi-build CI pipeline is failing intermittently → accesses build metadata and troubleshooting analytics across the entire pipeline → identifies the root cause without manually correlating logs across jobs.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: Offload -->
+  <section id="journey-offload" class="journey-section">
+    <div class="journey-num-label">Journey 10</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Cloud engine switching</div>
+        <div class="journey-title">Docker Offload</div>
+        <div class="journey-persona-role">Persona: Developer · DevOps Engineer</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">Developer on constrained hardware, or DevOps engineer managing remote workers who need a consistent Docker environment</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Run Docker workloads without being limited by local hardware. Keep the local experience unchanged while compute runs in the cloud.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Stage 1</div>
+            <div class="stage-heading">Individual dev: Offload from underpowered hardware</div>
+            <div class="stage-body">Developer on an older machine or VDI instance selects a cloud engine in Desktop → all Docker workloads run remotely → local experience is unchanged. No new toolchain, no config changes to the project.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 2</div>
+            <div class="stage-heading">Team rollout: Enable offload for a remote team</div>
+            <div class="stage-body">DevOps engineer enables offload for a team of remote workers on secure VDI instances → developers get consistent build and run performance regardless of local hardware → no disruption to existing workflows.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 3</div>
+            <div class="stage-heading">AI workloads: GPU-focused cloud engine for AI</div>
+            <div class="stage-body">Developer working on AI features selects a GPU-focused cloud engine → runs all AI workloads through Offload regardless of local GPU support → no separate cloud account or infra to manage.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: Sandboxes -->
+  <section id="journey-sandboxes" class="journey-section">
+    <div class="journey-num-label">Journey 11</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Agentic isolation &amp; governance</div>
+        <div class="journey-title">Docker Sandboxes</div>
+        <div class="journey-persona-role">Persona: Developer · DevOps Engineer · IT Admin</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">Developer running agents locally, DevOps engineer managing agentic CI, or IT Admin setting org-level guardrails</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Run agents safely without risking the local filesystem or network. Enable parallel agent threads. Give admins control over what agents can do.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Stage 1</div>
+            <div class="stage-heading">Local isolation: Run an agent without risking local state</div>
+            <div class="stage-body">Developer isolates a coding agent in a local sandbox → agent runs in YOLO mode to accomplish a task without risking the local filesystem or making rogue network calls.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 2</div>
+            <div class="stage-heading">Parallel threads: Multiple agents on the same codebase</div>
+            <div class="stage-body">Engineer runs multiple agent threads on the same working directory using <code>--branch</code> → each thread is isolated → no local file conflicts while sharing the same codebase.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 3</div>
+            <div class="stage-heading">Cloud sandboxes: Agentic isolation across CI and cloud</div>
+            <div class="stage-body">DevOps engineer uses <code>sbx --cloud</code> to enable agentic isolation across local, CI, and public views → consistent governance model regardless of where the agent runs.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 4</div>
+            <div class="stage-heading">Org governance: Set guardrails for the whole org</div>
+            <div class="stage-body">IT Admin configures agentic controls in Admin Console → decides which levels of sandbox enforcement are required or optional → development team uses agents safely and predictably within those bounds.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: DHI -->
+  <section id="journey-dhi" class="journey-section">
+    <div class="journey-num-label">Journey 12</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Secure base images</div>
+        <div class="journey-title">Docker Hardened Images</div>
+        <div class="journey-persona-role">Persona: Platform Engineer · Security Lead · Developer</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">Platform or security engineer reducing vulnerability surface across the org, or developer pulling a hardened base image for a regulated environment</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Swap in hardened base images, mirror them to an internal registry, and apply org-specific customizations without disrupting developer workflows.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Stage 1</div>
+            <div class="stage-heading">Catalog: Browse and select hardened images</div>
+            <div class="stage-body">Security engineer audits services across the org → browses the DHI catalog → identifies hardened equivalents for current base images → selects images with the right compliance profile (CIS, FIPS, STIG).</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 2</div>
+            <div class="stage-heading">Mirroring: Mirror to internal registry</div>
+            <div class="stage-body">Platform engineer configures mirroring → DHI images are copied to the org's private registry → developers pull from the internal mirror without touching the public catalog directly. Keeps the supply chain clean.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 3</div>
+            <div class="stage-heading">Customizations: Apply org-specific changes</div>
+            <div class="stage-body">Platform engineer creates a customization — adds content or changes configuration on top of a DHI image via the UI → customization triggers a rebuild → the resulting image is available in the org's mirror with the changes baked in.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: Agentic Platform -->
+  <section id="journey-agentic" class="journey-section">
+    <div class="journey-num-label">Journey 03</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Autonomous development</div>
+        <div class="journey-title">Agentic Platform</div>
+        <div class="journey-persona-role">Persona: Tech Lead</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">Tech lead managing multiple repos while also writing new features, handling PR reviews, and keeping docs in sync</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Experience</span>
+            <span class="persona-field-value">Comfortable with GitHub, Docker, and AI coding tools. Has used Copilot and Claude Code but finds them too babysitter-intensive for end-to-end work.</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Offload repetitive, well-defined coding work to autonomous agents without losing visibility. BYOK for billing control. Agents that behave like specialists, not chat tools.</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Frustrations</span>
+            <span class="persona-field-value">Existing AI tools require staying in the loop for every step. No way to run agents on a schedule or tie them to GitHub workflow without complex infra. Too many tools managed separately.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Awareness</div>
+            <div class="stage-heading">"I need agents that actually do the work, not just suggest it"</div>
+            <div class="stage-body">Hears about the platform through Docker's blog, a colleague, or a conference talk. The promise — agents that take action on a real codebase, securely, and surface results as PRs — is different from chat-based AI.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Consideration</div>
+            <div class="stage-heading">"Can I trust this with my repo?"</div>
+            <div class="stage-body">Signs in with Docker ID — no new account. Onboarding orients around: project ties together a repository, a team of agents, and a session history. Connects a GitHub repo with clearly scoped permissions: read, create PRs, read issues.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Activation</div>
+            <div class="stage-heading">"Let me see what it can do"</div>
+            <div class="stage-body">Describes a task in plain language. Selects an agent. Agent runs in a secure cloud sandbox and produces a PR. The moment she reviews that PR and finds it credible is the aha moment.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Engagement</div>
+            <div class="stage-heading">"I'm customizing this for how we work"</div>
+            <div class="stage-body">Creates a custom reviewer agent with specific instructions for her codebase, enables the GitHub capability, connects Slack for status updates. Uses the BYOK flow to connect her Anthropic API key, keeping billing and usage under her control.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Expansion</div>
+            <div class="stage-heading">"This is now part of our routine"</div>
+            <div class="stage-body">Sets up a daily schedule — reviewer agent on all open PRs at 9am, weekly documentalist run for the CHANGELOG. Engineering manager sees the session history and artifacts, rolls the platform out to the broader team.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Retention</div>
+            <div class="stage-heading">"Agents as teammates"</div>
+            <div class="stage-body">The platform handles PR reviews, issue triaging, test writing, and doc maintenance. Monitors sessions the way she'd monitor CI — checks in when something fails or needs approval, and mostly trusts the agents to handle the rest.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: MCP Toolkit -->
+  <section id="journey-mcp" class="journey-section">
+    <div class="journey-num-label">Journey 04</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">AI tooling setup</div>
+        <div class="journey-title">MCP Toolkit</div>
+        <div class="journey-persona-role">Persona: Developer</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">Developer configuring AI tooling that can be standardized and shared across a team</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Experience</span>
+            <span class="persona-field-value">Familiar with Docker Desktop and AI clients like Claude Desktop or Cursor. Has hit friction setting up MCP servers individually across teammates.</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Browse and connect MCP servers in one place, complete auth once, connect a preferred AI client, share a repeatable profile with the team.</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Frustrations</span>
+            <span class="persona-field-value">MCP server setup is manual and per-person. No standard way to version or share a configuration across a team.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Awareness</div>
+            <div class="stage-heading">"I want a standard way to manage my MCP setup"</div>
+            <div class="stage-body">Discovers the MCP catalog in Docker Desktop. A single place to browse, configure, and share MCP servers removes the per-person setup overhead.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Activation</div>
+            <div class="stage-heading">"Let me connect a server"</div>
+            <div class="stage-body">Browses the catalog, selects a server, completes OAuth or manual config. The Gateway handles routing — no additional configuration needed in the AI client.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Engagement</div>
+            <div class="stage-heading">"I'm connecting my AI client"</div>
+            <div class="stage-body">Goes to the Clients tab and connects Claude Desktop, Cursor, or another AI client. Requests from the client are routed to the correct MCP server through the Gateway automatically.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Expansion</div>
+            <div class="stage-heading">"My team should use this profile"</div>
+            <div class="stage-body">Exports or shares the profile with the team. Others connect without repeating the OAuth or config steps.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: Billing -->
+  <section id="journey-billing" class="journey-section">
+    <div class="journey-num-label">Journey 14</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Subscription &amp; spend management</div>
+        <div class="journey-title">Billing</div>
+        <div class="journey-persona-role">Persona: Procurement · IT Admin</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Persona</div>
+          <div class="persona-field">
+            <span class="persona-field-label">Role</span>
+            <span class="persona-field-value">Procurement owner managing Docker spend, or IT Admin handling license quantities as the team grows</span>
+          </div>
+          <div class="persona-field">
+            <span class="persona-field-label">Goals</span>
+            <span class="persona-field-value">Subscribe to the right plan, control PAYG spend, keep seat counts accurate, and understand what the org is paying for.</span>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Stage 1</div>
+            <div class="stage-heading">Subscribe: Choose a plan and add-ons</div>
+            <div class="stage-body">Procurement subscribes to Pro, Team, or Business → adds Gordon and/or DHI as add-ons if needed → selects annual or monthly billing cycle → completes checkout.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 2</div>
+            <div class="stage-heading">PAYG: Enable and control on-demand spend</div>
+            <div class="stage-body">Enables PAYG for Build Cloud or Offload → sets a spend limit → monitors usage against committed spend → adjusts on-demand settings if the team is burning through budget faster than expected.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 3</div>
+            <div class="stage-heading">Seat management: Add or remove seats as the team changes</div>
+            <div class="stage-body">Team grows → adds seats mid-cycle → prorated charge applied. Team contracts → schedules seat removal at end of billing cycle. Downgrade to free is scheduled, not immediate.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Stage 4</div>
+            <div class="stage-heading">Usage review: Understand what the org is spending</div>
+            <div class="stage-body">Reviews usage dashboards at end of month — build minutes, Offload sessions, agent runs — against committed spend. Downloads invoices. Adjusts plan or quantities for the next cycle.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Journey: Admin & provisioning -->
+  <section id="journey-admin" class="journey-section">
+    <div class="journey-num-label">Journey 05</div>
+    <div class="journey-card">
+      <div class="journey-card-header">
+        <div class="journey-tag">Platform governance</div>
+        <div class="journey-title">Admin &amp; org provisioning</div>
+        <div class="journey-persona-role">Persona: IT Admin · Procurement · Security Lead</div>
+      </div>
+      <div class="journey-card-body">
+        <div class="persona-block">
+          <div class="persona-block-title">Personas</div>
+          <div class="persona-cols">
+            <div>
+              <div class="persona-col-title">Procurement</div>
+              <div class="persona-col-body">Manages subscriptions, license quantities, and spend controls. Cares about cost visibility and plan flexibility.</div>
+            </div>
+            <div>
+              <div class="persona-col-title">IT Admin</div>
+              <div class="persona-col-body">Handles org onboarding, SSO, automated provisioning, and license assignment. Cares about consistency and auditability.</div>
+            </div>
+            <div>
+              <div class="persona-col-title">Security Lead</div>
+              <div class="persona-col-body">Manages network, filesystem, and AI governance policies. Cares about blast radius and enforcement.</div>
+            </div>
+          </div>
+        </div>
+        <div class="journey-stages">
+          <div class="stage">
+            <div class="stage-label">Billing</div>
+            <div class="stage-heading">Subscribe and manage spend</div>
+            <div class="stage-body">Procurement subscribes to the appropriate plan (Pro, Team, Business) and add-ons (Gordon, DHI). Enables or disables PAYG, manages costs and usage, updates license quantities as the team grows.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Org onboarding</div>
+            <div class="stage-heading">Set up the organization</div>
+            <div class="stage-body">IT Admin creates the org, configures SSO, and automates user provisioning via SCIM. Manages authentication and handles license assignment across the team.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Policy config</div>
+            <div class="stage-heading">Configure governance</div>
+            <div class="stage-body">IT Admin receives a policy requirement — for example, restricting registry access — finds the setting in Admin Console, and deploys it. Security Lead configures network and filesystem policies for AI tools, and sets governance rules for what Gordon can access and execute on behalf of developers.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">Compliance</div>
+            <div class="stage-heading">Verify and monitor</div>
+            <div class="stage-body">IT Admin verifies enforcement via Compliance Reporting and monitors adoption across the org. Resolves compliance issues as they surface.</div>
+          </div>
+          <div class="stage">
+            <div class="stage-label">DHI</div>
+            <div class="stage-heading">Hardened Images for regulated environments</div>
+            <div class="stage-body">IT Admin and the security team configure the hardened image catalog, set up registry mirroring, and apply org-specific customizations.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /journey-pool -->
+
+<!-- ─── MODAL ──────────────────────────────────────────────────────── -->
+<div id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-area-name">
+  <div id="modal-panel">
+    <div id="modal-header">
+      <div>
+        <div id="modal-area-eyebrow">Journeys</div>
+        <div id="modal-area-name"></div>
+      </div>
+      <button id="modal-close" aria-label="Close journeys panel">✕</button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+  // ─── DATA ──────────────────────────────────────────────────────
+  const AREA_JOURNEYS = {
+    'hub': ['journey-hub-publisher'],
+    'container-platform': ['journey-desktop-cli','journey-model-runner','journey-gordon','journey-compose','journey-build-ui','journey-build-cloud','journey-offload','journey-sandboxes','journey-dhi'],
+    'agentic-platform': ['journey-agentic','journey-mcp'],
+    'admin': ['journey-billing','journey-admin']
+  };
+
+  const AREA_NAMES = {
+    'hub': 'Hub',
+    'container-platform': 'Container Platform',
+    'agentic-platform': 'Agentic Platform',
+    'admin': 'Admin'
+  };
+
+  // ─── MODAL ─────────────────────────────────────────────────────
+  const modal = document.getElementById('modal');
+  const modalPanel = document.getElementById('modal-panel');
+  const modalBody = document.getElementById('modal-body');
+  const modalAreaName = document.getElementById('modal-area-name');
+  const modalClose = document.getElementById('modal-close');
+  const journeyPool = document.getElementById('journey-pool');
+
+  function openModal(area, scrollToId) {
+    const journeyIds = AREA_JOURNEYS[area];
+    if (!journeyIds) return;
+
+    // Clear previous content
+    modalBody.innerHTML = '';
+    modalAreaName.textContent = AREA_NAMES[area] || area;
+
+    // Clone journeys from pool
+    journeyIds.forEach(id => {
+      const source = journeyPool.querySelector('#' + id);
+      if (!source) return;
+      const clone = source.cloneNode(true);
+      // Strip id, store as data-src-id
+      clone.setAttribute('data-src-id', clone.id);
+      clone.removeAttribute('id');
+      modalBody.appendChild(clone);
+    });
+
+    // Show modal
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    // Scroll to specific journey if requested
+    if (scrollToId) {
+      requestAnimationFrame(() => {
+        const target = modalBody.querySelector('[data-src-id="' + scrollToId + '"]');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    } else {
+      modalBody.scrollTop = 0;
+    }
+  }
+
+  function closeModal() {
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Close button
+  modalClose.addEventListener('click', closeModal);
+
+  // Click outside panel
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+
+  // Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal.classList.contains('open')) closeModal();
+  });
+
+  // ─── AREA CARD CLICKS ──────────────────────────────────────────
+  document.querySelectorAll('.area-card.clickable').forEach(card => {
+    card.addEventListener('click', () => {
+      const area = card.getAttribute('data-area');
+      openModal(area, null);
+    });
+
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        const area = card.getAttribute('data-area');
+        openModal(area, null);
+      }
+    });
+  });
+
+  // ─── JOURNEY NAV LINKS ─────────────────────────────────────────
+  document.querySelectorAll('.nav-sub-link[data-area]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      const area = link.getAttribute('data-area');
+      const srcId = link.getAttribute('data-src-id');
+      openModal(area, srcId);
+    });
+  });
+
+  // ─── SCROLL SPY ────────────────────────────────────────────────
+  const mainSections = document.querySelectorAll('main .content-section, main .page-header');
+  const navLinks = document.querySelectorAll('#sidebar .nav-link[href]');
+
+  const sectionMap = {};
+  mainSections.forEach(section => {
+    if (section.id) sectionMap[section.id] = section;
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        navLinks.forEach(link => {
+          const href = link.getAttribute('href');
+          if (href === '#' + id) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      }
+    });
+  }, {
+    rootMargin: '-20% 0px -70% 0px',
+    threshold: 0
+  });
+
+  mainSections.forEach(section => {
+    if (section.id) observer.observe(section);
+  });
+
+  // ─── SMOOTH SCROLL FOR NAV LINKS ───────────────────────────────
+  navLinks.forEach(link => {
+    link.addEventListener('click', (e) => {
+      const href = link.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }
+    });
+  });
+</script>
+</body>
+</html>
