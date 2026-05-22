@@ -27,10 +27,12 @@ Things that should not exist or should be radically cut before being rebuilt:
 |---|---|---|
 | **www** | Execs, senior leaders evaluating Docker | Marketing, product pages, pricing, conversion |
 | **Docs** | Anyone using the tools | Full documentation, guides, reference |
-| **Hub** | Developers publishing and pulling images | Image registry, search, org namespaces |
-| **Container Platform** | Developers working with containers | Docker Desktop, Build, Compose, CLI (secondary) |
-| **Admin** | IT admins, security leads, procurement | Org management, billing, governance, provisioning |
-| **Agentic Platform** | Developers working with AI agents | Agent sessions, MCP, Gordon, CLI (secondary) |
+| **Hub** | Developers publishing and pulling images | Image registry, marketplace, search, org namespaces |
+| **Container Platform** | Developers working with containers | Docker Desktop, Build, Compose, Secure Artifacts, CLI (secondary) |
+| **Admin** | IT admins, security leads, procurement | Org management, billing, governance config, provisioning |
+| **Agentic Platform** | Developers working with AI agents | Agent sessions, MCP, Gordon, Cloud Sandboxes, CLI (secondary) |
+
+*Note: Hub is kept as a standalone area for now even though the Container Platform org owns it. Worth revisiting.*
 
 ---
 
@@ -77,9 +79,7 @@ Things that should not exist or should be radically cut before being rebuilt:
 **What lives here:**
 - Image registry (push, pull, search, browse)
 - Org namespaces and repository management
-- Docker Hardened Images (DHI) catalog
-- DHI mirroring and customizations
-- Image vulnerability data (Scout integration, surfaced in context)
+- Marketplace
 - Webhooks and access tokens for registry automation
 
 **Key workflows:**
@@ -87,17 +87,20 @@ Things that should not exist or should be radically cut before being rebuilt:
 *Publishing*
 Developer builds an image locally → tags it → pushes to Hub → sets visibility (public/private) → team pulls it as a dependency.
 
-*Hardened Images*
-Security or platform engineer browses the DHI catalog → selects a base image → configures mirroring to internal registry → applies org-specific customizations → developers pull from internal mirror without touching the public catalog directly.
+*Discovery*
+Developer searches Hub for a base image or tool → browses the Marketplace → pulls and integrates.
 
 **What does not live here:**
+- Hardened Images catalog and mirroring (Container Platform — Secure Artifacts)
 - Full billing (billing widget: yes — shows pull/storage usage; full plan management: Admin)
-- User auth settings (Admin)
+- Org-level auth (Admin)
 - Container runtime (Desktop)
 
 ---
 
 ## Container Platform
+
+**Org owner:** Container Platform group (Desktop Runtime, Desktop Platform, Desktop Delivery, Developer Productivity, Offload, Hub, Secure Artifacts, Secure Build)
 
 **Primary users:** Backend engineers, DevOps engineers, platform engineers working with containers day-to-day.
 
@@ -107,16 +110,22 @@ Security or platform engineer browses the DHI catalog → selects a base image �
   - Compose File Viewer
   - Compose Bridge (local → Kubernetes)
   - Build UI (build history, troubleshooting, performance comparison)
-  - Gordon (AI assistant, context-aware to local environment)
-  - MCP Toolkit (browse, configure, share MCP server profiles)
+  - Gordon (AI assistant, context-aware to local environment — see note)
   - Docker Offload (local/cloud engine switching)
-  - Docker Sandboxes (isolation for agentic and multi-thread work)
+  - Coding Agent Sandboxes (local isolation for agentic work — see note)
   - User-level settings for all of the above
 - Docker Build Cloud
   - Shared cache, accelerated CI builds
   - Build performance analytics (org, user, time period)
   - CI pipeline debugging and metadata
   - Billing widget (shows build minutes used; full plan in Admin)
+- Secure Artifacts
+  - Docker Hardened Images (DHI) catalog
+  - DHI mirroring and org-specific customizations
+  - Helm Charts
+  - Developer Experience tooling
+  - DOI (Docker Official Images)
+- Secure Build
 - CLI (secondary surface — commands map to Desktop and Build Cloud capabilities)
 
 **Key workflows:**
@@ -133,25 +142,30 @@ Developer runs a multi-container app locally with `docker compose up` → inspec
 *Offload*
 Engineer on underpowered hardware selects a cloud engine in Desktop → all Docker workloads run remotely → local experience is unchanged. DevOps manager enables offload for a team of remote workers on VDI instances.
 
-*Sandboxes*
-Developer isolates a coding agent in a sandbox → agent runs in YOLO mode → no risk to local filesystem or network. Engineer runs multiple agent threads on the same working directory using `--branch` for isolation without file conflicts.
+*Hardened Images*
+Security or platform engineer browses the DHI catalog → selects a base image → configures mirroring to internal registry → applies org-specific customizations → developers pull from internal mirror without touching the public catalog directly.
+
+*Local coding agent sandbox*
+Developer isolates a coding agent in a local sandbox → agent runs without risk to local filesystem or network. Engineer runs multiple agent threads on the same working directory using `--branch` for isolation without file conflicts.
 
 **User settings that live here:**
 - Model Runner configuration
 - Build Cloud preferences
 - Offload engine selection
 - Gordon access and behavior (user level — org-level governance is in Admin)
-- MCP server profiles and client connections
 - Desktop resource limits (CPU, memory, disk)
 
 **What does not live here:**
-- Org-level policy enforcement (Admin)
+- Org-level policy enforcement (Admin / Governance Platform)
 - Full billing (billing widget: yes; plan management: Admin)
-- Agent session history and scheduling (Agentic Platform)
+- Agent session history, scheduling, cloud sandboxes (Agentic Platform)
+- MCP Toolkit (Agentic Platform — owned by AI Tools & Security)
 
 ---
 
 ## Agentic Platform
+
+**Org owner:** Agents group (Gordon, Agent Builder, Cloud Group, AI Tools & Security, AI Models & Infra)
 
 **Primary users:** Senior engineers and tech leads who want to delegate well-defined coding work to autonomous agents.
 
@@ -163,6 +177,8 @@ Developer isolates a coding agent in a sandbox → agent runs in YOLO mode → n
 - BYOK (bring your own API key — Anthropic, OpenAI, etc.)
 - Slack and GitHub integrations
 - Session artifacts (PRs opened, diffs, logs)
+- MCP Toolkit (browse, configure, share MCP server profiles — owned by AI Tools & Security)
+- Cloud Sandboxes (`sbx --cloud` — owned by Cloud Group)
 - User-level settings for all of the above
 - CLI (secondary surface — `docker agent run`, session status, log tailing)
 
@@ -177,21 +193,30 @@ Developer creates a custom reviewer agent with specific instructions for their c
 *Scheduled automation*
 Tech lead sets up a daily schedule: reviewer agent runs on all open PRs at 9am. Weekly: documentalist agent updates the CHANGELOG. Engineering manager monitors session history the way they'd monitor CI.
 
+*MCP server setup*
+Developer browses the MCP catalog → selects servers → completes OAuth or config → connects AI client (Claude Desktop, Cursor) → Gateway routes requests automatically → exports profile for team reuse.
+
 **User settings that live here:**
 - API key management (BYOK)
 - GitHub and Slack integration credentials
 - Agent default behavior and instructions
+- MCP server profiles and client connections
 
 **What does not live here:**
-- Org-level agent governance (Admin — what agents can access and execute)
+- Org-level agent governance (Admin / Governance Platform)
 - Container runtime (Desktop)
+- Local coding agent sandboxes (Container Platform)
 - Full billing (billing widget: yes — shows agent minutes/API spend; plan management: Admin)
 
 ---
 
 ## Admin
 
+**Org owner:** Bridge group (Governance/Accounts/IAM, Billing, Operations, Data & Growth)
+
 **Primary users:** IT admins, security leads, procurement, engineering managers at Business-tier orgs.
+
+**Important distinction:** Admin is the UI where org admins configure governance. The Governance Platform is the underlying substrate (owned by Bridge) that Container Platform, Agentic Platform, and other products plug into. Admin exposes the controls; the platform enforces them.
 
 **What lives here:**
 - **Billing and subscriptions**
@@ -208,16 +233,17 @@ Tech lead sets up a daily schedule: reviewer agent runs on all open PRs at 9am. 
 - **Authentication**
   - SSO provider management
   - Session and token policies
-- **Policy configuration**
+- **Governance configuration** *(UI into the Governance Platform substrate)*
   - Registry access restrictions
   - Network and filesystem policies for AI tools
-  - AI governance: what Gordon can access and execute on behalf of developers
+  - Gordon governance: what Gordon can access and execute on behalf of developers
   - Agentic Platform governance: sandbox controls, agent permission levels, blast radius limits
+  - Cross-product policy enforcement
 - **Compliance and monitoring**
   - Compliance Reporting
   - Adoption monitoring across the org
   - Audit logs
-- **Inside sales and provisioning** (internal tooling)
+- **Inside sales and provisioning** *(internal tooling, not customer-facing)*
   - Org provisioning for sales-assisted deals
   - License management for enterprise accounts
 
@@ -237,20 +263,25 @@ Procurement subscribes to Team plan + Gordon add-on → enables PAYG for Build C
 
 **What does not live here:**
 - User-level settings for any product (those live in the product)
+- The Governance Platform substrate itself (Bridge-owned infrastructure, not a product surface)
 - The actual product experiences (Gordon, agents, builds) — Admin governs them, doesn't host them
 
 ---
 
 ## Open questions
 
-1. **Gordon vs. Agentic Platform overlap.** Gordon (in Desktop) helps a developer in the moment — it has context about their local environment. The Agentic Platform runs agents autonomously on a codebase. The line: Gordon is synchronous and local. Agentic Platform is async and cloud. They share the AI-acts-on-your-behalf surface but serve different moments. Worth making this distinction explicit in product copy.
+1. **Gordon placement.** Gordon is owned by the Agents group but lives in Docker Desktop (Container Platform). The ia-map has it under Container Platform. The org has it under Agents. This tension needs a resolution — does Gordon have a presence in both, or does it move fully to Agentic Platform?
 
-2. **Admin: one workflow or three for AI governance?** Admin serves procurement (billing), IT admins (provisioning), and security leads (governance) with pretty different goals. The settings are in the same place but the jobs-to-be-done are distinct enough that the navigation inside Admin probably needs to reflect three different entry points, not one flat list.
+2. **Coding Agent Sandboxes vs. Cloud Sandboxes.** Coding Agent Sandboxes (local, Dash Runtime group) is under Container Platform here. Cloud Sandboxes (Cloud Group) is under Agentic Platform. This split maps to the org but may be confusing to users who just think of "sandboxes." Worth a shared entry point or at least consistent naming.
 
-3. **MCP Toolkit placement.** Currently under Container Platform / Desktop. If MCP becomes a first-class agentic primitive (agents consuming MCP servers), it may want a presence in Agentic Platform too. For now: primary home is Desktop, secondary surface in Agentic Platform.
+3. **Admin: one workflow or three?** Admin serves procurement (billing), IT admins (provisioning), and security leads (governance) with pretty different goals. The navigation inside Admin probably needs three distinct entry points, not one flat list.
 
-4. **Docs panels ownership.** A platform team owns the component. Docs team owns the content. Which team decides where panels appear and what content they surface? Needs an owner before this scales.
+4. **MCP placement.** MCP is owned by AI Tools & Security (Agents group) and listed under Agentic Platform here. But MCP Toolkit in Desktop has historically lived in Container Platform. Primary home: Agentic Platform. Secondary surface: Desktop. Needs to be explicit in both places.
 
-5. **DHI: Hub or Admin?** The catalog and pull experience lives in Hub. The org-level mirroring configuration and customizations feel more like Admin (IT admin sets it up, not the developer). Currently listed under Hub — worth a conversation.
+5. **Docs panels ownership.** A platform team owns the component. Docs team owns the content. Which team decides where panels appear and what content they surface? Needs an owner before this scales.
 
-6. **CLI placement.** Currently listed as a secondary surface under both Container Platform and Agentic Platform. Is that the right model or does it need a clearer primary home?
+6. **Hub org ownership.** Hub (Registry + Marketplace) is owned by the Container Platform group but kept as a standalone area in this map. Revisit once the product surface boundaries are clearer.
+
+7. **CLI placement.** Listed as secondary under both Container Platform and Agentic Platform. Is that the right model or does it need a clearer primary home?
+
+8. **Governance Platform as infrastructure.** The Code Red doc is explicit that Governance is the substrate, not a sibling product. The ia-map reflects this in the Admin section but the full implications (what "plugging in" means for each product, what's hosted on app.docker.com) are still being defined by Steven/Brian.
